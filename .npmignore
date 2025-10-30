@@ -1,0 +1,11 @@
+# Keep package lean; dist is whitelisted by package.json files field
+src/
+*.map
+*.log
+.DS_Store
+.vscode/
+.idea/
+.github/
+**/*.test.*
+**/__tests__/**
+**/*.spec.*

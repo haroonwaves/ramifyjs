@@ -1,0 +1,56 @@
+{
+	"name": "memdb",
+	"version": "0.1.0",
+	"description": "Lightweight in-memory DB/query utilities with live queries.",
+	"type": "module",
+	"main": "dist/index.js",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"sideEffects": false,
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"postbuild": "tsc-alias -p tsconfig.json",
+		"clean": "rimraf dist || rm -rf dist",
+		"prepublishOnly": "npm run build"
+	},
+	"peerDependencies": {
+		"react": ">=18"
+	},
+	"devDependencies": {
+		"@types/react": "^18.0.0",
+		"@typescript-eslint/eslint-plugin": "^8.46.2",
+		"@typescript-eslint/parser": "^8.46.2",
+		"eslint": "^9.38.0",
+		"tsc-alias": "^1.8.10",
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"sorted-btree": "^1.0.0"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"keywords": [
+		"in-memory",
+		"database",
+		"query",
+		"react",
+		"livequery",
+		"observable"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/haroonwaves/ramify-db.git"
+	},
+	"author": "Usman Haroon",
+	"license": "MIT"
+}

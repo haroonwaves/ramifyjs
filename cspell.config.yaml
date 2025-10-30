@@ -1,0 +1,29 @@
+version: '0.2'
+language: en
+allowCompoundWords: true
+useGitignore: true
+gitignoreRoot: '.' # Prevent searching for .gitignore files past root
+
+ignorePaths:
+  - '**/*.{png,jpg,jpeg,gif,svg,icns}'
+  - '**/*.min.*'
+
+words:
+  - eslint
+  - remify
+  - tsbuildinfo
+  - tsconfig
+  - tseslint
+  - typecheck
+  - icns
+
+dictionaries:
+  - css
+  - html
+  - node
+  - npm
+  - typescript
+  - rust
+  - rust-common
+  - companies
+  - misc
