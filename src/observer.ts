@@ -19,11 +19,11 @@ export class NotificationManager {
 	constructor(collectionName: string) {
 		this.collectionName = collectionName;
 		this.observers[this.collectionName] = new Set();
-		this.notifiers[this.collectionName] = debounce((operation: CollectionOperation) => {
+		this.notifiers[this.collectionName] = debounce((operation: unknown) => {
 			const observers = this.observers[this.collectionName];
 			if (!observers) return;
 
-			for (const obs of observers) obs(operation);
+			for (const obs of observers) obs(operation as CollectionOperation);
 		}, 70);
 	}
 

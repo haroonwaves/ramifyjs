@@ -6,7 +6,7 @@ export type Subscribable = {
 
 export function useLiveQuery<T>(
 	callback: () => T,
-	dependencies: { collections: Subscribable[]; others: any[] }
+	dependencies: { collections: readonly Subscribable[]; others: readonly unknown[] }
 ) {
 	const [result, setResult] = useState<T | null>(null);
 

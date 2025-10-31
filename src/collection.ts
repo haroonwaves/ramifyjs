@@ -19,8 +19,8 @@ function createBTreeKey<T>(document: T): BTreeKey<T> {
 	return { ...document };
 }
 
-function getNestedValue(obj: any, path: string): any {
-	return path.split('.').reduce((acc, part) => acc?.[part], obj);
+function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+    return path.split('.').reduce<unknown>((acc, part) => (acc as Record<string, unknown>)?.[part], obj);
 }
 
 export class Collection<T = any> {
@@ -30,7 +30,7 @@ export class Collection<T = any> {
 	readonly multiEntryIndexes: string[];
 
 	protected data: Map<any, T>;
-	protected indexMaps: { [key: string]: Map<any, Map<any, T>> };
+    protected indexMaps: { [key: string]: Map<unknown, Map<unknown, T>> };
 	protected sortedBTree: BTree<T> | null;
 
 	protected observer: NotificationManager;
@@ -205,8 +205,8 @@ export class Collection<T = any> {
 		return this.observer.unsubscribe(cb);
 	}
 
-	private addToIndex(index: string, document: T): void {
-		const value = getNestedValue(document, index);
+    private addToIndex(index: string, document: T): void {
+        const value = getNestedValue(document as unknown as Record<string, unknown>, index);
 		const indexMap = this.indexMaps[index];
 		if (!indexMap) return;
 
@@ -217,8 +217,8 @@ export class Collection<T = any> {
 		}
 	}
 
-	private removeFromIndex(index: string, document: T): void {
-		const value = getNestedValue(document, index);
+    private removeFromIndex(index: string, document: T): void {
+        const value = getNestedValue(document as unknown as Record<string, unknown>, index);
 		const indexMap = this.indexMaps[index];
 		if (!indexMap) return;
 
@@ -239,11 +239,11 @@ export class Collection<T = any> {
 		indexMap.set(field, documentsMap);
 	}
 
-	private removeFromSet<V extends { [K in keyof T]: T[K] }>(
-		indexMap: Map<any, Map<any, V>>,
-		field: any,
-		document: V
-	): void {
+    private removeFromSet<V extends { [K in keyof T]: T[K] }>(
+        indexMap: Map<unknown, Map<unknown, V>>,
+        field: unknown,
+        document: V
+    ): void {
 		const documentsMap = indexMap.get(field);
 		if (documentsMap) {
 			documentsMap.delete(document[this.primaryKey]);

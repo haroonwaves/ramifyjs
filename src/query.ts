@@ -1,7 +1,7 @@
 import { Collection } from '@/collection.js';
 
 export type Criteria<T> = {
-	[key in keyof T]?: T[key];
+	[K in keyof T]?: T[K] | T[K][];
 };
 
 type OrderDirection = 'asc' | 'desc';
@@ -14,7 +14,7 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 
 export class Query<T = any> {
 	private results: T[] | null = null;
-	private whereField: string | null = null;
+	private whereField: Extract<keyof T, string> | null = null;
 	private orderField: keyof T | null = null;
 	private orderDirection: OrderDirection = 'asc';
 	private limitCount: number | null = null;
@@ -40,18 +40,20 @@ export class Query<T = any> {
 			) {
 				throw new Error('Ramify: The field is not a primary key or an index');
 			}
-			this.whereField = criteriaStr;
+			this.whereField = criteriaStr as Extract<keyof T, string>;
 			this.criteria = {} as Criteria<T>;
 		}
 	}
 
 	anyOf(values: T[keyof T][]): this {
-		if (this.whereField) (this.criteria as any)[this.whereField] = values;
+		if (this.whereField)
+			this.criteria[this.whereField] = values as Criteria<T>[typeof this.whereField];
 		return this;
 	}
 
 	equals(value: T[keyof T]): this {
-		if (this.whereField) this.criteria[this.whereField as keyof T] = value;
+		if (this.whereField)
+			this.criteria[this.whereField] = value as Criteria<T>[typeof this.whereField];
 		return this;
 	}
 
