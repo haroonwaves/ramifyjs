@@ -2,10 +2,10 @@ import { NotificationManager, type Observer } from '@/observer.js';
 import { Query, type Criteria } from '@/query.js';
 import BTree from 'sorted-btree';
 
-export type CollectionSchema<T = any> = {
-	primaryKey: keyof T;
-	indexes?: Array<string>;
-	multiEntry?: Array<string>;
+export type CollectionSchema<T, PK extends keyof T = keyof T> = {
+	primaryKey: PK;
+	indexes?: Array<keyof T & string>;
+	multiEntry?: Array<keyof T & string>;
 	bTree?: (a: T, b: T) => number;
 };
 
@@ -20,23 +20,25 @@ function createBTreeKey<T>(document: T): BTreeKey<T> {
 }
 
 function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce<unknown>((acc, part) => (acc as Record<string, unknown>)?.[part], obj);
+	return path
+		.split('.')
+		.reduce<unknown>((acc, part) => (acc as Record<string, unknown>)?.[part], obj);
 }
 
-export class Collection<T = any> {
+export class Collection<T = any, Pk extends keyof T = keyof T> {
 	readonly collectionName: string;
-	readonly primaryKey: keyof T;
-	readonly indexes: Array<string>;
+	readonly primaryKey: Pk;
+	readonly indexes: string[];
 	readonly multiEntryIndexes: string[];
 
 	protected data: Map<any, T>;
-    protected indexMaps: { [key: string]: Map<unknown, Map<unknown, T>> };
+	protected indexMaps: { [key: string]: Map<unknown, Map<unknown, T>> };
 	protected sortedBTree: BTree<T> | null;
 
 	protected observer: NotificationManager;
 	batchOperationInProgress: boolean;
 
-	constructor(collectionName: string, schema: CollectionSchema<T>) {
+	constructor(collectionName: string, schema: CollectionSchema<T, Pk>) {
 		this.collectionName = collectionName;
 		this.primaryKey = schema.primaryKey;
 		this.indexes = schema.indexes || [];
@@ -53,11 +55,11 @@ export class Collection<T = any> {
 		this.batchOperationInProgress = false;
 	}
 
-	where(criteria: Criteria<T> | keyof T): Query<T> {
-		return new Query<T>(this, criteria);
+	where(criteria: Criteria<T> | keyof T): Query<T, Pk> {
+		return new Query<T, Pk>(this, criteria);
 	}
 
-	put(document: T): T {
+	put(document: T): T[Pk] {
 		this.delete(document[this.primaryKey]); // Delete existing document
 
 		this.data.set(document[this.primaryKey], document); // Add to primary Map
@@ -67,10 +69,10 @@ export class Collection<T = any> {
 		if (this.sortedBTree) this.sortedBTree.set(createBTreeKey(document), document); // Add to BTree
 
 		if (!this.batchOperationInProgress) this.observer?.notify('create');
-		return document;
+		return document[this.primaryKey];
 	}
 
-	bulkPut(documents: T[]): T[] {
+	bulkPut(documents: T[]) {
 		this.batchOperationInProgress = true;
 		const results = documents.map((document) => this.put(document));
 		this.batchOperationInProgress = false;
@@ -79,14 +81,18 @@ export class Collection<T = any> {
 		return results;
 	}
 
-	add(document: T): T {
-		const existingDocument = this.data.get(document[this.primaryKey]);
-		if (existingDocument) throw new Error(`Ramify: Document already exists in the collection`);
+	add(document: T) {
+		const primaryVal = document[this.primaryKey];
+		const existingDocument = this.data.get(primaryVal);
+		if (existingDocument)
+			throw new Error(
+				`Ramify: Document with primary key ${primaryVal} already exists in the collection`
+			);
 
 		return this.put(document);
 	}
 
-	bulkAdd(documents: T[]): T[] {
+	bulkAdd(documents: T[]) {
 		this.batchOperationInProgress = true;
 		const results = documents.map((document) => this.add(document));
 		this.batchOperationInProgress = false;
@@ -95,20 +101,20 @@ export class Collection<T = any> {
 		return results;
 	}
 
-	get(primaryValue: T[keyof T]): T | undefined {
-		return this.data.get(primaryValue);
+	get(primaryVal: T[Pk]): T | undefined {
+		return this.data.get(primaryVal);
 	}
 
-	bulkGet(primaryValues: Array<T[keyof T]>): Array<T | undefined> {
-		return primaryValues.map((value) => this.get(value));
+	bulkGet(primaryVals: Array<T[Pk]>): Array<T | undefined> {
+		return primaryVals.map((value) => this.get(value));
 	}
 
 	toArray(): T[] {
 		return [...(this.sortedBTree?.values() || this.data.values())];
 	}
 
-	update(primaryValue: T[keyof T], changes: Partial<T>): T {
-		const oldData = this.get(primaryValue);
+	update(primaryVal: T[Pk], changes: Partial<T>): T {
+		const oldData = this.get(primaryVal);
 		if (!oldData) throw new Error(`Ramify: Document not found in the collection`);
 
 		const oldKey = createBTreeKey(oldData);
@@ -121,7 +127,7 @@ export class Collection<T = any> {
 		);
 
 		if (isPrimaryKeyUpdate || isIndexUpdate) {
-			this.delete(primaryValue);
+			this.delete(primaryVal);
 			this.put(newData);
 		}
 
@@ -134,7 +140,7 @@ export class Collection<T = any> {
 		return newData;
 	}
 
-	bulkUpdate(documents: Array<{ key: T[keyof T]; changes: Partial<T> }>): T[] {
+	bulkUpdate(documents: Array<{ key: T[Pk]; changes: Partial<T> }>): T[] {
 		this.batchOperationInProgress = true;
 		const results = documents.map(({ key, changes }) => this.update(key, changes));
 		this.batchOperationInProgress = false;
@@ -143,23 +149,23 @@ export class Collection<T = any> {
 		return results;
 	}
 
-	delete(primaryValue: T[keyof T]): T[keyof T] | undefined {
-		const oldData = this.get(primaryValue);
-		if (!oldData) return;
+	delete(primaryVal: T[Pk]): T[Pk] | undefined {
+		const document = this.get(primaryVal);
+		if (!document) return;
 
-		this.data.delete(primaryValue); // Delete from primary Map
+		this.data.delete(primaryVal); // Delete from primary Map
 		for (const index of [...this.indexes, ...this.multiEntryIndexes]) {
-			this.removeFromIndex(index, oldData); // Delete from index Set
+			this.removeFromIndex(index, document); // Delete from index Set
 		}
-		if (this.sortedBTree) this.sortedBTree.delete(createBTreeKey(oldData)); // Delete from sorted BTree
+		if (this.sortedBTree) this.sortedBTree.delete(createBTreeKey(document)); // Delete from sorted BTree
 
 		if (!this.batchOperationInProgress) this.observer?.notify('delete');
-		return oldData[this.primaryKey];
+		return document[this.primaryKey];
 	}
 
-	bulkDelete(primaryValues: Array<T[keyof T]>): Array<T[keyof T] | undefined> {
+	bulkDelete(primaryVals: Array<T[Pk]>): Array<T[Pk] | undefined> {
 		this.batchOperationInProgress = true;
-		const results = primaryValues.map((value) => this.delete(value));
+		const results = primaryVals.map((value) => this.delete(value));
 		this.batchOperationInProgress = false;
 
 		this.observer?.notify('delete');
@@ -177,24 +183,24 @@ export class Collection<T = any> {
 		return this.toArray().length;
 	}
 
-	filter(callback: (document: T) => boolean): Query<T> {
-		return new Query<T>(this, {}).filter((element) => callback(element));
+	filter(callback: (document: T) => boolean): Query<T, Pk> {
+		return new Query<T, Pk>(this, {}).filter((element) => callback(element));
 	}
 
 	each(callback: (document: T) => void): void {
 		this.toArray().forEach((element) => callback(element));
 	}
 
-	orderBy(field: keyof T): Query<T> {
-		return new Query<T>(this, {}).orderBy(field);
+	orderBy(field: keyof T): Query<T, Pk> {
+		return new Query<T, Pk>(this, {}).orderBy(field);
 	}
 
-	limit(count: number): Query<T> {
-		return new Query<T>(this, {}).limit(count);
+	limit(count: number): Query<T, Pk> {
+		return new Query<T, Pk>(this, {}).limit(count);
 	}
 
-	offset(count: number): Query<T> {
-		return new Query<T>(this, {}).offset(count);
+	offset(count: number): Query<T, Pk> {
+		return new Query<T, Pk>(this, {}).offset(count);
 	}
 
 	subscribe(cb: Observer) {
@@ -205,8 +211,8 @@ export class Collection<T = any> {
 		return this.observer.unsubscribe(cb);
 	}
 
-    private addToIndex(index: string, document: T): void {
-        const value = getNestedValue(document as unknown as Record<string, unknown>, index);
+	private addToIndex(index: string, document: T): void {
+		const value = getNestedValue(document as unknown as Record<string, unknown>, index);
 		const indexMap = this.indexMaps[index];
 		if (!indexMap) return;
 
@@ -217,8 +223,8 @@ export class Collection<T = any> {
 		}
 	}
 
-    private removeFromIndex(index: string, document: T): void {
-        const value = getNestedValue(document as unknown as Record<string, unknown>, index);
+	private removeFromIndex(index: string, document: T): void {
+		const value = getNestedValue(document as unknown as Record<string, unknown>, index);
 		const indexMap = this.indexMaps[index];
 		if (!indexMap) return;
 
@@ -239,11 +245,11 @@ export class Collection<T = any> {
 		indexMap.set(field, documentsMap);
 	}
 
-    private removeFromSet<V extends { [K in keyof T]: T[K] }>(
-        indexMap: Map<unknown, Map<unknown, V>>,
-        field: unknown,
-        document: V
-    ): void {
+	private removeFromSet<V extends { [K in keyof T]: T[K] }>(
+		indexMap: Map<unknown, Map<unknown, V>>,
+		field: unknown,
+		document: V
+	): void {
 		const documentsMap = indexMap.get(field);
 		if (documentsMap) {
 			documentsMap.delete(document[this.primaryKey]);

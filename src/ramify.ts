@@ -1,25 +1,25 @@
 import { Collection, type CollectionSchema } from '@/collection.js';
 
-type StoreSchema<T> = {
-	[K in keyof T]: CollectionSchema<T[K]>;
+type StoreDefinition<T extends Record<string, any>> = {
+	[K in keyof T]: CollectionSchema<T[K], keyof T[K]>;
 };
 
 export class Ramify<T> {
-	#collections: { [K in keyof T]?: Collection<T[K]> } = {};
+	#collections: { [K in keyof T]?: Collection<T[K], any> } = {};
 
 	constructor() {
 		this.#collections = {};
 	}
 
-	createStore<S>(storeDefinition: StoreSchema<S>) {
-		const ramify = new Ramify<S>();
+	createStore<T extends Record<string, any>>(storeDefinition: StoreDefinition<T>) {
+		const ramify = new Ramify<T>();
 		const entries = Object.entries(storeDefinition) as Array<
-			[keyof S, CollectionSchema<S[keyof S]>]
+			[keyof T, CollectionSchema<T[keyof T], any>]
 		>;
 
 		for (const [collectionName, schema] of entries) {
-			const collection = new Collection(collectionName as string, schema);
-			ramify.#collections[collectionName] = collection;
+			const collection = new Collection(collectionName as string, schema as any);
+			ramify.#collections[collectionName] = collection as any;
 
 			Object.defineProperty(ramify, collectionName, {
 				value: collection,
@@ -27,7 +27,9 @@ export class Ramify<T> {
 			});
 		}
 
-		return ramify as Ramify<S> & { [K in keyof S]: Collection<S[K]> };
+		return ramify as Ramify<T> & {
+			[K in keyof T]: Collection<T[K], T[K]['primaryKey']>;
+		};
 	}
 
 	delete() {

@@ -12,7 +12,7 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 		.reduce((acc: unknown, part) => (acc as Record<string, unknown>)?.[part], obj);
 }
 
-export class Query<T = any> {
+export class Query<T = any, P extends keyof T = keyof T> {
 	private results: T[] | null = null;
 	private whereField: Extract<keyof T, string> | null = null;
 	private orderField: keyof T | null = null;
@@ -20,10 +20,10 @@ export class Query<T = any> {
 	private limitCount: number | null = null;
 	private offsetCount: number = 0;
 
-	readonly collection: Collection<T>;
+	readonly collection: Collection<T, P>;
 	readonly criteria: Criteria<T>;
 
-	constructor(collection: Collection<T>, criteria: Criteria<T> | keyof T) {
+	constructor(collection: Collection<T, P>, criteria: Criteria<T> | keyof T) {
 		this.collection = collection;
 		this.criteria = typeof criteria === 'object' ? criteria : ({} as Criteria<T>);
 		this.orderField = null;
@@ -85,7 +85,7 @@ export class Query<T = any> {
 		return results;
 	}
 
-	delete(): Array<T[keyof T] | undefined> {
+	delete(): Array<T[P] | undefined> {
 		if (!this.results) this.execute();
 
 		this.collection.batchOperationInProgress = true;
@@ -177,12 +177,12 @@ export class Query<T = any> {
 		const primaryValue = this.criteria[primaryField as keyof T];
 
 		if (Array.isArray(primaryValue)) {
-			for (const value of primaryValue) {
-				const record = this.collection.get(value as T[keyof T]);
+			for (const value of primaryValue as T[P][]) {
+				const record = this.collection.get(value);
 				if (record && this.matchesCriteria(record)) records.push(record);
 			}
 		} else if (primaryValue !== undefined) {
-			const record = this.collection.get(primaryValue as T[keyof T]);
+			const record = this.collection.get(primaryValue as T[P]);
 			if (record && this.matchesCriteria(record)) records.push(record);
 		}
 
