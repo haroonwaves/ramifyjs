@@ -72,7 +72,7 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		return this.results || [];
 	}
 
-	modify(changes: Partial<T>): T[] {
+	modify(changes: Partial<T>): number {
 		if (!this.results) this.execute();
 
 		this.collection.batchOperationInProgress = true;
@@ -82,7 +82,7 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		this.collection.batchOperationInProgress = false;
 
 		(this.collection as any).observer.notify('update');
-		return results;
+		return results.filter((result) => result === 1).length;
 	}
 
 	delete(): Array<T[P] | undefined> {
@@ -169,7 +169,7 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		if (offsetCount) records = records.slice(offsetCount);
 		if (limitCount !== null) records = records.slice(0, limitCount);
 
-		this.results = records;
+		this.results = records.map((record) => structuredClone(record));
 	}
 
 	private getRecordsByPrimaryField(primaryField: string): T[] {

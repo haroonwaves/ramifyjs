@@ -89,7 +89,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	get(primaryVal: T[Pk]): T | undefined {
-		return this.data.get(primaryVal);
+		return structuredClone(this.data.get(primaryVal));
 	}
 
 	bulkGet(primaryVals: Array<T[Pk]>): Array<T | undefined> {
@@ -97,36 +97,37 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	toArray(): T[] {
-		return [...this.data.values()];
+		return structuredClone([...this.data.values()]);
 	}
 
-	update(primaryVal: T[Pk], changes: Partial<T>): T {
-		const oldData = this.get(primaryVal);
-		if (!oldData) throw new Error(`Ramify: Document not found in the collection`);
+	update(primaryVal: T[Pk], changes: Partial<T>): number {
+		const oldData = this.data.get(primaryVal);
+		if (!oldData) return 0;
 
-		const newData = Object.assign(oldData, changes); // Update the data
+		const newData = Object.assign(oldData, changes); // Update the data through reference.
 
 		const isPrimaryKeyUpdate = changes[this.primaryKey] !== undefined;
 		const isIndexUpdate = Object.keys(changes).some(
 			(key) => this.indexes.includes(key) || this.multiEntryIndexes.includes(key)
 		);
 
+		// If the primary key or index is updated, delete the old document and add the new one.
 		if (isPrimaryKeyUpdate || isIndexUpdate) {
 			this.delete(primaryVal);
 			this.put(newData);
 		}
 
 		if (!this.batchOperationInProgress) this.observer?.notify('update');
-		return newData;
+		return 1;
 	}
 
-	bulkUpdate(documents: Array<{ key: T[Pk]; changes: Partial<T> }>): T[] {
+	bulkUpdate(documents: Array<{ key: T[Pk]; changes: Partial<T> }>): number {
 		this.batchOperationInProgress = true;
 		const results = documents.map(({ key, changes }) => this.update(key, changes));
 		this.batchOperationInProgress = false;
 
 		this.observer?.notify('update');
-		return results;
+		return results.filter((result) => result === 1).length;
 	}
 
 	delete(primaryVal: T[Pk]): T[Pk] | undefined {

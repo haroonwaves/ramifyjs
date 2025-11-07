@@ -3,11 +3,13 @@ import { Ramify } from './dist/index.js';
 type User = { id: number; name: string; tags?: string[]; age: number };
 type Message = { id: number; content: string; userId: number };
 
+/*INITIALIZE DATABASE*/
 const ramify = new Ramify().createStore<{ users: User; messages: Message }>({
 	users: { primaryKey: 'id', indexes: ['name', 'age'], multiEntry: ['tags'] },
 	messages: { primaryKey: 'id', indexes: ['userId'] },
 });
 
+/*COLLECTION OPERATIONS*/
 const add = ramify.users.add({ id: 1, name: 'John', tags: ['a', 'b'], age: 20 }); // PK
 const bulkAdd = ramify.users.bulkAdd([
 	{ id: 2, name: 'Jane', tags: ['b'], age: 21 },
@@ -31,7 +33,7 @@ const bulkUpdated = ramify.users.bulkUpdate([
 const deleted = ramify.users.delete(1); // PK | undefined
 const bulkDeleted = ramify.users.bulkDelete([2, 3]); // [PK | undefined]
 
-const each = ramify.users.each((user) => console.log(user)); // void
+const each = ramify.users.each((user) => {}); // void
 const filter = ramify.users.filter((user) => user.name === 'John'); // Query instance
 const limit = ramify.users.limit(1); // Query instance
 const offset = ramify.users.offset(1); // Query instance
@@ -39,4 +41,10 @@ const orderBy = ramify.users.orderBy('name'); // Query instance
 const where = ramify.users.where('name'); // Query instance
 
 const count = ramify.users.count(); // number
-const cleared = ramify.users.clear(); // void
+// const cleared = ramify.users.clear(); // void
+
+/*QUERY OPERATIONS*/
+const queriedUsers = ramify.users.where('name').anyOf(['John', 'Jane']).orderBy('age').toArray(); // [User]
+const queryCount = ramify.users.count(); // number
+console.log(queriedUsers);
+console.log(queryCount);
