@@ -33,9 +33,6 @@
 		"tsc-alias": "^1.8.10",
 		"typescript": "^5.0.0"
 	},
-	"dependencies": {
-		"sorted-btree": "^1.0.0"
-	},
 	"engines": {
 		"node": ">=18"
 	},

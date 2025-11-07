@@ -1,23 +1,13 @@
 import { NotificationManager, type Observer } from '@/observer.js';
 import { Query, type Criteria } from '@/query.js';
-import BTree from 'sorted-btree';
 
 export type CollectionSchema<T, PK extends keyof T = keyof T> = {
 	primaryKey: PK;
 	indexes?: Array<keyof T & string>;
 	multiEntry?: Array<keyof T & string>;
-	bTree?: (a: T, b: T) => number;
 };
 
 export type CollectionOperation = 'create' | 'update' | 'delete' | 'clear';
-
-type BTreeKey<T> = {
-	[K in keyof T]: T[K];
-};
-
-function createBTreeKey<T>(document: T): BTreeKey<T> {
-	return { ...document };
-}
 
 function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 	return path
@@ -33,7 +23,6 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 
 	protected data: Map<any, T>;
 	protected indexMaps: { [key: string]: Map<unknown, Map<unknown, T>> };
-	protected sortedBTree: BTree<T> | null;
 
 	protected observer: NotificationManager;
 	batchOperationInProgress: boolean;
@@ -46,7 +35,6 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 
 		this.data = new Map();
 		this.indexMaps = {};
-		this.sortedBTree = schema.bTree ? new BTree(undefined, schema.bTree) : null;
 		for (const index of [...this.indexes, ...this.multiEntryIndexes]) {
 			this.indexMaps[index] = new Map();
 		}
@@ -66,7 +54,6 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 
 		for (const index of [...this.indexes, ...this.multiEntryIndexes])
 			this.addToIndex(index, document); // Add to index Set
-		if (this.sortedBTree) this.sortedBTree.set(createBTreeKey(document), document); // Add to BTree
 
 		if (!this.batchOperationInProgress) this.observer?.notify('create');
 		return document[this.primaryKey];
@@ -110,16 +97,14 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	toArray(): T[] {
-		return [...(this.sortedBTree?.values() || this.data.values())];
+		return [...this.data.values()];
 	}
 
 	update(primaryVal: T[Pk], changes: Partial<T>): T {
 		const oldData = this.get(primaryVal);
 		if (!oldData) throw new Error(`Ramify: Document not found in the collection`);
 
-		const oldKey = createBTreeKey(oldData);
 		const newData = Object.assign(oldData, changes); // Update the data
-		const newKey = createBTreeKey(newData);
 
 		const isPrimaryKeyUpdate = changes[this.primaryKey] !== undefined;
 		const isIndexUpdate = Object.keys(changes).some(
@@ -129,11 +114,6 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		if (isPrimaryKeyUpdate || isIndexUpdate) {
 			this.delete(primaryVal);
 			this.put(newData);
-		}
-
-		if (this.sortedBTree) {
-			this.sortedBTree.delete(oldKey);
-			this.sortedBTree.set(newKey, newData);
 		}
 
 		if (!this.batchOperationInProgress) this.observer?.notify('update');
@@ -157,7 +137,6 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		for (const index of [...this.indexes, ...this.multiEntryIndexes]) {
 			this.removeFromIndex(index, document); // Delete from index Set
 		}
-		if (this.sortedBTree) this.sortedBTree.delete(createBTreeKey(document)); // Delete from sorted BTree
 
 		if (!this.batchOperationInProgress) this.observer?.notify('delete');
 		return document[this.primaryKey];
@@ -173,9 +152,9 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	clear(): void {
-		this.data.clear();
-		for (const index of this.indexes) this.indexMaps[index]?.clear();
-		if (this.sortedBTree) this.sortedBTree.clear();
+		this.data.clear(); // Clear the primary Map
+		for (const index of [...this.indexes, ...this.multiEntryIndexes])
+			this.indexMaps[index]?.clear(); // Clear the index Map
 		this.observer?.notify('clear');
 	}
 
