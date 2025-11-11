@@ -38,7 +38,7 @@ const each = ramify.users.each((user) => {}); // void
 const filter = ramify.users.filter((user) => user.name === 'John'); // Query instance
 const limit = ramify.users.limit(1); // Query instance
 const offset = ramify.users.offset(1); // Query instance
-const orderBy = ramify.users.orderBy('name'); // Query instance
+const orderBy = ramify.users.orderBy('name').reverse(); // Query instance
 const where = ramify.users.where('name'); // Query instance
 
 const count = ramify.users.count(); // number

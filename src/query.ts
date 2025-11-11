@@ -4,7 +4,29 @@ export type Criteria<T> = {
 	[K in keyof T]?: T[K] | T[K][];
 };
 
-type OrderDirection = 'asc' | 'desc';
+export type WhereStage<T> = {
+	anyOf(values: T[keyof T][]): ExecutableStage<T>;
+	equals(value: T[keyof T]): ExecutableStage<T>;
+};
+
+export type OrderableStage<T> = Omit<ExecutableStage<T>, 'orderBy'> & {
+	reverse(): OrderableStage<T>;
+};
+
+export type LimitedStage<T> = Omit<ExecutableStage<T>, 'limit' | 'orderBy'>;
+
+export type ExecutableStage<T> = {
+	orderBy(field: keyof T): OrderableStage<T>;
+	limit(count: number): LimitedStage<T>;
+	offset(count: number): LimitedStage<T>;
+	filter(callback: (document: T) => boolean): ExecutableStage<T>;
+	toArray(): T[];
+	first(): T | undefined;
+	last(): T | undefined;
+	modify(changes: Partial<T>): number;
+	delete(): Array<T[keyof T] | undefined>;
+	count(): number;
+};
 
 function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 	return path
@@ -12,11 +34,13 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 		.reduce((acc: unknown, part) => (acc as Record<string, unknown>)?.[part], obj);
 }
 
-export class Query<T = any, P extends keyof T = keyof T> {
+export class Query<T = any, P extends keyof T = keyof T>
+	implements ExecutableStage<T>, WhereStage<T>
+{
 	private results: T[] | null = null;
 	private whereField: Extract<keyof T, string> | null = null;
 	private orderField: keyof T | null = null;
-	private orderDirection: OrderDirection = 'asc';
+	private orderDirection: 'asc' | 'desc' = 'asc';
 	private limitCount: number | null = null;
 	private offsetCount: number = 0;
 
@@ -45,31 +69,31 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		}
 	}
 
-	anyOf(values: T[keyof T][]): this {
+	anyOf(values: T[keyof T][]): ExecutableStage<T> {
 		if (this.whereField)
 			this.criteria[this.whereField] = values as Criteria<T>[typeof this.whereField];
-		return this;
+		return this as ExecutableStage<T>;
 	}
 
-	equals(value: T[keyof T]): this {
+	equals(value: T[keyof T]): ExecutableStage<T> {
 		if (this.whereField)
 			this.criteria[this.whereField] = value as Criteria<T>[typeof this.whereField];
-		return this;
+		return this as ExecutableStage<T>;
 	}
 
 	first(): T | undefined {
 		if (!this.results) this.execute();
-		return this.results?.length ? this.results[0] : undefined;
+		return this.results?.length ? structuredClone(this.results[0]) : undefined;
 	}
 
 	last(): T | undefined {
 		if (!this.results) this.execute();
-		return this.results?.length ? this.results.at(-1) : undefined;
+		return this.results?.length ? structuredClone(this.results.at(-1)!) : undefined;
 	}
 
 	toArray(): T[] {
 		if (!this.results) this.execute();
-		return this.results || [];
+		return (this.results || []).map((item) => structuredClone(item));
 	}
 
 	modify(changes: Partial<T>): number {
@@ -98,27 +122,27 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		return results;
 	}
 
-	orderBy(field: keyof T): this {
+	orderBy(field: keyof T): OrderableStage<T> {
 		this.orderField = field;
 		return this;
 	}
 
-	reverse(): this {
+	reverse(): OrderableStage<T> {
 		this.orderDirection = 'desc';
 		return this;
 	}
 
-	limit(count: number): this {
+	limit(count: number): LimitedStage<T> {
 		this.limitCount = count;
 		return this;
 	}
 
-	offset(count: number): this {
+	offset(count: number): LimitedStage<T> {
 		this.offsetCount = count;
 		return this;
 	}
 
-	filter(callback: (document: T) => boolean): this {
+	filter(callback: (document: T) => boolean): ExecutableStage<T> {
 		if (!this.results) this.execute();
 		this.results = (this.results || []).filter((element) => callback(element));
 		return this;
@@ -151,7 +175,7 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		} else if (indexFields.length > 0) {
 			records = this.getRecordsByIndexFields(indexFields); // Query by index fields
 		} else if (Object.keys(criteria).length === 0) {
-			records = collection.toArray(); // Query all records (for collection.filter(callback))
+			records = [...(collection as any).data.values()]; // Query all records (for collection.filter(callback))
 		} else {
 			throw new Error('Ramify: No primary key or index fields found for the query');
 		}
@@ -169,7 +193,7 @@ export class Query<T = any, P extends keyof T = keyof T> {
 		if (offsetCount) records = records.slice(offsetCount);
 		if (limitCount !== null) records = records.slice(0, limitCount);
 
-		this.results = records.map((record) => structuredClone(record));
+		this.results = records;
 	}
 
 	private getRecordsByPrimaryField(primaryField: string): T[] {

@@ -1,5 +1,12 @@
 import { NotificationManager, type Observer } from '@/observer.js';
-import { Query, type Criteria } from '@/query.js';
+import {
+	Query,
+	type Criteria,
+	type ExecutableStage,
+	type LimitedStage,
+	type OrderableStage,
+	type WhereStage,
+} from '@/query.js';
 
 export type CollectionSchema<T, PK extends keyof T = keyof T> = {
 	primaryKey: PK;
@@ -43,8 +50,10 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		this.batchOperationInProgress = false;
 	}
 
-	where(criteria: Criteria<T> | keyof T): Query<T, Pk> {
-		return new Query<T, Pk>(this, criteria);
+	where<K extends keyof T>(field: K): WhereStage<T>;
+	where(criteria: Criteria<T>): ExecutableStage<T>;
+	where(criteriaOrField: Criteria<T> | keyof T): WhereStage<T> | ExecutableStage<T> {
+		return new Query<T, Pk>(this, criteriaOrField);
 	}
 
 	put(document: T): T[Pk] {
@@ -53,7 +62,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		this.data.set(document[this.primaryKey], document); // Add to primary Map
 
 		for (const index of [...this.indexes, ...this.multiEntryIndexes])
-			this.addToIndex(index, document); // Add to index Set
+			this.addToIndex(index, document); // Add to index Map
 
 		if (!this.batchOperationInProgress) this.observer?.notify('create');
 		return document[this.primaryKey];
@@ -89,7 +98,8 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	get(primaryVal: T[Pk]): T | undefined {
-		return structuredClone(this.data.get(primaryVal));
+		const value = this.data.get(primaryVal);
+		return value ? structuredClone(value) : undefined;
 	}
 
 	bulkGet(primaryVals: Array<T[Pk]>): Array<T | undefined> {
@@ -97,14 +107,14 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	toArray(): T[] {
-		return structuredClone([...this.data.values()]);
+		return [...this.data.values()].map((item) => structuredClone(item));
 	}
 
 	update(primaryVal: T[Pk], changes: Partial<T>): number {
 		const oldData = this.data.get(primaryVal);
 		if (!oldData) return 0;
 
-		const newData = Object.assign(oldData, changes); // Update the data through reference.
+		const newData = Object.assign({}, oldData, changes); // Create a new object with changes
 
 		const isPrimaryKeyUpdate = changes[this.primaryKey] !== undefined;
 		const isIndexUpdate = Object.keys(changes).some(
@@ -115,6 +125,9 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		if (isPrimaryKeyUpdate || isIndexUpdate) {
 			this.delete(primaryVal);
 			this.put(newData);
+		} else {
+			// Update the Map with the new object
+			this.data.set(primaryVal, newData);
 		}
 
 		if (!this.batchOperationInProgress) this.observer?.notify('update');
@@ -131,12 +144,12 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	delete(primaryVal: T[Pk]): T[Pk] | undefined {
-		const document = this.get(primaryVal);
+		const document = this.data.get(primaryVal);
 		if (!document) return;
 
 		this.data.delete(primaryVal); // Delete from primary Map
 		for (const index of [...this.indexes, ...this.multiEntryIndexes]) {
-			this.removeFromIndex(index, document); // Delete from index Set
+			this.removeFromIndex(index, document); // Delete from index Map
 		}
 
 		if (!this.batchOperationInProgress) this.observer?.notify('delete');
@@ -163,7 +176,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		return this.toArray().length;
 	}
 
-	filter(callback: (document: T) => boolean): Query<T, Pk> {
+	filter(callback: (document: T) => boolean): ExecutableStage<T> {
 		return new Query<T, Pk>(this, {}).filter((element) => callback(element));
 	}
 
@@ -171,15 +184,15 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		this.toArray().forEach((element) => callback(element));
 	}
 
-	orderBy(field: keyof T): Query<T, Pk> {
+	orderBy(field: keyof T): OrderableStage<T> {
 		return new Query<T, Pk>(this, {}).orderBy(field);
 	}
 
-	limit(count: number): Query<T, Pk> {
+	limit(count: number): LimitedStage<T> {
 		return new Query<T, Pk>(this, {}).limit(count);
 	}
 
-	offset(count: number): Query<T, Pk> {
+	offset(count: number): LimitedStage<T> {
 		return new Query<T, Pk>(this, {}).offset(count);
 	}
 
@@ -197,9 +210,9 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		if (!indexMap) return;
 
 		if (this.multiEntryIndexes.includes(index) && Array.isArray(value)) {
-			for (const entry of value) this.addToSet(indexMap, entry, document);
+			for (const entry of value) this.addToMap(indexMap, entry, document);
 		} else {
-			this.addToSet(indexMap, value, document);
+			this.addToMap(indexMap, value, document);
 		}
 	}
 
@@ -209,13 +222,13 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		if (!indexMap) return;
 
 		if (this.multiEntryIndexes.includes(index) && Array.isArray(value)) {
-			for (const entry of value) this.removeFromSet(indexMap, entry, document);
+			for (const entry of value) this.removeFromMap(indexMap, entry, document);
 		} else {
-			this.removeFromSet(indexMap, value, document);
+			this.removeFromMap(indexMap, value, document);
 		}
 	}
 
-	private addToSet<V extends { [K in keyof T]: T[K] }>(
+	private addToMap<V extends { [K in keyof T]: T[K] }>(
 		indexMap: Map<unknown, Map<unknown, V>>,
 		field: unknown,
 		document: V
@@ -225,7 +238,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		indexMap.set(field, documentsMap);
 	}
 
-	private removeFromSet<V extends { [K in keyof T]: T[K] }>(
+	private removeFromMap<V extends { [K in keyof T]: T[K] }>(
 		indexMap: Map<unknown, Map<unknown, V>>,
 		field: unknown,
 		document: V
