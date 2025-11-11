@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Ramify } from './dist/index.js';
 
 type User = { id: number; name: string; tags?: string[]; age: number };

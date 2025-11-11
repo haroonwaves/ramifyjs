@@ -28,16 +28,16 @@ export class NotificationManager {
 	}
 
 	subscribe(obs: Observer) {
-		this.observers[this.collectionName]!.add(obs);
+		this.observers[this.collectionName].add(obs);
 		return () => this.unsubscribe(obs);
 	}
 
 	unsubscribe(obs: Observer) {
-		this.observers[this.collectionName]!.delete(obs);
+		this.observers[this.collectionName].delete(obs);
 	}
 
 	notify(operation: CollectionOperation) {
 		const notifier = this.notifiers[this.collectionName];
-		notifier!(operation);
+		notifier(operation);
 	}
 }

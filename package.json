@@ -20,18 +20,23 @@
 		"build": "tsc -p tsconfig.json",
 		"postbuild": "tsc-alias -p tsconfig.json",
 		"clean": "rimraf dist || rm -rf dist",
+		"lint": "eslint src/**/*.ts",
+		"lint:fix": "eslint src/**/*.ts --fix",
 		"prepublishOnly": "npm run build"
 	},
 	"peerDependencies": {
 		"react": ">=18"
 	},
 	"devDependencies": {
+		"@cspell/eslint-plugin": "^9.3.0",
 		"@types/react": "^18.0.0",
 		"@typescript-eslint/eslint-plugin": "^8.46.2",
 		"@typescript-eslint/parser": "^8.46.2",
 		"eslint": "^9.38.0",
+		"jiti": "^2.6.1",
 		"tsc-alias": "^1.8.10",
-		"typescript": "^5.0.0"
+		"typescript": "^5.0.0",
+		"typescript-eslint": "^8.46.2"
 	},
 	"engines": {
 		"node": ">=18"

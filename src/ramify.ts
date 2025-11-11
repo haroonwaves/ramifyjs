@@ -18,7 +18,7 @@ export class Ramify<T> {
 		>;
 
 		for (const [collectionName, schema] of entries) {
-			const collection = new Collection(collectionName as string, schema as any);
+			const collection = new Collection(collectionName as string, schema);
 			ramify.#collections[collectionName] = collection as any;
 
 			Object.defineProperty(ramify, collectionName, {

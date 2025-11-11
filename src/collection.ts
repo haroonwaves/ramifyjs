@@ -73,7 +73,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		const existingDocument = this.data.get(primaryVal);
 		if (existingDocument)
 			throw new Error(
-				`Ramify: Document with primary key ${primaryVal} already exists in the collection`
+				`Ramify: Document with primary key ${primaryVal as string} already exists in the collection`
 			);
 
 		return this.put(document);
