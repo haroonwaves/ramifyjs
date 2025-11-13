@@ -19,6 +19,6 @@
 		"resolveJsonModule": true,
 		"verbatimModuleSyntax": true
 	},
-	"include": ["src/**/*.ts", "./eslint.config.mjs", "./test.mjs", "./performance.mjs"],
+	"include": ["src/**/*"],
 	"exclude": ["dist", "node_modules"]
 }

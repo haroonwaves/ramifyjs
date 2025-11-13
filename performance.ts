@@ -1,4 +1,4 @@
-import { Ramify } from './dist/index.js';
+import { Ramify, Schema } from './dist/index.js';
 
 export type Message = {
 	id: string; // ← add primary key
@@ -40,7 +40,7 @@ export type Message = {
 	received: number | null;
 };
 
-const ramify = new Ramify().createStore<{ messages: Message }>({
+const ramify = new Ramify().createStore<{ messages: Schema<Message, 'id'> }>({
 	messages: { primaryKey: 'id', indexes: ['userAccount', 'date', 'folder', 'isUnread'] },
 });
 
@@ -138,7 +138,7 @@ const t6 = performance.now();
 console.log('Get:', get, ', Time (ms):', (t6 - t5).toFixed(2));
 
 const t7 = performance.now();
-const updated = ramify.messages.update(get?.id, {
+const updated = ramify.messages.update(get!.id, {
 	recipients: { ...get!.recipients, copied: [{ name: 'haroon', email: 'haroon@gmail.com' }] },
 });
 const t8 = performance.now();

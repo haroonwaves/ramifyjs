@@ -9,7 +9,7 @@ import {
 } from '@/query.js';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 
-export type CollectionSchema<T, PK extends keyof T = keyof T> = {
+export type Schema<T, PK extends keyof T = keyof T> = {
 	primaryKey: PK;
 	indexes?: Array<keyof T & string>;
 	multiEntry?: Array<keyof T & string>;
@@ -35,7 +35,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	protected observer: NotificationManager;
 	batchOperationInProgress: boolean;
 
-	constructor(collectionName: string, schema: CollectionSchema<T, Pk>) {
+	constructor(collectionName: string, schema: Schema<T, Pk>) {
 		this.collectionName = collectionName;
 		this.primaryKey = schema.primaryKey;
 		this.indexes = schema.indexes || [];

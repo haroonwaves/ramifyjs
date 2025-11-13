@@ -1,13 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Ramify } from './dist/index.js';
+import { Ramify, Schema } from './dist/index.js';
 
-type User = { id: number; name: string; tags?: string[]; age: number };
-type Message = { id: number; content: string; userId: number };
+export type User = {
+	id: number;
+	name: string;
+	tags: string[];
+	age: number;
+};
+
+export type Message = {
+	msgId: string;
+	text: string;
+	sender: string;
+};
 
 /*INITIALIZE DATABASE*/
-const ramify = new Ramify().createStore<{ users: User; messages: Message }>({
+const ramify = new Ramify().createStore<{
+	users: Schema<User, 'id'>;
+	messages: Schema<Message, 'msgId'>;
+}>({
 	users: { primaryKey: 'id', indexes: ['name', 'age'], multiEntry: ['tags'] },
-	messages: { primaryKey: 'id', indexes: ['userId'] },
+	messages: { primaryKey: 'msgId', indexes: ['sender'] },
 });
 
 /*COLLECTION OPERATIONS*/
