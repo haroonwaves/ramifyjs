@@ -1,4 +1,5 @@
 import { Collection } from '@/collection.js';
+import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 
 export type Criteria<T> = {
 	[K in keyof T]?: T[K] | T[K][];
@@ -83,17 +84,17 @@ export class Query<T = any, P extends keyof T = keyof T>
 
 	first(): T | undefined {
 		if (!this.results) this.execute();
-		return this.results?.length ? structuredClone(this.results[0]) : undefined;
+		return this.results?.length ? this.results[0] : undefined;
 	}
 
 	last(): T | undefined {
 		if (!this.results) this.execute();
-		return this.results?.length ? structuredClone(this.results.at(-1)!) : undefined;
+		return this.results?.length ? this.results.at(-1) : undefined;
 	}
 
 	toArray(): T[] {
 		if (!this.results) this.execute();
-		return (this.results || []).map((item) => structuredClone(item));
+		return this.results || [];
 	}
 
 	modify(changes: Partial<T>): number {
@@ -193,20 +194,22 @@ export class Query<T = any, P extends keyof T = keyof T>
 		if (offsetCount) records = records.slice(offsetCount);
 		if (limitCount !== null) records = records.slice(0, limitCount);
 
-		this.results = records;
+		// Wrap results in lazy clone proxies to prevent mutations from affecting stored data
+		this.results = records.map((record) => createLazyCloneProxy<T>(record));
 	}
 
 	private getRecordsByPrimaryField(primaryField: string): T[] {
 		const records: T[] = [];
 		const primaryValue = this.criteria[primaryField as keyof T];
+		const data = (this.collection as any).data;
 
 		if (Array.isArray(primaryValue)) {
 			for (const value of primaryValue as T[P][]) {
-				const record = this.collection.get(value);
+				const record = data.get(value) as T;
 				if (record && this.matchesCriteria(record)) records.push(record);
 			}
 		} else if (primaryValue !== undefined) {
-			const record = this.collection.get(primaryValue as T[P]);
+			const record = data.get(primaryValue as T[P]) as T;
 			if (record && this.matchesCriteria(record)) records.push(record);
 		}
 

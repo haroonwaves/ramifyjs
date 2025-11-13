@@ -120,7 +120,27 @@ export function generateMessages(count = 100_000) {
 generateMessages(500_000);
 
 const t1 = performance.now();
-const messages = ramify.messages.orderBy('date').reverse().toArray();
+const messages = ramify.messages.limit(200).toArray();
 const t2 = performance.now();
 
 console.log('Fetched:', messages.length, ', Time (ms):', (t2 - t1).toFixed(2));
+
+const t3 = performance.now();
+const added = ramify.messages.add(generateRandomMessage(500_001));
+const t4 = performance.now();
+
+console.log('Added:', added, ', Time (ms):', (t4 - t3).toFixed(2));
+
+const t5 = performance.now();
+const get = ramify.messages.get(added);
+const t6 = performance.now();
+
+console.log('Get:', get, ', Time (ms):', (t6 - t5).toFixed(2));
+
+if (get) get.p2Helper = 'haroon@example.com';
+
+const t7 = performance.now();
+const newGet = ramify.messages.get(added);
+const t8 = performance.now();
+
+console.log('New Get:', newGet, ', Time (ms):', (t8 - t7).toFixed(2));

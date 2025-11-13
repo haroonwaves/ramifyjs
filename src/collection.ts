@@ -7,6 +7,7 @@ import {
 	type OrderableStage,
 	type WhereStage,
 } from '@/query.js';
+import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 
 export type CollectionSchema<T, PK extends keyof T = keyof T> = {
 	primaryKey: PK;
@@ -99,7 +100,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 
 	get(primaryVal: T[Pk]): T | undefined {
 		const value = this.data.get(primaryVal);
-		return value ? structuredClone(value) : undefined;
+		return value ? createLazyCloneProxy<T>(value) : undefined;
 	}
 
 	bulkGet(primaryVals: Array<T[Pk]>): Array<T | undefined> {
@@ -107,14 +108,14 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	toArray(): T[] {
-		return [...this.data.values()].map((item) => structuredClone(item));
+		return [...this.data.values()].map((item) => createLazyCloneProxy<T>(item));
 	}
 
 	update(primaryVal: T[Pk], changes: Partial<T>): number {
 		const oldData = this.data.get(primaryVal);
 		if (!oldData) return 0;
 
-		const newData = Object.assign({}, oldData, changes); // Create a new object with changes
+		const newData = Object.assign(oldData, changes); // Update the data through reference.
 
 		const isPrimaryKeyUpdate = changes[this.primaryKey] !== undefined;
 		const isIndexUpdate = Object.keys(changes).some(
@@ -125,9 +126,6 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		if (isPrimaryKeyUpdate || isIndexUpdate) {
 			this.delete(primaryVal);
 			this.put(newData);
-		} else {
-			// Update the Map with the new object
-			this.data.set(primaryVal, newData);
 		}
 
 		if (!this.batchOperationInProgress) this.observer?.notify('update');
