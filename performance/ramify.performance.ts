@@ -153,7 +153,7 @@ type ScenarioContext = {
 	};
 };
 
-const OUT_DIR = path.resolve(process.cwd(), 'docs');
+const OUT_DIR = path.resolve(process.cwd(), 'performance');
 const OUT_FILE = path.join(OUT_DIR, 'performance-results.md');
 
 const DATASET_SIZES = [10_000, 50_000, 100_000] as const;
