@@ -1,4 +1,5 @@
-import { Collection, type Schema } from '@/collection.js';
+import { Collection } from '@/collection.js';
+import type { Schema } from '@/types';
 
 export class Ramify<T> {
 	#collections: { [K in keyof T]?: Collection<T[K], any> } = {};

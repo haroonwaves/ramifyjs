@@ -1,4 +1,13 @@
 {
 	"extends": "./tsconfig.json",
-	"include": ["src/**/*.ts", "eslint.config.mts", "test.ts", "performance.ts"]
+	"include": [
+		"src/**/*.ts",
+		"tests/**/*.ts",
+		"jest.config.mjs",
+		"babel.config.cjs",
+		"performance/**/*.ts",
+		"eslint.config.mts",
+		"test.ts",
+		"performance.ts"
+	]
 }

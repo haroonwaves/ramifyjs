@@ -7,13 +7,8 @@ import {
 	type OrderableStage,
 	type WhereStage,
 } from '@/query.js';
+import type { Schema } from '@/types';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
-
-export type Schema<T, PK extends keyof T = keyof T> = {
-	primaryKey: PK;
-	indexes?: Array<keyof T & string>;
-	multiEntry?: Array<keyof T & string>;
-};
 
 export type CollectionOperation = 'create' | 'update' | 'delete' | 'clear';
 

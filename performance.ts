@@ -1,4 +1,4 @@
-import { Ramify, Schema } from './dist/index.js';
+import { Ramify, type Schema } from './dist/index.js';
 
 export type Message = {
 	id: string; // ← add primary key

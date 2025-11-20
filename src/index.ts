@@ -3,3 +3,4 @@ export * from '@/observer.js';
 export * from '@/query.js';
 export * from '@/collection.js';
 export * from '@/useLiveQuery.js';
+export * from '@/types.js';
