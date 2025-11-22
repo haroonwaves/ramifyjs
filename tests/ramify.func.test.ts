@@ -70,6 +70,7 @@ describe('Ramify - functional test suite', () => {
 		expect(db.users.update(100, { id: 101, name: 'PKTest2' })).toBe(1);
 		expect(db.users.get(100)).toBeUndefined();
 		expect(db.users.get(101)).toBeDefined();
+		expect(db.users.update(9999, { name: 'Nope' })).toBe(0);
 	});
 
 	test('delete / bulkDelete / clear', () => {
@@ -134,4 +135,117 @@ describe('Ramify - functional test suite', () => {
 			done();
 		}, 120);
 	}, 1000);
+
+	test('range operators: between / above / below / aboveOrEqual / belowOrEqual', () => {
+		db.users.bulkPut([
+			{ id: 61, name: 'User1', tags: [], age: 10 },
+			{ id: 62, name: 'User2', tags: [], age: 20 },
+			{ id: 63, name: 'User3', tags: [], age: 30 },
+			{ id: 64, name: 'User4', tags: [], age: 40 },
+			{ id: 65, name: 'User5', tags: [], age: 50 },
+		]);
+
+		// between
+		const between = db.users.where('age').between(20, 40).toArray();
+		expect(between.length).toBe(3);
+		expect(between.map((u) => u.age).sort()).toEqual([20, 30, 40]);
+
+		// above
+		const above = db.users.where('age').above(30).toArray();
+		expect(above.length).toBe(2);
+		expect(above.every((u) => u.age > 30)).toBe(true);
+
+		// below
+		const below = db.users.where('age').below(30).toArray();
+		expect(below.length).toBe(2);
+		expect(below.every((u) => u.age < 30)).toBe(true);
+
+		// aboveOrEqual
+		const aboveOrEqual = db.users.where('age').aboveOrEqual(30).toArray();
+		expect(aboveOrEqual.length).toBe(3);
+		expect(aboveOrEqual.every((u) => u.age >= 30)).toBe(true);
+
+		// belowOrEqual
+		const belowOrEqual = db.users.where('age').belowOrEqual(30).toArray();
+		expect(belowOrEqual.length).toBe(3);
+		expect(belowOrEqual.every((u) => u.age <= 30)).toBe(true);
+	});
+
+	test('notEquals operator', () => {
+		db.users.bulkPut([
+			{ id: 71, name: 'Active', tags: [], age: 25 },
+			{ id: 72, name: 'Inactive', tags: [], age: 26 },
+			{ id: 73, name: 'Active', tags: [], age: 27 },
+		]);
+
+		const notActive = db.users.where('name').notEquals('Active').toArray();
+		expect(notActive.length).toBe(1);
+		expect(notActive[0].name).toBe('Inactive');
+
+		// notEquals with age
+		const notAge25 = db.users.where('age').notEquals(25).toArray();
+		expect(notAge25.length).toBe(2);
+		expect(notAge25.every((u) => u.age !== 25)).toBe(true);
+	});
+
+	test('keys() and has() methods', () => {
+		db.users.bulkPut([
+			{ id: 81, name: 'K1', tags: [], age: 1 },
+			{ id: 82, name: 'K2', tags: [], age: 2 },
+			{ id: 83, name: 'K3', tags: [], age: 3 },
+		]);
+
+		// keys() should return all primary keys
+		const keys = db.users.keys();
+		expect(keys.length).toBe(3);
+		expect(keys).toContain(81);
+		expect(keys).toContain(82);
+		expect(keys).toContain(83);
+
+		// has() should check existence
+		expect(db.users.has(81)).toBe(true);
+		expect(db.users.has(82)).toBe(true);
+		expect(db.users.has(999)).toBe(false);
+
+		// delete and check again
+		db.users.delete(81);
+		expect(db.users.has(81)).toBe(false);
+		expect(db.users.keys().length).toBe(2);
+	});
+
+	test('range operators with orderBy and limit', () => {
+		db.users.bulkPut([
+			{ id: 91, name: 'U1', tags: [], age: 15 },
+			{ id: 92, name: 'U2', tags: [], age: 25 },
+			{ id: 93, name: 'U3', tags: [], age: 35 },
+			{ id: 94, name: 'U4', tags: [], age: 45 },
+		]);
+
+		const result = db.users.where('age').between(20, 50).orderBy('age').limit(2).toArray();
+		expect(result.length).toBe(2);
+		expect(result[0].age).toBe(25);
+		expect(result[1].age).toBe(35);
+	});
+
+	test('returned docs are fully detached (no shared references)', () => {
+		const id = db.nested.add({
+			id: 'player1',
+			meta: { score: 92, flags: ['top'] },
+		});
+
+		// 1) read document
+		const doc1 = db.nested.get(id);
+
+		// mutate field
+		doc1!.id = 'player2';
+		doc1!.meta.score = 60;
+		doc1!.meta.flags = ['middle', 'final'];
+
+		const doc2 = db.nested.get(id);
+
+		// original must not change
+		expect(doc2!.id).toBe('player1');
+		expect(doc2!.meta.score).toBe(92);
+		expect(doc2!.meta.flags).toEqual(['top']);
+	});
 });

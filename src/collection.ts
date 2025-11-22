@@ -169,6 +169,14 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		return this.toArray().length;
 	}
 
+	keys(): Array<T[Pk]> {
+		return [...this.data.keys()];
+	}
+
+	has(primaryVal: T[Pk]): boolean {
+		return this.data.has(primaryVal);
+	}
+
 	filter(callback: (document: T) => boolean): ExecutableStage<T> {
 		return new Query<T, Pk>(this, {}).filter((element) => callback(element));
 	}

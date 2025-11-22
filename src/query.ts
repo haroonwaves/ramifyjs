@@ -5,9 +5,24 @@ export type Criteria<T> = {
 	[K in keyof T]?: T[K] | T[K][];
 };
 
+export type RangeOperator = {
+	$between?: [number, number];
+	$above?: number;
+	$below?: number;
+	$aboveOrEqual?: number;
+	$belowOrEqual?: number;
+	$notEquals?: any;
+};
+
 export type WhereStage<T> = {
 	anyOf(values: T[keyof T][]): ExecutableStage<T>;
 	equals(value: T[keyof T]): ExecutableStage<T>;
+	notEquals(value: T[keyof T]): ExecutableStage<T>;
+	between(lower: number, upper: number): ExecutableStage<T>;
+	above(value: number): ExecutableStage<T>;
+	below(value: number): ExecutableStage<T>;
+	aboveOrEqual(value: number): ExecutableStage<T>;
+	belowOrEqual(value: number): ExecutableStage<T>;
 };
 
 export type OrderableStage<T> = Omit<ExecutableStage<T>, 'orderBy'> & {
@@ -44,6 +59,7 @@ export class Query<T = any, P extends keyof T = keyof T>
 	private orderDirection: 'asc' | 'desc' = 'asc';
 	private limitCount: number | null = null;
 	private offsetCount: number = 0;
+	private rangeOperators: Map<string, RangeOperator> = new Map();
 
 	readonly collection: Collection<T, P>;
 	readonly criteria: Criteria<T>;
@@ -79,6 +95,60 @@ export class Query<T = any, P extends keyof T = keyof T>
 	equals(value: T[keyof T]): ExecutableStage<T> {
 		if (this.whereField)
 			this.criteria[this.whereField] = value as Criteria<T>[typeof this.whereField];
+		return this as ExecutableStage<T>;
+	}
+
+	notEquals(value: T[keyof T]): ExecutableStage<T> {
+		if (this.whereField) {
+			const operator = this.rangeOperators.get(this.whereField) || {};
+			operator.$notEquals = value;
+			this.rangeOperators.set(this.whereField, operator);
+		}
+		return this as ExecutableStage<T>;
+	}
+
+	between(lower: number, upper: number): ExecutableStage<T> {
+		if (this.whereField) {
+			const operator = this.rangeOperators.get(this.whereField) || {};
+			operator.$between = [lower, upper];
+			this.rangeOperators.set(this.whereField, operator);
+		}
+		return this as ExecutableStage<T>;
+	}
+
+	above(value: number): ExecutableStage<T> {
+		if (this.whereField) {
+			const operator = this.rangeOperators.get(this.whereField) || {};
+			operator.$above = value;
+			this.rangeOperators.set(this.whereField, operator);
+		}
+		return this as ExecutableStage<T>;
+	}
+
+	below(value: number): ExecutableStage<T> {
+		if (this.whereField) {
+			const operator = this.rangeOperators.get(this.whereField) || {};
+			operator.$below = value;
+			this.rangeOperators.set(this.whereField, operator);
+		}
+		return this as ExecutableStage<T>;
+	}
+
+	aboveOrEqual(value: number): ExecutableStage<T> {
+		if (this.whereField) {
+			const operator = this.rangeOperators.get(this.whereField) || {};
+			operator.$aboveOrEqual = value;
+			this.rangeOperators.set(this.whereField, operator);
+		}
+		return this as ExecutableStage<T>;
+	}
+
+	belowOrEqual(value: number): ExecutableStage<T> {
+		if (this.whereField) {
+			const operator = this.rangeOperators.get(this.whereField) || {};
+			operator.$belowOrEqual = value;
+			this.rangeOperators.set(this.whereField, operator);
+		}
 		return this as ExecutableStage<T>;
 	}
 
@@ -171,6 +241,8 @@ export class Query<T = any, P extends keyof T = keyof T>
 			(field) => collection.indexes.includes(field) || collection.multiEntryIndexes.includes(field)
 		);
 
+		const hasRangeOperators = this.rangeOperators.size > 0;
+
 		if (primaryField) {
 			records = this.getRecordsByPrimaryField(primaryField); // Query by primary key
 		} else if (indexFields.length > 0) {
@@ -180,6 +252,8 @@ export class Query<T = any, P extends keyof T = keyof T>
 		} else {
 			throw new Error('Ramify: No primary key or index fields found for the query');
 		}
+
+		if (hasRangeOperators) records = records.filter((record) => this.matchesRangeOperators(record));
 
 		if (orderField) {
 			records.sort((a, b) => {
@@ -275,5 +349,59 @@ export class Query<T = any, P extends keyof T = keyof T>
 		}
 
 		return recordValue === criteriaValue;
+	}
+
+	private matchesRangeOperators(record: T): boolean {
+		for (const [field, operators] of this.rangeOperators.entries()) {
+			const recordValue = getNestedValue(record as Record<string, unknown>, field);
+
+			// Handle notEquals
+			if (operators.$notEquals !== undefined) {
+				if (recordValue === operators.$notEquals) return false;
+			}
+
+			// Range operators require numeric values
+			if (typeof recordValue !== 'number') {
+				// If any numeric range operator is defined, but the value is not a number, fail
+				if (
+					operators.$between !== undefined ||
+					operators.$above !== undefined ||
+					operators.$below !== undefined ||
+					operators.$aboveOrEqual !== undefined ||
+					operators.$belowOrEqual !== undefined
+				) {
+					return false;
+				}
+				continue;
+			}
+
+			// Handle between
+			if (operators.$between !== undefined) {
+				const [lower, upper] = operators.$between;
+				if (recordValue < lower || recordValue > upper) return false;
+			}
+
+			// Handle above
+			if (operators.$above !== undefined) {
+				if (recordValue <= operators.$above) return false;
+			}
+
+			// Handle below
+			if (operators.$below !== undefined) {
+				if (recordValue >= operators.$below) return false;
+			}
+
+			// Handle aboveOrEqual
+			if (operators.$aboveOrEqual !== undefined) {
+				if (recordValue < operators.$aboveOrEqual) return false;
+			}
+
+			// Handle belowOrEqual
+			if (operators.$belowOrEqual !== undefined) {
+				if (recordValue > operators.$belowOrEqual) return false;
+			}
+		}
+
+		return true;
 	}
 }
