@@ -22,6 +22,7 @@ export function useLiveQuery<T>(
 		};
 		// dependencies.collections, dependencies.others, and callback are intentionally excluded to prevent unnecessary re-renders
 		// when the array reference changes but content remains the same
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [...dependencies.collections, ...dependencies.others]);
 
 	return result ?? callback();

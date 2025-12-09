@@ -220,7 +220,7 @@ function writeMarkdown(seedInfo: any, results: any[]) {
 
 	for (const r of results) {
 		md += `| ${r.label} | ${r.ops} | ${r.ms.toFixed(2)} | ${r.msPerOp.toFixed(6)} | ${Math.round(
-			r.opsPerSec
+			r.opsPerSec as number
 		).toLocaleString()} |\n`;
 	}
 

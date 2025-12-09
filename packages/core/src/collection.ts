@@ -178,7 +178,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	filter(callback: (document: T) => boolean): ExecutableStage<T> {
-		return new Query<T, Pk>(this, {}).filter((element) => callback(element));
+		return new Query<T, Pk>(this, {}).filter((element: T) => callback(element));
 	}
 
 	each(callback: (document: T) => void): void {

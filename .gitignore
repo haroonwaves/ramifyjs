@@ -7,4 +7,6 @@ yarn-error.log*
 .pnpm-debug.log*
 .idea/
 .vscode/
-performance/performance-results.md
+
+# Performance tracking
+packages/core/performance/performance-results.md

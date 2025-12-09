@@ -5,9 +5,6 @@
 		"tests/**/*.ts",
 		"jest.config.mjs",
 		"babel.config.cjs",
-		"performance/**/*.ts",
-		"eslint.config.mts",
-		"test.ts",
-		"performance.ts"
+		"performance/**/*.ts"
 	]
 }

@@ -1,0 +1,29 @@
+{
+	"name": "@ramify-db/core",
+	"version": "0.0.1",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"keywords": [],
+	"author": "Haroon (https://github.com/haroonwaves)",
+	"license": "MIT",
+	"scripts": {
+		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"type-check": "tsc --noEmit",
+		"test": "npm run build && jest",
+		"perf": "node ./performance/ramify.performance.ts"
+	},
+	"devDependencies": {
+		"jest": "^30.2.0",
+		"jiti": "^2.6.1",
+		"@babel/core": "^7.28.5",
+		"@babel/preset-env": "^7.28.5",
+		"@babel/preset-typescript": "^7.28.5",
+		"@types/jest": "^30.0.0",
+		"babel-jest": "^30.2.0"
+	}
+}

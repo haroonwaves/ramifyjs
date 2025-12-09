@@ -331,7 +331,7 @@ export class Query<T = any, P extends keyof T = keyof T>
 
 		return Object.entries(this.criteria).every(([field, value]) => {
 			const recordValue = getNestedValue(record as Record<string, unknown>, field);
-			const isMultiEntry = this.collection.multiEntryIndexes.includes(field);
+			const isMultiEntry: boolean = this.collection.multiEntryIndexes.includes(field);
 			return this.compareValues(recordValue, value, isMultiEntry);
 		});
 	}

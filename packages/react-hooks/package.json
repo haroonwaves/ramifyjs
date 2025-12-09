@@ -1,0 +1,24 @@
+{
+	"name": "@ramify-db/react-hooks",
+	"version": "0.0.1",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"keywords": [],
+	"author": "Haroon (https://github.com/haroonwaves)",
+	"license": "MIT",
+	"scripts": {
+		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"type-check": "tsc --noEmit"
+	},
+	"peerDependencies": {
+		"react": ">=18"
+	},
+	"devDependencies": {
+		"@types/react": "^18.x"
+	}
+}
