@@ -1,14 +1,16 @@
 {
-	"name": "app",
-	"version": "0.1.0",
+	"name": "@ramify-db/app",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start",
+		"export": "next export"
 	},
 	"dependencies": {
-		"@haroonwaves/blog-kit-core": "^1.0.4",
+		"@haroonwaves/blog-kit-core": "^1.0.5",
+		"@haroonwaves/blog-kit-react": "^1.0.5",
 		"next": "16.0.8",
 		"react": "19.2.1",
 		"react-dom": "19.2.1"
