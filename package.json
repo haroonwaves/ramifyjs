@@ -20,6 +20,7 @@
 	"author": "Haroon (https://github.com/haroonwaves)",
 	"license": "MIT",
 	"scripts": {
+		"dev": "pnpm -r dev",
 		"build": "pnpm -r build",
 		"check": "npm run lint && npm run format:check && npm run type-check",
 		"lint": "eslint . --ext .ts,.tsx",

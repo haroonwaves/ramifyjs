@@ -38,5 +38,5 @@
 
 		"@typescript-eslint/no-redundant-type-constituents": "off"
 	},
-	"ignorePatterns": ["dist", "node_modules", "*.js", "*.mjs"]
+	"ignorePatterns": ["dist", "node_modules"]
 }

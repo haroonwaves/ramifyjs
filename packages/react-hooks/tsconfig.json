@@ -8,6 +8,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src/**/*", "../react-hooks/useLiveQuery.ts"],
+	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]
 }
