@@ -10,6 +10,11 @@ import {
 import type { Schema } from '@/types';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 
+/*
+	primaryMap => Map<primaryKey, document>
+	indexMaps => {[index]: Map<value, Map<primaryKey, document>>}
+*/
+
 export type CollectionOperation = 'create' | 'update' | 'delete' | 'clear';
 
 function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
@@ -46,7 +51,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		this.batchOperationInProgress = false;
 	}
 
-	where<K extends keyof T>(field: K): WhereStage<T>;
+	where<K extends keyof T>(field: K): WhereStage<T, K>;
 	where(criteria: Criteria<T>): ExecutableStage<T>;
 	where(criteriaOrField: Criteria<T> | keyof T): WhereStage<T> | ExecutableStage<T> {
 		return new Query<T, Pk>(this, criteriaOrField);

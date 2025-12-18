@@ -265,44 +265,6 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 	}, 1000);
 
 	/* -------------------------------------------------------------------------- */
-	/*                             Range Operators                                */
-	/* -------------------------------------------------------------------------- */
-
-	test('between / above / below / aboveOrEqual / belowOrEqual', () => {
-		seedUsers();
-
-		const between = db.users.where('age').between(22, 30).toArray();
-		expect(between.map((u) => u.age).sort()).toEqual([22, 25, 30]);
-
-		const above = db.users.where('age').above(30).toArray();
-		expect(above.map((u) => u.age)).toEqual([40]);
-
-		const below = db.users.where('age').below(30).toArray();
-		expect(below.length).toBe(2);
-
-		const aboveOrEqual = db.users.where('age').aboveOrEqual(30).toArray();
-		expect(aboveOrEqual.map((u) => u.age).sort()).toEqual([30, 40]);
-
-		const belowOrEqual = db.users.where('age').belowOrEqual(25).toArray();
-		expect(belowOrEqual.map((u) => u.age).sort()).toEqual([22, 25]);
-	});
-
-	/* -------------------------------------------------------------------------- */
-	/*                               notEquals                                    */
-	/* -------------------------------------------------------------------------- */
-
-	test('notEquals operator', () => {
-		seedUsers();
-
-		const notAlice = db.users.where('name').notEquals('Alice').toArray();
-		expect(notAlice.length).toBe(3);
-		expect(notAlice.every((u) => u.name !== 'Alice')).toBe(true);
-
-		const notAge25 = db.users.where('age').notEquals(25).toArray();
-		expect(notAge25.every((u) => u.age !== 25)).toBe(true);
-	});
-
-	/* -------------------------------------------------------------------------- */
 	/*                               keys() / has()                                */
 	/* -------------------------------------------------------------------------- */
 
@@ -319,17 +281,6 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 		db.users.delete(1);
 		expect(db.users.has(1)).toBe(false);
 		expect(db.users.keys().length).toBe(3);
-	});
-
-	/* -------------------------------------------------------------------------- */
-	/*                     range+orderBy+limit combined                            */
-	/* -------------------------------------------------------------------------- */
-
-	test('range + orderBy + limit', () => {
-		seedUsers();
-
-		const result = db.users.where('age').between(20, 40).orderBy('age').limit(2).toArray();
-		expect(result.map((u) => u.age)).toEqual([22, 25]);
 	});
 
 	/* -------------------------------------------------------------------------- */

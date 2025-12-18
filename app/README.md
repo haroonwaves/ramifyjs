@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ramify DB Documentation
 
-## Getting Started
+This is the documentation website for Ramify DB, built with Next.js 16, React 19, and Tailwind
+CSS 4.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 📚 **Comprehensive Documentation** - Complete guides, API reference, and examples
+- 🎨 **Beautiful UI** - Modern design with glassmorphism, gradients, and smooth animations
+- 🌓 **Dark Mode** - Full dark mode support with system preference detection
+- 🔍 **Easy Navigation** - Sidebar navigation with active state highlighting
+- 📱 **Responsive** - Works perfectly on all devices
+- ⚡ **Fast** - Built with Next.js for optimal performance
+
+## Documentation Structure
+
+The documentation is organized into the following sections:
+
+### Getting Started
+
+- **Introduction** - Learn the basics and get up and running quickly
+
+### Core Concepts
+
+- **API Reference** - Complete reference for all classes, methods, and types
+- **Advanced Queries** - Master complex querying patterns and techniques
+- **Live Queries** - Build reactive UIs with live query observation
+
+### Guides
+
+- **Best Practices** - Tips and patterns for building efficient applications
+- **Examples** - Real-world examples and use cases
+
+## Adding New Documentation
+
+Documentation files are markdown files located in `/content/docs/`. Each file should have
+frontmatter:
+
+```markdown
+---
+title: Your Title
+description: Your description
+date: 2024-12-10
+category: Tutorial | Reference | Guide
+---
+
+# Your Content Here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The blog-kit system automatically generates routes and navigation from these files.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The documentation site runs alongside the main Ramify DB development:
 
-## Learn More
+```bash
+# Start the dev server
+pnpm dev
 
-To learn more about Next.js, take a look at the following resources:
+# Build for production
+pnpm build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start production server
+pnpm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Components
 
-## Deploy on Vercel
+### DocsSidebar
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Located in `/src/components/docs-sidebar.tsx`, this component provides the navigation sidebar with
+sections and links.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### CodePlayground
+
+Located in `/src/components/code-playground.tsx`, this component allows users to experiment with
+code examples interactively.
+
+### ThemeToggle
+
+Located in `/src/components/theme-toggle.tsx`, this component provides dark/light/system theme
+switching.
+
+## Styling
+
+The site uses:
+
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **shadcn/ui** - High-quality React components
+- **Custom CSS** - Additional styles in `/src/app/globals.css`
+
+## Blog Kit Integration
+
+The documentation uses `@haroonwaves/blog-kit-core` and `@haroonwaves/blog-kit-react` for:
+
+- Markdown parsing and rendering
+- Syntax highlighting with Prism
+- Automatic route generation
+- Metadata extraction
+
+## License
+
+MIT © Usman Haroon

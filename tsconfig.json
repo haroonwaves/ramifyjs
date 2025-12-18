@@ -6,7 +6,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		"types": ["node"],
+		"types": ["node", "jest"],
 		"skipLibCheck": true,
 		"strict": true,
 		"esModuleInterop": true,
