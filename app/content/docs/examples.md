@@ -14,8 +14,8 @@ Practical examples showing how to use Ramify DB in real-world applications.
 A complete todo list with filtering and persistence.
 
 ```typescript
-import { Ramify } from 'ramify-db';
-import { useLiveQuery } from 'ramify-db/react';
+import { Ramify } from '@ramify-db/core';
+import { useLiveQuery } from '@ramify-db/react-hooks';
 import { useState } from 'react';
 
 // Define types

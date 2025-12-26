@@ -30,7 +30,6 @@ in-memory structures to hold your data.
 
 Each collection is dedicated to a specific entity type (e.g., `User`, `Post`).
 
-- **Type Safety**: TypeScript generics (`Collection<T>`) ensure that you can't insert invalid data.
 - **Reactive Updates**: Collections emit events when data changes, which powers Ramify's Live Query
   system.
 - **Indexing**: Collections manage their own indexes to optimize lookups.
@@ -38,7 +37,7 @@ Each collection is dedicated to a specific entity type (e.g., `User`, `Post`).
 ### Examples
 
 ```typescript
-import { Ramify } from 'ramify-db';
+import { Ramify, type Schema } from 'ramify-db';
 
 // Initialize Ramify
 const ramify = new Ramify();
@@ -52,10 +51,13 @@ interface User {
 }
 
 // Create a store with collections and schema
-const db = ramify.createStore({
+const db = ramify.createStore<{
+	users: Schema<User, 'id'>;
+}>({
 	users: {
 		primaryKey: 'id',
 		indexes: ['email', 'age'],
+		multiEntry: ['tags'],
 	},
 });
 

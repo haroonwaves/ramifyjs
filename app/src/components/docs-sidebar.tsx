@@ -31,6 +31,16 @@ const docSections: DocSection[] = [
 		],
 	},
 	{
+		title: 'API Reference',
+		icon: Package,
+		items: [
+			{ title: 'Store API', href: '/docs/api/store' },
+			{ title: 'Collection API', href: '/docs/api/collection' },
+			{ title: 'Query API', href: '/docs/api/query' },
+			{ title: 'React Hooks', href: '/docs/api/react-hooks' },
+		],
+	},
+	{
 		title: 'Guides',
 		icon: Lightbulb,
 		items: [
@@ -39,16 +49,6 @@ const docSections: DocSection[] = [
 			{ title: 'Search', href: '/docs/guides/search' },
 			{ title: 'Performance', href: '/docs/guides/performance' },
 			{ title: 'Persistence', href: '/docs/guides/persistence' },
-		],
-	},
-	{
-		title: 'API Reference',
-		icon: Package,
-		items: [
-			{ title: 'Store API', href: '/docs/api/store' },
-			{ title: 'Collection API', href: '/docs/api/collection' },
-			{ title: 'Query API', href: '/docs/api/query' },
-			{ title: 'React Hooks', href: '/docs/api/react-hooks' },
 		],
 	},
 	{

@@ -5,76 +5,408 @@ description: 'Complete query syntax and operators reference'
 
 ## Query API
 
-Queries in Ramify DB are built using a **fluent Interface**. You start a query with `.where()`,
+Queries in Ramify DB are built using a **fluent interface**. You start a query with `.where()`,
 chain operators, and execute it with a termination method (like `toArray()` or `first()`).
+
+---
 
 ### Starting a Query
 
 #### `where(field)`
 
-Target a specific field for range or comparison operations.
+Target a specific field for filtering operations.
+
+**Example:**
 
 ```typescript
-users.where('age').above(18);
+users.where('age').equals(18);
 ```
+
+**Parameters:**
+
+- **`field`**: `K extends keyof T` - The field name to query
+
+**Returns:** `WhereStage<T, K>` - A query stage with filtering operators
+
+---
 
 #### `where(criteria)`
 
-Match fields by equality (or inclusion).
+Match fields by equality (or inclusion for array values).
+
+**Example:**
 
 ```typescript
+// Exact match
+users.where({ role: 'admin' });
+
+// Array values act as IN operator
 users.where({
 	role: 'admin',
-	status: ['active', 'pending'], // acts as IN
+	status: ['active', 'pending'], // matches if status is 'active' OR 'pending'
 });
 ```
 
-### Comparison Methods
+**Parameters:**
+
+- **`criteria`**: `Criteria<T>` - An object with field-value pairs to match
+
+Where `Criteria<T>` is defined as:
+
+```typescript
+type Criteria<T> = {
+	[K in keyof T]?: T[K] | T[K][];
+};
+```
+
+**Returns:** `ExecutableStage<T>` - An executable query stage
+
+---
+
+### Filtering Methods
 
 Available after `where(field)`.
 
-- **`equals(value)`**: Exact match.
-- **`notEquals(value)`**: Not match.
-- **`anyOf(values)`**: Match any value in the array.
-- **`above(value)`**: `>`
-- **`aboveOrEqual(value)`**: `>=`
-- **`below(value)`**: `<`
-- **`belowOrEqual(value)`**: `<=`
-- **`between(lower, upper)`**: Inclusive range `[lower, upper]`.
+#### `equals(value)`
+
+Exact match for the specified field.
+
+**Example:**
+
+```typescript
+users.where('status').equals('active').toArray();
+```
+
+**Parameters:**
+
+- **`value`**: `T[K]` - The value to match (for array fields, matches individual elements)
+
+**Returns:** `ExecutableStage<T>` - An executable query stage
+
+---
+
+#### `anyOf(values)`
+
+Match any value in the provided array.
+
+**Example:**
+
+```typescript
+users.where('role').anyOf(['admin', 'moderator']).toArray();
+```
+
+**Parameters:**
+
+- **`values`**: Array of values - Match documents where the field equals any of these values
+
+**Returns:** `ExecutableStage<T>` - An executable query stage
+
+---
+
+#### `allOf(values)`
+
+Match all values in the provided array (for multi-entry indexes).
+
+**Example:**
+
+```typescript
+// Assuming 'tags' is a multi-entry index
+users.where('tags').allOf(['javascript', 'typescript']).toArray();
+```
+
+**Parameters:**
+
+- **`values`**: Array of values - Match documents where the field contains all of these values
+
+**Returns:** `ExecutableStage<T>` - An executable query stage
+
+**Note:** This is primarily useful for multi-entry indexed array fields.
+
+---
 
 ### Modifiers
 
-Chain these to sort or paginate.
+Chain these to sort, paginate, or apply additional filtering.
 
-- **`orderBy(field)`**: Sort results.
-- **`reverse()`**: Reverse sort order.
-- **`limit(n)`**: Take first N results.
-- **`offset(n)`**: Skip first N results.
-- **`filter(cb)`**: Apply arbitrary JS filter (runs after index queries).
+#### `orderBy(field)`
+
+Sort results by the specified field in ascending order.
+
+**Example:**
+
+```typescript
+users.where('status').equals('active').orderBy('lastName').toArray();
+```
+
+**Parameters:**
+
+- **`field`**: `keyof T` - The field to sort by
+
+**Returns:** `OrderableStage<T>` - An orderable query stage (supports `.reverse()`)
+
+---
+
+#### `reverse()`
+
+Reverse the sort order (only available after `orderBy()`).
+
+**Example:**
+
+```typescript
+users.orderBy('createdAt').reverse().toArray(); // Descending order
+```
+
+**Parameters:** None
+
+**Returns:** `OrderableStage<T>` - An orderable query stage
+
+---
+
+#### `limit(n)`
+
+Take the first N results.
+
+**Example:**
+
+```typescript
+users.where('status').equals('active').limit(10).toArray();
+```
+
+**Parameters:**
+
+- **`count`**: `number` - Maximum number of results to return
+
+**Returns:** `LimitedStage<T>` - A limited query stage
+
+---
+
+#### `offset(n)`
+
+Skip the first N results.
+
+**Example:**
+
+```typescript
+users.where('status').equals('active').offset(10).limit(10).toArray();
+```
+
+**Parameters:**
+
+- **`count`**: `number` - Number of results to skip
+
+**Returns:** `LimitedStage<T>` - A limited query stage
+
+---
+
+#### `filter(callback)`
+
+Apply an arbitrary JavaScript filter. This runs **after** index queries and is slower than indexed
+queries.
+
+**Example:**
+
+```typescript
+users
+	.where('status')
+	.equals('active')
+	.filter((u) => u.name.startsWith('A'))
+	.toArray();
+```
+
+**Parameters:**
+
+- **`callback`**: `(document: T) => boolean` - Predicate function to filter documents
+
+**Returns:** `ExecutableStage<T>` - An executable query stage
+
+---
 
 ### Execution Methods
 
-Terminate the chain and get results.
+Terminate the query chain and get results.
 
-- **`toArray()`**: Returns all matching documents.
-- **`first()`**: Returns the first match or undefined.
-- **`last()`**: Returns the last match or undefined.
-- **`count()`**: Returns the number of matches.
-- **`delete()`**: Deletes all matching documents.
-- **`modify(changes)`**: Updates all matching documents.
+#### `toArray()`
+
+Returns all matching documents as an array.
+
+**Example:**
+
+```typescript
+const activeUsers = users.where('status').equals('active').toArray();
+```
+
+**Parameters:** None
+
+**Returns:** `T[]` - Array of matching documents
+
+---
+
+#### `first()`
+
+Returns the first matching document.
+
+**Example:**
+
+```typescript
+const firstAdmin = users.where('role').equals('admin').first();
+```
+
+**Parameters:** None
+
+**Returns:** `T | undefined` - The first matching document, or `undefined` if no matches
+
+---
+
+#### `last()`
+
+Returns the last matching document.
+
+**Example:**
+
+```typescript
+const lastUser = users.orderBy('createdAt').last();
+```
+
+**Parameters:** None
+
+**Returns:** `T | undefined` - The last matching document, or `undefined` if no matches
+
+---
+
+#### `count()`
+
+Returns the number of matching documents.
+
+**Example:**
+
+```typescript
+const activeCount = users.where('status').equals('active').count();
+```
+
+**Parameters:** None
+
+**Returns:** `number` - The count of matching documents
+
+---
+
+#### `delete()`
+
+Deletes all matching documents.
+
+**Example:**
+
+```typescript
+const deleted = users.where('status').equals('inactive').delete();
+console.log(`Deleted ${deleted.length} users`);
+```
+
+**Parameters:** None
+
+**Returns:** `Array<T[Pk] | undefined>` - Array of deleted primary keys
+
+---
+
+#### `modify(changes)`
+
+Updates all matching documents with the specified changes.
+
+**Example:**
+
+```typescript
+const modified = users.where('status').equals('pending').modify({ status: 'active' });
+console.log(`Modified ${modified} users`);
+```
+
+**Parameters:**
+
+- **`changes`**: `Partial<T>` - An object containing the fields to update
+
+**Returns:** `number` - The number of documents modified
+
+---
+
+### Query Stages
+
+The query API uses a type-safe fluent interface with different stages:
+
+#### `WhereStage<T, K>`
+
+Available after `where(field)`. Provides filtering operators:
+
+- `equals(value)`
+- `anyOf(values)`
+- `allOf(values)`
+
+#### `ExecutableStage<T>`
+
+Available after applying a filter or using `where(criteria)`. Provides:
+
+- Modifiers: `orderBy()`, `limit()`, `offset()`, `filter()`
+- Execution: `toArray()`, `first()`, `last()`, `count()`, `delete()`, `modify()`
+
+#### `OrderableStage<T>`
+
+Available after `orderBy()`. Extends `ExecutableStage<T>` with:
+
+- `reverse()`
+
+#### `LimitedStage<T>`
+
+Available after `limit()` or `offset()`. Extends `ExecutableStage<T>`.
+
+---
 
 ### Examples
 
+#### Exact match
+
 ```typescript
-// Range Query
-users.where('age').between(18, 65).toArray();
-
-// Complex Sort & Limit
-users.where('status').equals('active').orderBy('lastName').offset(10).limit(5).toArray();
-
-// Delete by Query
-users
-	.where('lastLogin')
-	.below(Date.now() - 10000)
-	.delete();
+users.where('status').equals('active').toArray();
 ```
+
+#### Match any value
+
+```typescript
+users.where('role').anyOf(['admin', 'moderator']).toArray();
+```
+
+#### Complex sort & limit
+
+```typescript
+users.where('status').equals('active').orderBy('lastName').offset(10).limit(5).toArray();
+```
+
+#### Delete by query
+
+```typescript
+users.where('status').equals('inactive').delete();
+```
+
+#### Modify by query
+
+```typescript
+users
+	.where('role')
+	.equals('user')
+	.modify({ permissions: ['read'] });
+```
+
+#### Chaining filters
+
+```typescript
+users
+	.where('status')
+	.equals('active')
+	.filter((u) => u.age > 18)
+	.orderBy('name')
+	.toArray();
+```
+
+---
+
+### Performance Tips
+
+- **Use indexed queries** – Queries on indexed fields are significantly faster than `filter()`.
+- **Order matters** – Apply indexed filters first, then use `filter()` for additional criteria.
+- **Limit early** – Use `limit()` to reduce the number of documents processed.
+- **Multi-entry indexes** – Use `allOf()` for array fields with multi-entry indexes.

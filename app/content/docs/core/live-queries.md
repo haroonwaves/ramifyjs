@@ -17,12 +17,12 @@ re-render with the new data.
 ### The `useLiveQuery` Hook
 
 ```tsx
-import { useLiveQuery } from 'ramify-db/react';
+import { useLiveQuery } from '@ramify-db/react-hooks';
 
 function UserList() {
 	const users = useLiveQuery(
 		// 1. Query Function
-		() => db.users.where('age').above(18).toArray(),
+		() => db.users.where({ status: 'active' }).toArray(),
 		// 2. Dependencies
 		{
 			collections: [db.users],
@@ -64,6 +64,5 @@ Ramify's approach is more direct and similar to `dexie-react-hooks`.
 
 ### Common pitfalls
 
-- **Not memoizing query objects**: Causes unnecessary re-subscriptions
 - **Using in non-React contexts**: Use observers instead
 - **Too many live queries**: Each subscription has overhead

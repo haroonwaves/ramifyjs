@@ -39,11 +39,11 @@ Since it is in-memory:
 #### How do I install Ramify DB?
 
 ```bash
-npm install ramify-db
+npm install @ramify-db/core
 # or
-pnpm add ramify-db
+pnpm add @ramify-db/core
 # or
-yarn add ramify-db
+yarn add @ramify-db/core
 ```
 
 #### Do I need to install anything else?
@@ -52,7 +52,7 @@ For React integration, you'll need React 16.8+ (for hooks support). The React ho
 the main package:
 
 ```typescript
-import { useLiveQuery } from 'ramify-db/react';
+import { useLiveQuery } from '@ramify-db/react-hooks';
 ```
 
 #### Can I use Ramify DB with TypeScript?
@@ -61,7 +61,7 @@ Yes! Ramify DB is written in TypeScript and provides full type safety. All types
 inferred from your schema:
 
 ```typescript
-const db = ramify.createStore({
+const db = new Ramify().createStore({
 	users: {
 		primaryKey: 'id',
 		indexes: ['email'],
@@ -193,10 +193,10 @@ db.users.filter((u) => u.role === 'admin' || u.status === 'premium').toArray();
 Combine indexed queries with `filter()`:
 
 ```typescript
-// Adults who are admins OR have premium status
+// Active users with admin role OR premium status
 db.users
-	.where('age')
-	.aboveOrEqual(18) // Indexed query
+	.where('status')
+	.equals('active') // Indexed query
 	.filter((u) => u.role === 'admin' || u.status === 'premium') // Complex logic
 	.toArray();
 ```
@@ -344,7 +344,7 @@ const page = db.users
 
 ```typescript
 const oldDate = Date.now() - 30 * 24 * 60 * 60 * 1000;
-db.posts.where('createdAt').below(oldDate).delete();
+db.posts.filter((p) => p.createdAt < oldDate).delete();
 ```
 
 4. **Lazy loading** - Load data on demand

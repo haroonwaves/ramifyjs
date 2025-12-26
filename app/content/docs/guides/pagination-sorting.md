@@ -5,60 +5,66 @@ description: 'Handle large datasets with pagination and sorting'
 
 ## Pagination & Sorting
 
-### Overview
+Efficiently handle large datasets with Ramify DB's built-in pagination and sorting capabilities.
 
-Efficiently handling large datasets is crucial for performance and user experience. Ramify DB
-supports both **Sort** operations and **Pagination** (Offset-based or Cursor-based) directly in the
-query chain.
+### Sorting
 
-### Concepts
-
-#### Sorting
-
-Sorting requires an index on the field being sorted. This ensures that ordering operations are fast
-and do not require loading the entire collection into memory to sort. You can sort in ascending
-(`orderBy`) or descending (`reverse`) order.
-
-#### Offset Pagination
-
-The most common form of pagination, using `limit()` and `offset()`. It is suitable for most UI
-components like data tables.
-
-- **Pros**: Easy to implement.
-- **Cons**: Performance degrades if `offset` becomes very large (e.g., skipping 10,000 records
-  requires scanning them).
-
-#### Cursor-Based Pagination
-
-For very large datasets or infinite scroll, cursor-pagination is preferred. Instead of skipping
-records, you query for records _after_ the last record of the previous page.
-
-- **Pros**: Constant time performance regardless of dataset size.
-- **Cons**: Requires a slightly more complex query setup.
-
-### Examples
+You can sort results in ascending or descending order using `orderBy()` and `reverse()`.
 
 ```typescript
-// SORTING
-// Sort by indexed field
-const sorted = users.where('name').orderBy('name').toArray();
-const reverse = users.where('createdAt').orderBy('createdAt').reverse().toArray();
+// Sort by any field (ascending)
+const sorted = users.orderBy('age').toArray();
 
-// OFFSET PAGINATION
-const page1 = users.limit(10).offset(0).toArray();
-const page2 = users.limit(10).offset(10).toArray();
+// Sort in descending order
+const reversed = users.orderBy('age').reverse().toArray();
 
-// CURSOR PAGINATION
-// 1. Get first page
-const firstPage = users.limit(10).orderBy('id').toArray();
-const lastId = firstPage[firstPage.length - 1].id;
-
-// 2. Get next page starting after lastId
-const nextPage = users.where('id').above(lastId).limit(10).toArray();
+// Combine with where queries
+const activeUsers = users.where({ active: true }).orderBy('name').toArray();
 ```
 
-### Common pitfalls
+> [!NOTE] You can sort by any field. Sorting uses JavaScript's `Array.sort()` and is not optimized
+> by indexes. However, indexing fields used in `where()` queries will improve the filtering
+> performance before sorting is applied.
 
-- **Using skip for large offsets**: Slow on big datasets, use cursor pagination
-- **Not indexing sort fields**: Sorting without indexes is slow
-- **Inconsistent ordering**: Always include a unique field in sort for stability
+### Offset Pagination
+
+The most common pagination method, using `limit()` and `offset()`. Perfect for data tables and
+traditional page-based UIs.
+
+```typescript
+// First page (10 items)
+const page1 = db.users.orderBy('id').limit(10).offset(0).toArray();
+
+// Second page
+const page2 = db.users.orderBy('id').limit(10).offset(10).toArray();
+
+// With filtering
+const activePage1 = db.users
+	.where({ active: true })
+	.orderBy('createdAt')
+	.limit(20)
+	.offset(0)
+	.toArray();
+```
+
+### Cursor-Based Pagination
+
+Alternatively you can use cursor pagination if you are data is likely to change often.
+
+```typescript
+const firstPageByDate = db.users.orderBy('createdAt').limit(10).toArray();
+const lastTimestamp = firstPageByDate[firstPageByDate.length - 1].createdAt;
+
+// Get IDs where createdAt > lastTimestamp, then fetch those records
+const usersAfter = db.users
+	.filter((u) => u.createdAt > lastTimestamp)
+	.orderBy('createdAt')
+	.limit(10)
+	.toArray();
+```
+
+### Common Pitfalls
+
+- **Large offsets**: Avoid `offset(10000)` on huge datasets—use cursor pagination instead
+- **Missing indexes**: Index fields used in `where()` queries for better performance
+- **Inconsistent ordering**: Always sort by a unique field (like `id`) for stable pagination

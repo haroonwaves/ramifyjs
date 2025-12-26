@@ -1,30 +1,55 @@
-`--- title: 'Store API' description: 'Complete API reference for the Store class'
-
----
-
 ## Store API
 
 The **Store API** is initialized via the `Ramify` class. It serves as the central database instance,
 managing collections, definitions, and schemas.
 
+---
+
 ### Core Methods
 
-#### `new Ramify()`
+#### `new Ramify<T>()`
 
 Creates a new Ramify instance.
 
+**Example:**
+
 ```typescript
-import { Ramify } from 'ramify-db';
+import { Ramify, type Schema } from '@ramify-db/core';
 
 const ramify = new Ramify();
 ```
 
-#### `createStore(schema)`
+**Parameters:** None
 
-Defines the database schema and creates collections.
+**Returns:** A new `Ramify<T>` instance
+
+---
+
+#### `createStore<S>(storeDefinition)`
+
+Defines the database schema and creates collections. This method infers document types and primary
+keys from the schema definition.
+
+**Example:**
 
 ```typescript
-const db = ramify.createStore({
+interface User {
+	id: string;
+	email: string;
+	role: string;
+	tags: string[];
+}
+
+interface Post {
+	id: string;
+	userId: string;
+	title: string;
+}
+
+const db = ramify.createStore<{
+	users: Schema<User, 'id'>;
+	posts: Schema<Post, 'id'>;
+}>({
 	users: {
 		primaryKey: 'id',
 		indexes: ['email', 'role'],
@@ -35,53 +60,73 @@ const db = ramify.createStore({
 		indexes: ['userId'],
 	},
 });
+
+// db.users is now typed as Collection<User, 'id'>
+// db.posts is now typed as Collection<Post, 'id'>
 ```
 
 **Parameters:**
 
-- `schema`: An object mapping collection names to their schema definition.
-  - `primaryKey`: The field used as the unique identifier.
-  - `indexes`: Array of fields to be indexed for fast lookups.
-  - `multiEntry`: Array of array-fields where each element should be indexed individually.
+- **`storeDefinition`**: `S` - An object mapping collection names to their schema definition
+  - **`primaryKey`**: `Pk extends keyof T` - The field used as the unique identifier (required)
+  - **`indexes`**: `string[]` - Array of fields to be indexed for fast lookups (optional)
+  - **`multiEntry`**: `string[]` - Array of array-fields where each element should be indexed
+    individually (optional)
 
-**Returns:** An object containing the typed collections.
+**Returns:** A typed store object where:
+
+- The store extends `Ramify` with inferred document types
+- Each collection is accessible as a property with type `Collection<T, Pk>`
+
+---
 
 #### `delete()`
 
 Clears all data from all collections in the store.
 
+**Example:**
+
 ```typescript
 ramify.delete();
 ```
 
-**Returns:** `void`.
+**Parameters:** None
+
+**Returns:** `void`
+
+---
 
 ### Schema Definition
 
-Where `Schema` is defined as:
+The `Schema` type is defined as:
 
 ```typescript
-type Schema<T, Pk extends keyof T> = {
-	primaryKey: Pk;
-	indexes?: string[];
-	multiEntry?: string[];
+type Schema<T, PK extends keyof T = keyof T> = {
+	primaryKey: PK;
+	indexes?: Array<keyof T & string>;
+	multiEntry?: Array<keyof T & string>;
 };
 ```
+
+**Type Parameters:**
+
+- **`T`**: The document type for the collection
+- **`Pk`**: The primary key field name, must be a key of `T`
+
+---
 
 ### Common Pitfalls
 
 - **Defining indexes later** – Indexes must be defined at store creation time in the schema. You
   cannot add them dynamically later.
 - **Missing Primary Key** – Every collection requires a valid `primaryKey`.
+- **Type mismatches** – Ensure the `primaryKey` specified in the schema matches a field in your
+  document type.
 
-{{ ... }}
+---
 
 ### Mental Model
 
 - **Ramify Instance** → Database Server
 - **Store Definition** → Schema / Migration
 - **Collection** → Table
-
-```
-
-```

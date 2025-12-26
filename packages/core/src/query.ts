@@ -1,8 +1,18 @@
 import { Collection } from '@/collection.js';
+import type { GetNestedType, NestedKeyOf } from '@/types';
+import { getNestedValue } from '@/utils/getNestedValue';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 
+/**
+ * whereCriteria (Object): always perform exact query
+ * whereStage (String)
+  - $equals (Any): perform exact query
+  - $anyOf (Array): perform inexact query
+  - $allOf (Array): perform inexact query
+ **/
+
 export type Criteria<T> = {
-	[K in keyof T]?: T[K] | T[K][];
+	[K in keyof T]?: T[K];
 };
 
 export type WhereStageOperator = {
@@ -13,8 +23,19 @@ export type WhereStageOperator = {
 
 export type WhereStage<T, K extends keyof T = keyof T> = {
 	anyOf(values: T[K] extends (infer E)[] ? E[] : T[K][]): ExecutableStage<T>;
-	equals(value: T[K] extends (infer E)[] ? E : T[K]): ExecutableStage<T>;
+	equals(value: T[K]): ExecutableStage<T>;
 	allOf(values: T[K] extends (infer E)[] ? E[] : T[K][]): ExecutableStage<T>;
+};
+
+// Overload for nested paths using string
+export type WhereStageNested<T, Path extends string> = {
+	anyOf(
+		values: GetNestedType<T, Path> extends (infer E)[] ? E[] : GetNestedType<T, Path>[]
+	): ExecutableStage<T>;
+	equals(value: GetNestedType<T, Path>): ExecutableStage<T>;
+	allOf(
+		values: GetNestedType<T, Path> extends (infer E)[] ? E[] : GetNestedType<T, Path>[]
+	): ExecutableStage<T>;
 };
 
 export type OrderableStage<T> = Omit<ExecutableStage<T>, 'orderBy'> & {
@@ -31,19 +52,13 @@ export type ExecutableStage<T> = {
 	toArray(): T[];
 	first(): T | undefined;
 	last(): T | undefined;
-	modify(changes: Partial<T>): number;
+	modify(changes: Partial<T>): (T[keyof T] | undefined)[];
 	delete(): Array<T[keyof T] | undefined>;
 	count(): number;
 };
 
-function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-	return path
-		.split('.')
-		.reduce((acc: unknown, part) => (acc as Record<string, unknown>)?.[part], obj);
-}
-
-export class Query<T = any, P extends keyof T = keyof T>
-	implements ExecutableStage<T>, WhereStage<T>
+export class Query<T = any, PK extends keyof T = keyof T>
+	implements ExecutableStage<T>, WhereStage<T>, WhereStageNested<T, any>
 {
 	private results: T[] | null = null;
 	private orderField: keyof T | null = null;
@@ -51,11 +66,12 @@ export class Query<T = any, P extends keyof T = keyof T>
 	private limitCount: number | null = null;
 	private offsetCount: number = 0;
 	private whereStage: [Extract<keyof T, string>, WhereStageOperator] | null = null;
+	private isExact: boolean = true;
 
-	readonly collection: Collection<T, P>;
+	readonly collection: Collection<T, PK>;
 	readonly criteria: Criteria<T>;
 
-	constructor(collection: Collection<T, P>, criteria: Criteria<T> | keyof T) {
+	constructor(collection: Collection<T, PK>, criteria: Criteria<T> | keyof T | NestedKeyOf<T>) {
 		this.collection = collection;
 		this.criteria = typeof criteria === 'object' ? criteria : ({} as Criteria<T>);
 		this.orderField = null;
@@ -79,69 +95,72 @@ export class Query<T = any, P extends keyof T = keyof T>
 
 	anyOf(values: any[]): ExecutableStage<T> {
 		if (this.whereStage) {
-			const [field, operator] = this.whereStage;
+			const [, operator] = this.whereStage;
 			operator.$anyOf = values;
-			this.criteria[field] = values; // For primary/index query matching
 		}
 		return this as ExecutableStage<T>;
 	}
 
 	allOf(values: any[]): ExecutableStage<T> {
 		if (this.whereStage) {
-			const [field, operator] = this.whereStage;
+			const [, operator] = this.whereStage;
 			operator.$allOf = values;
-			this.criteria[field] = values; // For primary/index query matching
 		}
 		return this as ExecutableStage<T>;
 	}
 
 	equals(value: any): ExecutableStage<T> {
 		if (this.whereStage) {
-			const [field, operator] = this.whereStage;
+			const [, operator] = this.whereStage;
 			operator.$equals = value;
-			this.criteria[field] = value; // For primary/index query matching
 		}
 		return this as ExecutableStage<T>;
 	}
 
 	first(): T | undefined {
 		if (!this.results) this.execute();
-		return this.results?.length ? this.results[0] : undefined;
+		return this.results?.length ? createLazyCloneProxy<T>(this.results[0]) : undefined;
 	}
 
 	last(): T | undefined {
 		if (!this.results) this.execute();
-		return this.results?.length ? this.results.at(-1) : undefined;
+		return this.results?.length ? createLazyCloneProxy<T>(this.results.at(-1) as T) : undefined;
 	}
 
 	toArray(): T[] {
 		if (!this.results) this.execute();
-		return this.results || [];
+		return this.results?.map((record) => createLazyCloneProxy<T>(record)) || [];
 	}
 
-	modify(changes: Partial<T>): number {
+	modify(changes: Partial<T>): (T[PK] | undefined)[] {
 		if (!this.results) this.execute();
 
 		this.collection.batchOperationInProgress = true;
-		const results = (this.results || []).map((record) =>
-			this.collection.update(record[this.collection.primaryKey], changes)
-		);
+		const keys: T[PK][] = [];
+		const results = (this.results || []).map((record) => {
+			const key = record[this.collection.primaryKey];
+			keys.push(key as T[PK]);
+			return this.collection.update(key, changes);
+		});
 		this.collection.batchOperationInProgress = false;
 
-		(this.collection as any).observer.notify('update');
-		return results.filter((result) => result === 1).length;
+		(this.collection as any).observer.notify('update', keys);
+		return results;
 	}
 
-	delete(): Array<T[P] | undefined> {
+	delete(): Array<T[PK] | undefined> {
 		if (!this.results) this.execute();
 
 		this.collection.batchOperationInProgress = true;
-		const results = (this.results || []).map((record) =>
-			this.collection.delete(record[this.collection.primaryKey])
-		);
+		const keys: T[PK][] = [];
+		const results = (this.results || []).map((record) => {
+			const key = record[this.collection.primaryKey];
+			keys.push(key as T[PK]);
+			return this.collection.delete(key);
+		});
 		this.collection.batchOperationInProgress = false;
 
-		(this.collection as any).observer.notify('delete');
+		(this.collection as any).observer.notify('delete', keys);
 		return results;
 	}
 
@@ -182,18 +201,27 @@ export class Query<T = any, P extends keyof T = keyof T>
 	}
 
 	private execute(): void {
-		const { criteria, collection, orderField, orderDirection, offsetCount, limitCount } = this;
+		const {
+			criteria,
+			collection,
+			orderField,
+			orderDirection,
+			offsetCount,
+			limitCount,
+			whereStage,
+		} = this;
 
 		let records: T[] = [];
 
-		const primaryField = Object.keys(criteria).find(
-			(field) => field === String(collection.primaryKey)
-		);
-		const indexFields = Object.keys(criteria).filter(
+		const hasWhereStage = whereStage !== null;
+		const fields = hasWhereStage ? [whereStage[0]] : Object.keys(criteria);
+
+		const primaryField = fields.find((field) => field === String(collection.primaryKey));
+		const indexFields = fields.filter(
 			(field) => collection.indexes.includes(field) || collection.multiEntryIndexes.includes(field)
 		);
 
-		const hasWhereStage = this.whereStage !== null;
+		this.isExact = !hasWhereStage || whereStage?.[1].$equals;
 
 		if (primaryField) {
 			records = this.getRecordsByPrimaryField(primaryField); // Query by primary key
@@ -207,7 +235,7 @@ export class Query<T = any, P extends keyof T = keyof T>
 
 		if (hasWhereStage) {
 			records = records.filter((record) => this.matchesWhereStage(record));
-		} else if ((primaryField || indexFields.length > 0) && Object.keys(criteria).length > 1) {
+		} else if (primaryField || indexFields.length > 0) {
 			records = records.filter((record) => this.matchesCriteria(record));
 		}
 
@@ -224,22 +252,21 @@ export class Query<T = any, P extends keyof T = keyof T>
 		if (offsetCount) records = records.slice(offsetCount);
 		if (limitCount !== null) records = records.slice(0, limitCount);
 
-		// Wrap results in lazy clone proxies to prevent mutations from affecting stored data
-		this.results = records.map((record) => createLazyCloneProxy<T>(record));
+		this.results = records;
 	}
 
 	private getRecordsByPrimaryField(primaryField: string): T[] {
 		const records: T[] = [];
-		const primaryValue = this.criteria[primaryField as keyof T];
+		const primaryValue = this.getFieldValue(primaryField);
 		const data = (this.collection as any).data;
 
 		if (Array.isArray(primaryValue)) {
-			for (const value of primaryValue as T[P][]) {
+			for (const value of primaryValue as T[PK][]) {
 				const record = data.get(value) as T;
 				if (record) records.push(record);
 			}
 		} else if (primaryValue !== undefined) {
-			const record = data.get(primaryValue as T[P]) as T;
+			const record = data.get(primaryValue as T[PK]) as T;
 			if (record) records.push(record);
 		}
 
@@ -256,7 +283,7 @@ export class Query<T = any, P extends keyof T = keyof T>
 		let smallestMap: Map<any, T> | null = null;
 
 		for (const field of indexFields) {
-			const indexValue = this.criteria[field as keyof T];
+			const indexValue = this.getFieldValue(field);
 			if (indexValue === undefined) continue;
 
 			const currentMap = this.getMatchingMapForField(field, indexValue);
@@ -282,20 +309,30 @@ export class Query<T = any, P extends keyof T = keyof T>
 		return indexMaps[field]?.get(indexValue) || new Map();
 	}
 
+	private getFieldValue(field: string): T[keyof T] {
+		return this.criteria[field as keyof T] || Object.values(this.whereStage?.[1] || {})[0];
+	}
+
 	private matchesCriteria(record: T): boolean {
 		return Object.entries(this.criteria).every(([field, value]) => {
 			const recordValue = getNestedValue(record as Record<string, unknown>, field);
-			return this.compareValues(recordValue, value);
+			return this.compareValues(recordValue, value, true);
 		});
 	}
 
 	private compareValues(recordValue: any, criteriaValue: any, isEvery: boolean = false): boolean {
 		if (Array.isArray(criteriaValue)) {
 			if (Array.isArray(recordValue)) {
-				if (isEvery) return criteriaValue.every((v) => recordValue.includes(v));
+				if (isEvery) {
+					return (
+						(this.isExact ? criteriaValue.length === recordValue.length : true) &&
+						criteriaValue.every((v) => recordValue.includes(v))
+					);
+				}
 				return criteriaValue.some((v) => recordValue.includes(v));
 			}
-			return criteriaValue.includes(recordValue);
+
+			return isEvery ? false : criteriaValue.includes(recordValue);
 		}
 
 		if (Array.isArray(recordValue)) return recordValue.includes(criteriaValue);
@@ -307,7 +344,8 @@ export class Query<T = any, P extends keyof T = keyof T>
 		const [field, operators] = this.whereStage;
 		const recordValue = getNestedValue(record as Record<string, unknown>, field);
 
-		if (operators.$equals && !this.compareValues(recordValue, operators.$equals)) return false;
+		if (operators.$equals && !this.compareValues(recordValue, operators.$equals, true))
+			return false;
 		if (operators.$anyOf && !this.compareValues(recordValue, operators.$anyOf)) return false;
 		if (operators.$allOf && !this.compareValues(recordValue, operators.$allOf, true)) return false;
 

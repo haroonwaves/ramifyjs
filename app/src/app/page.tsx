@@ -183,8 +183,9 @@ export default function Home() {
 								</div>
 							</div>
 							<pre className="relative overflow-x-auto bg-muted/30 p-8 text-sm leading-7">
-								<code className="text-foreground">{`import { Ramify } from 'ramify-db';
-import { useLiveQuery } from 'ramify-db/react';
+								<code className="text-foreground">{`
+import { Ramify, type Schema } from '@ramify-db/core';
+import { useLiveQuery } from '@ramify-db/react';
 
 // Define your schema
 type User = {
@@ -195,12 +196,14 @@ type User = {
 };
 
 // Create a store
-const ramify = new Ramify();
-const db = ramify.createStore({
-  users: {
-    primaryKey: 'id',
-    indexes: ['email', 'age']
-  }
+const db = new Ramify().createStore<{
+	users: Schema<User, 'id'>;
+}>({
+	users: {
+		primaryKey: 'id',
+		indexes: ['email', 'age'],
+		multiEntry: ['tags'],
+	},
 });
 
 // Add data
@@ -215,9 +218,10 @@ db.users.add({
 function UserList() {
   const users = useLiveQuery(
     () => db.users
-      .where('age').aboveOrEqual(18)
-      .orderBy('name')
-      .toArray(),
+    	.orderBy('name')
+    	.reverse()
+    	.limit(10)
+    	.toArray(),
     { collections: [db.users], others: [] }
   );
   

@@ -152,7 +152,7 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 		expect(db.users.update(1, { age: 26 })).toBe(1);
 
 		// update indexed (name)
-		expect(db.users.update(2, { name: 'Bob2' })).toBe(1);
+		expect(db.users.update(2, { name: 'Bob2' })).toBe(2);
 		expect(db.users.where('name').equals('Bob2').count()).toBe(1);
 
 		// update PK (simulate)
@@ -164,12 +164,12 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 			active: true,
 			stats: { score: 99, level: 9 },
 		});
-		expect(db.users.update(10, { id: 11 })).toBe(1);
+		expect(db.users.update(10, { id: 11 })).toBe(10);
 		expect(db.users.get(10)).toBeUndefined();
 		expect(db.users.get(11)).toBeDefined();
 
 		// update missing
-		expect(db.users.update(9999, { name: 'Nope' })).toBe(0);
+		expect(db.users.update(9999, { name: 'Nope' })).toBeUndefined();
 	});
 
 	/* -------------------------------------------------------------------------- */
@@ -238,7 +238,7 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 	test('subscribe / unsubscribe behavior (debounced)', (done) => {
 		const received: string[] = [];
 
-		const unsubscribe = db.users.subscribe((op) => received.push(op));
+		const unsubscribe = db.users.subscribe((type) => received.push(type));
 
 		db.users.add({
 			id: 1,
@@ -304,5 +304,45 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 		const doc2 = db.users.get(1)!;
 		expect(doc2.name).toBe('X');
 		expect(doc2.stats.score).toBe(100);
+	});
+
+	/* -------------------------------------------------------------------------- */
+	/*                    where() exact equality matching only                    */
+	/* -------------------------------------------------------------------------- */
+
+	test('where() performs exact equality matching, not IN queries', () => {
+		seedUsers();
+
+		// Exact match on single value
+		const alice = db.users.where({ name: 'Alice' }).toArray();
+		expect(alice.length).toBe(1);
+		expect(alice[0].name).toBe('Alice');
+
+		// Exact match on boolean
+		const activeUsers = db.users.where({ active: true }).toArray();
+		expect(activeUsers.length).toBe(3);
+
+		// Exact match on number
+		const age25 = db.users.where({ age: 25 }).toArray();
+		expect(age25.length).toBe(1);
+
+		// Exact match on array field - should match the exact array
+		const adminOnly = db.users.where({ roles: ['admin'] }).toArray();
+		expect(adminOnly.length).toBe(1);
+		expect(adminOnly[0].id).toBe(1);
+
+		// Different array should not match
+		const editorOnly = db.users.where({ roles: ['editor'] }).toArray();
+		expect(editorOnly.length).toBe(1);
+		expect(editorOnly[0].id).toBe(2);
+
+		// For IN queries, must use anyOf()
+		const adminsAndEditors = db.users.where('roles').anyOf(['admin', 'editor']).toArray();
+		expect(adminsAndEditors.length).toBe(3); // Alice (admin), Bob (editor), Daniel (admin, ops)
+
+		// Multiple criteria - all must match exactly
+		const activeAlice = db.users.where({ name: 'Alice', active: true }).toArray();
+		expect(activeAlice.length).toBe(1);
+		expect(activeAlice[0].id).toBe(1);
 	});
 });

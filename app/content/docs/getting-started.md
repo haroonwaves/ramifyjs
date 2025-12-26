@@ -12,8 +12,6 @@ category: Tutorial
 Welcome to Ramify DB! This guide will help you get up and running with this powerful, lightweight
 in-memory database designed for reactive applications.
 
-<hr />
-
 ### What is Ramify DB?
 
 Ramify DB is a TypeScript-first, in-memory database that provides:
@@ -23,36 +21,6 @@ Ramify DB is a TypeScript-first, in-memory database that provides:
 - **Type-safe API** - Full TypeScript support with intelligent autocomplete
 - **Indexed collections** - Fast lookups with primary keys and secondary indexes
 - **Fluent query API** - Chainable methods for powerful data queries
-
-### Mental Model: Data vs UI State
-
-Ramify DB is a **reactive in-memory database**, designed to work _alongside_ your existing state
-management tools, not necessarily to replace them entirely.
-
-#### The Hybrid Approach
-
-Most applications benefit from separating "Data" from "UI State":
-
-- **Ramify DB** → **Application Data**
-  - Collections of entities (Users, Posts, Products)
-  - Shared state accessed by many components
-  - Data that requires filtering, sorting, or searching
-
-- **State Manager (Zustand / Context / Signals)** → **UI Control State**
-  - Ephemeral UI state (isModalOpen, currentTab)
-  - Form input values
-  - Theme settings (dark/light mode)
-
-#### When is Ramify DB the right choice?
-
-Ramify DB is the ideal solution when your state is:
-
-- **Collection-based**: You are managing lists of records rather than simple values.
-- **Query-heavy**: You need to filter, sort, or paginate data on the client.
-- **Derived often**: You need to calculate stats or subsets efficiently in real-time.
-- **Reactive**: You need components to auto re-render only when specific data queries change.
-
-<hr />
 
 ### Installation
 
@@ -66,7 +34,21 @@ pnpm add @ramify-db/core
 yarn add @ramify-db/core
 ```
 
-<hr />
+**For React Applications (Optional):**
+
+If you're using React and want to use live queries with the `useLiveQuery` hook, install the React
+hooks package:
+
+```bash
+npm install @ramify-db/react-hooks
+# or
+pnpm add @ramify-db/react-hooks
+# or
+yarn add @ramify-db/react-hooks
+```
+
+> **Note:** The `@ramify-db/react-hooks` package is optional and only required if you're building a
+> React application. The core package works independently in any JavaScript/TypeScript environment.
 
 ### Basic Usage
 
@@ -165,11 +147,8 @@ const user = db.users.get('1');
 // Get all users
 const allUsers = db.users.toArray();
 
-// Query with filter
-const adults = db.users
-	.where('age')
-	.filter((age) => age >= 18)
-	.toArray();
+// Collection filter (use with caution for large datasets)
+const adults = db.users.filter((user) => user.age >= 18).toArray();
 
 // Query with multi-entry index
 const developers = db.users.where('tags').equals('developer').toArray();
@@ -198,7 +177,7 @@ db.users.bulkUpdate([
 ]);
 
 // Update via query
-db.users.where({ tags: 'intern' }).modify({ tags: ['developer'] });
+db.users.where({ email: 'alice@example.com' }).modify({ tags: ['team lead'] });
 ```
 
 #### 6. Delete Data
@@ -213,27 +192,25 @@ db.users.delete('1');
 db.users.bulkDelete(['1', '2', '3']);
 
 // Delete via query
-db.users.where('age').below(18).delete();
+db.users.where('tags').equals('intern').delete();
 
 // Clear entire collection
 db.users.clear();
 ```
-
-<hr />
 
 ### Using with React
 
 Ramify DB provides a React hook for live queries that automatically re-render when data changes:
 
 ```typescript
-import { useLiveQuery } from 'ramify-db/react';
+import { useLiveQuery } from '@ramify-db/react-hooks';
 
 function UserList() {
   const users = useLiveQuery(
     () => db.users
       .orderBy('name')
-			.reverse()
-			.limit(10)
+      .reverse()
+      .limit(10)
       .toArray(),
     {
       collections: [db.users],
@@ -256,8 +233,6 @@ The component will automatically re-render whenever:
 - Users are added, updated, or deleted
 - The query results change
 
-<hr />
-
 ### Next Steps
 
 Now that you've learned the basics, explore more advanced features:
@@ -266,8 +241,6 @@ Now that you've learned the basics, explore more advanced features:
 - [Advanced Queries](/docs/advanced-queries) - Complex filtering and query patterns
 - [Live Queries](/docs/live-queries) - Deep dive into reactive queries with React
 - [Best Practices](/docs/best-practices) - Tips for optimal performance
-
-<hr />
 
 ### Need Help?
 

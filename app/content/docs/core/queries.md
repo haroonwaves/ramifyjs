@@ -18,16 +18,16 @@ as your datasets grow.
 
 Queries start with `.where()` and proceed through a chain of operations.
 
-- **Selection**: Target a field or criteria (`where('age')`).
-- **Filtering**: Apply constraints (`above(18)`).
-- **Modification**: Sort or paginate (`orderBy('age')`, `limit(10)`).
+- **Selection**: Target a field or criteria (`where('tags')`).
+- **Filtering**: Apply constraints (`anyOf(['developer', 'manager'])`).
+- **Modification**: Sort or paginate (`orderBy('name')`, `limit(10)`).
 - **Execution**: Run the query (`toArray()`).
 
 #### Index Usage
 
-For a query to be performant, it generally needs to use an index. Ramify enforces this for range
-queries: you can only call `.where('field')` if `field` is indexed. This "fail-fast" design prevents
-accidental full-collection scans in production.
+For a query to be performant, it generally needs to use an index. Ramify enforces this for queries:
+you can only call `.where('field')` or `.where({ field: value })` if `field` is indexed. This
+"fail-fast" design prevents accidental full-collection scans in production.
 
 #### Execution Model
 
@@ -38,30 +38,24 @@ mutation of the store.
 
 ```typescript
 // Simple equality
-const adults = users.where('age').aboveOrEqual(18).toArray();
+const developers = db.users.where('tags').equals('developer').toArray();
 
-// Multiple conditions (using indexed 'status' and 'age')
-// Note: Compound queries usually require compound indexes or client-side filtering
-const activeAdults = users
-	.where('age')
-	.aboveOrEqual(18)
-	.filter((u) => u.status === 'active')
+// AND condition: using exact match for multiple fields
+const special = db.users
+	.where({ role: 'admin' }) // exact match
+	.filter((u) => u.verified === true) // manual filter for complex AND logic
 	.toArray();
 
-// OR conditions
-const special = users
-	.where({ role: 'admin' }) // partial match
-	.filter((u) => u.verified === true) // manual filter for complex OR logic
-	.toArray();
-// OR: using anyOf for single field
-const adminsOrMods = users.where('role').anyOf(['admin', 'moderator']).toArray();
+// OR condition: using anyOf for single field
+const adminsOrMods = db.users.where('role').anyOf(['admin', 'moderator']).toArray();
 
 // Sorting
-const sorted = users.where('createdAt').above(0).orderBy('createdAt').reverse().toArray();
+const sorted = db.users.where({ status: 'active' }).orderBy('createdAt').reverse().toArray();
 ```
 
 ### Common Pitfalls
 
-- **Querying non-indexed fields**: `where(field)` throws if the field is not indexed.
+- **Querying non-indexed fields**: `where(field)` or `where({ field: value })` throws if the field
+  is not indexed.
 - **Expect chained filters**: The query builder is specific; use `.filter()` for arbitrary logic.
 - **Forgeting toArray()**: The query object is not the result; you must execute it.

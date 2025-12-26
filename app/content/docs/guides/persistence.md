@@ -1,88 +1,101 @@
 ---
 title: 'Persistence'
-description: 'Save and restore data across sessions'
+description: 'Save and restore data across sessions with incremental sync'
 ---
 
 ## Persistence
 
-### Overview
+By default, Ramify DB operates as an **in-memory** database. Data is lost when the page refreshes.
+For persistence, sync your store with **IndexedDB** using the event-based pattern below.
 
-By default, Ramify DB operates as an **in-memory** database. This means data is lost when the page
-refreshes. However, due to its event-driven nature, it is straightforward to sync your store with
-persistent storage mechanisms like `localStorage` or `IndexedDB`.
+### Recommended Pattern: Event-Based Incremental Sync
 
-### Strategies
-
-#### 1. Snapshot Persistence (Simpler)
-
-For smaller datasets, you can simply save the entire collection to `localStorage` whenever it
-changes.
-
-- **Save**: Subscribe to collection changes and `JSON.stringify` the data.
-- **Load**: On app startup, read from storage and `bulkAdd` into the collection.
-
-#### 2. Incremental Persistence (Robust)
-
-For larger datasets, using `IndexedDB` (via a library like `idb`) is recommended. You can treat
-Ramify as a "cache" over IndexedDB, loading only what you need or syncing changes individually.
-
-### Core Concepts
-
-- **Hydration**: The process of populating the in-memory store from cold storage on boot.
-- **Serialization**: Converting your objects to a storable format (Ramify records are plain JS
-  objects, so this is usually trivial).
-
-### Examples
+Ramify DB emits events with the primary keys of changed documents, enabling efficient incremental
+sync to IndexedDB.
 
 ```typescript
-// 1. Define Store (no persistence built-in)
+import { openDB } from 'idb';
+import { Ramify } from '@ramify-db/core';
+
+// 1. Setup IndexedDB
+const idb = await openDB('mydb', 1, {
+	upgrade(db) {
+		db.createObjectStore('users', { keyPath: 'id' });
+		db.createObjectStore('posts', { keyPath: 'id' });
+	},
+});
+
+// 2. Setup Ramify DB
 const ramify = new Ramify();
-const db = ramify.createStore({
-	users: { primaryKey: 'id', indexes: [] },
+const db = ramify.createStore<{
+	users: Schema<User, 'id'>;
+	posts: Schema<Post, 'id'>;
+}>({
+	users: { primaryKey: 'id', indexes: ['email'] },
+	posts: { primaryKey: 'id', indexes: ['userId'] },
 });
 
-// 2. Persistence Logic (localStorage)
-const STORAGE_KEY = 'my-app-users';
-
-// Save to storage
-function save() {
-	const allUsers = db.users.toArray();
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
-}
-
-// Load from storage
-function load() {
-	const json = localStorage.getItem(STORAGE_KEY);
-	if (json) {
-		const data = JSON.parse(json);
-		db.users.bulkAdd(data);
+// 3. Event-Based Incremental Sync
+db.users.subscribe(async (type, keys) => {
+	switch (type) {
+		case 'create':
+		case 'update':
+			// Fetch only the changed documents
+			const docs = db.users.where('id').anyOf(keys).toArray();
+			await idb.bulkPut('users', docs);
+			break;
+		case 'delete':
+			// Delete only the removed documents
+			await idb.bulkDelete('users', keys);
+			break;
+		case 'clear':
+			await idb.clear('users');
+			break;
 	}
-}
-
-// 3. Connect them
-// Watch for any changes to the collection
-db.users.subscribe((event) => {
-	console.log('Data changed:', event.type);
-	save();
 });
 
-// Initial hydration
-load();
+// 4. Initial Hydration
+const storedUsers = await idb.getAll('users');
+db.users.bulkAdd(storedUsers);
 
-// --- IndexedDB Example (Conceptual) ---
-// Using a library like 'idb-keyval' is simpler than raw IndexedDB
-// async function syncWithIDB() {
-//   const stored = await get('users-store');
-//   if (stored) db.users.bulkAdd(stored);
-//
-//   db.users.subscribe(() => {
-//     set('users-store', db.users.toArray());
-//   });
-// }
+// Now use Ramify DB normally - persistence happens automatically!
+db.users.add({ id: '1', name: 'Alice', email: 'alice@example.com' }); // Auto-synced
+db.users.update('1', { name: 'Alice Smith' }); // Auto-synced
+db.users.delete('1'); // Auto-synced
 ```
 
-### Common pitfalls
+### How It Works
 
-- **Not handling storage errors**: Storage can fail or be full
-- **Storing too much data**: Browser storage has limits
-- **Not versioning data**: Schema changes can break persisted data
+**Observer Events**: Every collection operation emits an event with:
+
+- `type`: Operation type (`'create'`, `'update'`, `'delete'`, `'clear'`)
+- `keys`: Array of affected primary keys
+
+**Incremental Sync**: Only changed documents are synced to IndexedDB:
+
+- Single operation: `event.keys` contains 1 key
+- Bulk operation: `event.keys` contains all affected keys
+- Scales to any dataset size
+
+### Multiple Collections
+
+Sync multiple collections independently:
+
+```typescript
+// Users sync
+db.users.subscribe(async (event) => {
+	/* sync logic */
+});
+
+// Posts sync
+db.posts.subscribe(async (event) => {
+	/* sync logic */
+});
+```
+
+### Common Pitfalls
+
+- **Not handling storage errors**: IndexedDB operations can fail - use try/catch
+- **Forgetting initial hydration**: Load data from IndexedDB on app startup
+- **Schema changes**: Version your IndexedDB schema and handle migrations
+- **Large bulk operations**: Consider batching very large bulk operations
