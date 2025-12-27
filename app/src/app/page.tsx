@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Database, Zap, Code2, Sparkles, ArrowRight, Github, Terminal } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Home() {
 	return (
@@ -126,8 +127,7 @@ export default function Home() {
 								{
 									icon: Sparkles,
 									title: 'Powerful Queries',
-									description:
-										'Fluent API with filtering, sorting, pagination, and range operators. Query like a pro.',
+									description: 'Fluent API with filtering, sorting, pagination. Query like a pro.',
 								},
 								{
 									icon: Database,
@@ -160,6 +160,64 @@ export default function Home() {
 					</div>
 				</section>
 
+				{/* Mental Model Section */}
+				<section className="px-6 py-16 lg:px-8">
+					<div className="mx-auto max-w-6xl">
+						<div className="mb-12 text-center">
+							<h2 className="mb-3 text-3xl font-bold tracking-tight sm:text-4xl">
+								Not Another State Manager
+							</h2>
+							<p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
+								A reactive in-memory database that works{' '}
+								<span className="font-medium text-foreground">alongside</span> your existing tools
+							</p>
+						</div>
+
+						<div className="grid gap-6 md:grid-cols-3">
+							<div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-linear-to-br from-green-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-green-500/30 hover:shadow-[0_8px_30px_rgba(34,197,94,0.1)]">
+								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-green-500/10 blur-2xl transition-all group-hover:bg-green-500/20" />
+								<div className="relative">
+									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-green-500/10 px-3 py-1 text-sm font-semibold text-green-600 dark:text-green-400">
+										✓ Use Ramify DB
+									</div>
+									<h3 className="mb-3 text-xl font-semibold">For Your Data</h3>
+									<p className="leading-relaxed text-muted-foreground">
+										Collections, entities, records. Anything that needs filtering, sorting, or
+										querying.
+									</p>
+								</div>
+							</div>
+
+							<div className="group relative overflow-hidden rounded-2xl border border-purple-500/20 bg-linear-to-br from-purple-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-purple-500/30 hover:shadow-[0_8px_30px_rgba(168,85,247,0.1)]">
+								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl transition-all group-hover:bg-purple-500/20" />
+								<div className="relative">
+									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-purple-500/10 px-3 py-1 text-sm font-semibold text-purple-600 dark:text-purple-400">
+										⚡ Performance Layer
+									</div>
+									<h3 className="mb-3 text-xl font-semibold">As a Cache</h3>
+									<p className="leading-relaxed text-muted-foreground">
+										Bridge between persistent storage and UI. Instant feedback with in-memory
+									</p>
+								</div>
+							</div>
+
+							<div className="group relative overflow-hidden rounded-2xl border border-blue-500/20 bg-linear-to-br from-blue-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(59,130,246,0.1)]">
+								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-blue-500/10 blur-2xl transition-all group-hover:bg-blue-500/20" />
+								<div className="relative">
+									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-600 dark:text-blue-400">
+										★ Best Together
+									</div>
+									<h3 className="mb-3 text-xl font-semibold">Hybrid Approach</h3>
+									<p className="leading-relaxed text-muted-foreground">
+										Ramify DB for application data + your favorite state manager for UI. The perfect
+										combo.
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
 				{/* Code Example Section */}
 				<section className="px-6 py-24 lg:px-8">
 					<div className="mx-auto max-w-5xl">
@@ -170,64 +228,21 @@ export default function Home() {
 							</p>
 						</div>
 
-						<div className="group relative overflow-hidden rounded-2xl border border-border/60 bg-background/50 shadow-2xl backdrop-blur-sm transition-all hover:border-foreground/20 hover:shadow-[0_20px_70px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_70px_rgba(255,255,255,0.1)]">
-							<div className="absolute right-0 top-0 h-64 w-64 translate-x-20 -translate-y-20 rounded-full bg-foreground/5 blur-3xl transition-all group-hover:bg-foreground/10" />
-							<div className="relative border-b border-border/40 bg-muted/30 px-6 py-4">
-								<div className="flex items-center gap-2">
-									<div className="h-3 w-3 rounded-full bg-foreground/20" />
-									<div className="h-3 w-3 rounded-full bg-foreground/20" />
-									<div className="h-3 w-3 rounded-full bg-foreground/20" />
-									<span className="ml-4 text-xs font-medium text-muted-foreground">
-										example.tsx
-									</span>
-								</div>
-							</div>
-							<pre className="relative overflow-x-auto bg-muted/30 p-8 text-sm leading-7">
-								<code className="text-foreground">{`
-import { Ramify, type Schema } from '@ramify-db/core';
-import { useLiveQuery } from '@ramify-db/react';
-
-// Define your schema
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  age: number;
-};
-
-// Create a store
-const db = new Ramify().createStore<{
-	users: Schema<User, 'id'>;
-}>({
-	users: {
-		primaryKey: 'id',
-		indexes: ['email', 'age'],
-		multiEntry: ['tags'],
-	},
-});
-
-// Add data
-db.users.add({
-  id: '1',
-  name: 'Alice',
-  email: 'alice@example.com',
-  age: 28
-});
-
-// Query with live updates
-function UserList() {
-  const users = useLiveQuery(
-    () => db.users
-    	.orderBy('name')
-    	.reverse()
-    	.limit(10)
-    	.toArray(),
-    { collections: [db.users], others: [] }
-  );
-  
-  return <div>{users?.map(u => u.name)}</div>;
-}`}</code>
-							</pre>
+						<div className="rounded-lg border border-border/70">
+							<Image
+								className="rounded-lg dark:hidden"
+								src="/example-light.png"
+								alt="Example"
+								width={1024}
+								height={1000}
+							/>
+							<Image
+								className="hidden rounded-lg dark:block"
+								src="/example-dark.png"
+								alt="Example"
+								width={1024}
+								height={1000}
+							/>
 						</div>
 					</div>
 				</section>

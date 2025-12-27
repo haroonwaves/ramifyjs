@@ -19,8 +19,8 @@ as your datasets grow.
 Queries start with `.where()` and proceed through a chain of operations.
 
 - **Selection**: Target a field or criteria (`where('tags')`).
-- **Filtering**: Apply constraints (`anyOf(['developer', 'manager'])`).
-- **Modification**: Sort or paginate (`orderBy('name')`, `limit(10)`).
+- **Filtering**: Apply constraints (`anyOf(['needsAction'])`).
+- **Modification**: Sort or paginate (`orderBy('createdAt')`, `limit(10)`).
 - **Execution**: Run the query (`toArray()`).
 
 #### Index Usage
@@ -38,19 +38,19 @@ mutation of the store.
 
 ```typescript
 // Simple equality
-const developers = db.users.where('tags').equals('developer').toArray();
+const highPriorityMessages = db.messages.where('metadata.priority').equals('high').toArray();
 
 // AND condition: using exact match for multiple fields
-const special = db.users
-	.where({ role: 'admin' }) // exact match
-	.filter((u) => u.verified === true) // manual filter for complex AND logic
+const special = db.messages
+	.where({ channelId: 'h9asa09ajh38' }) // exact match
+	.filter((m) => m.metadata.readBy.length > 0) // manual filter for complex AND logic
 	.toArray();
 
 // OR condition: using anyOf for single field
-const adminsOrMods = db.users.where('role').anyOf(['admin', 'moderator']).toArray();
+const adminsOrMods = db.messages.where('metadata.priority').anyOf(['high', 'normal']).toArray();
 
 // Sorting
-const sorted = db.users.where({ status: 'active' }).orderBy('createdAt').reverse().toArray();
+const sorted = db.messages.where({ isDeleted: false }).orderBy('createdAt').reverse().toArray();
 ```
 
 ### Common Pitfalls

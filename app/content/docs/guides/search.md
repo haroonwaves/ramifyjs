@@ -25,30 +25,19 @@ const results = db.users
 
 ### Strategy 2: Multi-Entry Indexing (Tagging)
 
-If you want to search by strict keywords or tags, use Ramify's `multiEntry` index.
+If you want to search by strict keywords or roles, use Ramify's `multiEntry` index.
 
 **Schema:**
 
 ```typescript
-const db = ramify.createStore<{ posts: Schema<Post, 'id'> }>({
-	posts: {
-		primaryKey: 'id',
-		multiEntry: ['tags'],
-	},
-});
-```
+// Find all users with role only 'manager'
+const managers = db.users.where('roles').equals(['manager']).toArray();
 
-**Usage:**
+// Find all users with role 'admin'
+const admins = db.users.where('roles').anyOf(['admin']).toArray();
 
-```typescript
-// Find all posts tagged with 'javascript'
-const posts = db.posts.where('tags').equals('javascript').toArray();
-
-// Find all posts tagged with 'javascript' or 'typescript'
-const posts = db.posts.where('tags').anyOf(['javascript', 'typescript']).toArray();
-
-// Find all posts tagged with 'javascript' and 'typescript'
-const posts = db.posts.where('tags').allOf(['javascript', 'typescript']).toArray();
+// Find all users with role 'user' plus 'reader'
+const usersWithReadAccess = db.users.where('roles').allOf(['user', 'reader']).toArray();
 ```
 
 ### Strategy 3: Tokenization (Manual Search Index)
@@ -95,8 +84,14 @@ function saveProduct(product) {
 **Searching:**
 
 ```typescript
-// Find products containing the word "phone" (exact token match)
-const phones = db.products.where('_searchTerms').equals('phone').toArray();
+// Find products has the word only "phone" (exact token match)
+const phones = db.products.where('_searchTerms').equals(['phone']).toArray();
+
+// Find products containing the word "phone" or "tablet" (any token match)
+const phonesOrTablets = db.products.where('_searchTerms').anyOf(['phone', 'tablet']).toArray();
+
+// Find products containing the word "phone" and "smart" (all token match)
+const smartPhones = db.products.where('_searchTerms').allOf(['phone', 'smart']).toArray();
 ```
 
 ### Summary

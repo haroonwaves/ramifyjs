@@ -16,9 +16,9 @@ Indexes are the single most important factor for read performance in `where` que
 
 - **Always index fields used in `where` clauses** for exact-match filtering (`equals`, `anyOf`,
   `allOf`).
-- **Note**: Indexes do NOT improve sorting or range query performance. Sorting uses JavaScript's
-  `Array.sort()` on the filtered results, regardless of whether the field is indexed. Indexes only
-  optimize the initial filtering step.
+- **Note**: Indexes do NOT improve sorting. Sorting uses JavaScript's `Array.sort()` on the filtered
+  results, regardless of whether the field is indexed. Indexes only optimize the initial filtering
+  step.
 
 #### 2. Batch Operations
 
@@ -51,28 +51,6 @@ items.forEach((item) => db.todos.add(item));
 
 // ✅ GOOD: Bulk add (triggers 1 event)
 db.todos.bulkAdd(items);
-
-// ❌ BAD: Too many separate subscriptions
-function Dashboard() {
-	const active = useLiveQuery(() => db.users.where('status').equals('active').toArray(), {
-		collections: [db.users],
-		others: [],
-	});
-	const inactive = useLiveQuery(() => db.users.where('status').equals('inactive').toArray(), {
-		collections: [db.users],
-		others: [],
-	});
-	// ...
-}
-
-// ✅ GOOD: Single subscription, derived state
-function Dashboard() {
-	const allUsers = useLiveQuery(() => db.users.toArray(), { collections: [db.users], others: [] });
-
-	// Memoize derived computations
-	const active = useMemo(() => allUsers?.filter((u) => u.status === 'active'), [allUsers]);
-	const inactive = useMemo(() => allUsers?.filter((u) => u.status === 'inactive'), [allUsers]);
-}
 ```
 
 ### Common Pitfalls

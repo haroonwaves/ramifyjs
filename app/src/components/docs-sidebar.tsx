@@ -31,16 +31,6 @@ const docSections: DocSection[] = [
 		],
 	},
 	{
-		title: 'API Reference',
-		icon: Package,
-		items: [
-			{ title: 'Store API', href: '/docs/api/store' },
-			{ title: 'Collection API', href: '/docs/api/collection' },
-			{ title: 'Query API', href: '/docs/api/query' },
-			{ title: 'React Hooks', href: '/docs/api/react-hooks' },
-		],
-	},
-	{
 		title: 'Guides',
 		icon: Lightbulb,
 		items: [
@@ -52,11 +42,13 @@ const docSections: DocSection[] = [
 		],
 	},
 	{
-		title: 'Resources',
-		icon: Book,
+		title: 'API Reference',
+		icon: Package,
 		items: [
-			{ title: 'Examples', href: '/docs/examples' },
-			{ title: 'FAQ', href: '/docs/faq' },
+			{ title: 'Store API', href: '/docs/api/store' },
+			{ title: 'Collection API', href: '/docs/api/collection' },
+			{ title: 'Query API', href: '/docs/api/query' },
+			{ title: 'React Hooks', href: '/docs/api/react-hooks' },
 		],
 	},
 ];

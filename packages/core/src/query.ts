@@ -1,5 +1,13 @@
 import { Collection } from '@/collection.js';
-import type { GetNestedType, NestedKeyOf } from '@/types';
+import type {
+	Criteria,
+	ExecutableStage,
+	LimitedStage,
+	NestedKeyOf,
+	OrderableStage,
+	WhereStage,
+	WhereStageNested,
+} from '@/types';
 import { getNestedValue } from '@/utils/getNestedValue';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 
@@ -11,50 +19,10 @@ import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
   - $allOf (Array): perform inexact query
  **/
 
-export type Criteria<T> = {
-	[K in keyof T]?: T[K];
-};
-
-export type WhereStageOperator = {
+type WhereStageOperator = {
 	$anyOf?: any[];
 	$equals?: any;
 	$allOf?: any[];
-};
-
-export type WhereStage<T, K extends keyof T = keyof T> = {
-	anyOf(values: T[K] extends (infer E)[] ? E[] : T[K][]): ExecutableStage<T>;
-	equals(value: T[K]): ExecutableStage<T>;
-	allOf(values: T[K] extends (infer E)[] ? E[] : T[K][]): ExecutableStage<T>;
-};
-
-// Overload for nested paths using string
-export type WhereStageNested<T, Path extends string> = {
-	anyOf(
-		values: GetNestedType<T, Path> extends (infer E)[] ? E[] : GetNestedType<T, Path>[]
-	): ExecutableStage<T>;
-	equals(value: GetNestedType<T, Path>): ExecutableStage<T>;
-	allOf(
-		values: GetNestedType<T, Path> extends (infer E)[] ? E[] : GetNestedType<T, Path>[]
-	): ExecutableStage<T>;
-};
-
-export type OrderableStage<T> = Omit<ExecutableStage<T>, 'orderBy'> & {
-	reverse(): OrderableStage<T>;
-};
-
-export type LimitedStage<T> = Omit<ExecutableStage<T>, 'limit' | 'orderBy'>;
-
-export type ExecutableStage<T> = {
-	orderBy(field: keyof T): OrderableStage<T>;
-	limit(count: number): LimitedStage<T>;
-	offset(count: number): LimitedStage<T>;
-	filter(callback: (document: T) => boolean): ExecutableStage<T>;
-	toArray(): T[];
-	first(): T | undefined;
-	last(): T | undefined;
-	modify(changes: Partial<T>): (T[keyof T] | undefined)[];
-	delete(): Array<T[keyof T] | undefined>;
-	count(): number;
 };
 
 export class Query<T = any, PK extends keyof T = keyof T>
@@ -214,7 +182,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		let records: T[] = [];
 
 		const hasWhereStage = whereStage !== null;
-		const fields = hasWhereStage ? [whereStage[0]] : Object.keys(criteria);
+		const fields = hasWhereStage ? [whereStage[0]] : Object.keys(criteria as object);
 
 		const primaryField = fields.find((field) => field === String(collection.primaryKey));
 		const indexFields = fields.filter(
@@ -227,7 +195,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 			records = this.getRecordsByPrimaryField(primaryField); // Query by primary key
 		} else if (indexFields.length > 0) {
 			records = this.getRecordsByIndexFields(indexFields); // Query by index fields
-		} else if (Object.keys(criteria).length === 0) {
+		} else if (Object.keys(criteria as object).length === 0) {
 			records = [...(collection as any).data.values()]; // Query all records (for collection.filter(callback))
 		} else {
 			throw new Error('Ramify: No primary key or index fields found for the query');
@@ -314,7 +282,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 	}
 
 	private matchesCriteria(record: T): boolean {
-		return Object.entries(this.criteria).every(([field, value]) => {
+		return Object.entries(this.criteria as object).every(([field, value]) => {
 			const recordValue = getNestedValue(record as Record<string, unknown>, field);
 			return this.compareValues(recordValue, value, true);
 		});

@@ -33,45 +33,34 @@ keys from the schema definition.
 **Example:**
 
 ```typescript
-interface User {
-	id: string;
-	email: string;
-	role: string;
-	tags: string[];
-}
-
-interface Post {
-	id: string;
-	userId: string;
-	title: string;
-}
-
 const db = ramify.createStore<{
 	users: Schema<User, 'id'>;
-	posts: Schema<Post, 'id'>;
+	messages: Schema<Message, 'id'>;
 }>({
 	users: {
 		primaryKey: 'id',
-		indexes: ['email', 'role'],
-		multiEntry: ['tags'],
+		indexes: ['email', 'status', 'stats.level'],
+		multiEntry: ['roles'],
 	},
-	posts: {
+	messages: {
 		primaryKey: 'id',
-		indexes: ['userId'],
+		indexes: ['senderId', 'channelId', 'metadata.priority'],
+		multiEntry: ['mentions', 'tags', 'metadata.readBy'],
 	},
 });
 
 // db.users is now typed as Collection<User, 'id'>
-// db.posts is now typed as Collection<Post, 'id'>
+// db.messages is now typed as Collection<Message, 'id'>
 ```
 
 **Parameters:**
 
 - **`storeDefinition`**: `S` - An object mapping collection names to their schema definition
   - **`primaryKey`**: `Pk extends keyof T` - The field used as the unique identifier (required)
-  - **`indexes`**: `string[]` - Array of fields to be indexed for fast lookups (optional)
-  - **`multiEntry`**: `string[]` - Array of array-fields where each element should be indexed
-    individually (optional)
+  - **`indexes`**: `Array<NestedKeyOf<T>>` - Array of fields to be indexed for fast lookups
+    (optional)
+  - **`multiEntry`**: `Array<NestedKeyOf<T>>` - Array of array-fields where each element should be
+    indexed individually (optional)
 
 **Returns:** A typed store object where:
 
@@ -103,8 +92,8 @@ The `Schema` type is defined as:
 ```typescript
 type Schema<T, PK extends keyof T = keyof T> = {
 	primaryKey: PK;
-	indexes?: Array<keyof T & string>;
-	multiEntry?: Array<keyof T & string>;
+	indexes?: Array<NestedKeyOf<T>>;
+	multiEntry?: Array<NestedKeyOf<T>>;
 };
 ```
 

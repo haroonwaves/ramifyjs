@@ -16,8 +16,8 @@ Indexes are declared in the `createStore` configuration.
 const db = ramify.createStore<{ users: Schema<User, 'id'> }>({
 	users: {
 		primaryKey: 'id',
-		indexes: ['email', 'username', 'age'], // Single-field indexes
-		multiEntry: ['tags', 'roles'], // Multi-entry indexes (arrays)
+		indexes: ['email', 'active', 'stats.level'], // Single field indexes
+		multiEntry: ['roles'], // Multi-entry indexes (arrays)
 	},
 });
 ```
@@ -36,22 +36,24 @@ Every collection has exactly one primary key. It is always indexed and must be u
 
 #### Secondary Indexes
 
-Added via the `indexes` array. Use these for fields you frequently query with `.where()`.
+Added via the `indexes` array. Use these for fields you frequently query with `.where()`. Nested
+properties are supported using dot notation (e.g., `'stats.level'`).
 
 ```typescript
 {
-	indexes: ['status', 'createdAt'];
+	indexes: ['email', 'active', 'stats.level'];
 }
 ```
 
 #### Multi-Entry Indexes (Tags)
 
-Added via the `multiEntry` array. If a field contains an array of values (e.g., `tags: ['a', 'b']`),
-a multi-entry index allows you to query for documents that contain a specific tag.
+Added via the `multiEntry` array. If a field contains an array of values (e.g.,
+`roles: ['manager']`), a multi-entry index allows you to query for documents that contain a specific
+role. Nested properties are also supported using dot notation.
 
 ```typescript
 // Query: Find users with tag 'developer'
-db.users.where('tags').equals('developer').toArray();
+db.users.where('roles').equals(['manager']).toArray();
 ```
 
 ### Best Practices

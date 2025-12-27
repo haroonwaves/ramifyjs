@@ -13,13 +13,13 @@ You can sort results in ascending or descending order using `orderBy()` and `rev
 
 ```typescript
 // Sort by any field (ascending)
-const sorted = users.orderBy('age').toArray();
+const sorted = db.users.orderBy('age').toArray();
 
 // Sort in descending order
-const reversed = users.orderBy('age').reverse().toArray();
+const reversed = db.users.orderBy('age').reverse().toArray();
 
 // Combine with where queries
-const activeUsers = users.where({ active: true }).orderBy('name').toArray();
+const managers = db.users.where('roles').anyOf(['manager']).orderBy('name').toArray();
 ```
 
 > [!NOTE] You can sort by any field. Sorting uses JavaScript's `Array.sort()` and is not optimized
@@ -40,7 +40,7 @@ const page2 = db.users.orderBy('id').limit(10).offset(10).toArray();
 
 // With filtering
 const activePage1 = db.users
-	.where({ active: true })
+	.where({ status: 'active' })
 	.orderBy('createdAt')
 	.limit(20)
 	.offset(0)

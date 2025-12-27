@@ -22,7 +22,7 @@ Adding records is done via `add()` (which ensures uniqueness) or `put()` (which 
 
 Data can be retrieved by primary key or via queries.
 
-- **By ID**: `collection.get(id)`
+- **By ID**: `collection.get(key)`
 - **All**: `collection.toArray()` (use with caution on large datasets)
 - **Query**: `collection.where(...).toArray()`
 
@@ -30,38 +30,33 @@ Data can be retrieved by primary key or via queries.
 
 Updates are partial and immutable by default (they replace the internal record).
 
-- **Single**: `collection.update(id, changes)`
-- **Bulk**: `collection.bulkUpdate([{ key, changes }])`
+- **Single**: `collection.update(key, changes)`
+- **Bulk**: `collection.bulkUpdate(keys, changes)`
 - **Query**: `collection.where(...).modify(changes)`
 
 #### Delete
 
 Removing records is permanent.
 
-- **Single**: `collection.delete(id)`
-- **Bulk**: `collection.bulkDelete(ids)`
+- **Single**: `collection.delete(key)`
+- **Bulk**: `collection.bulkDelete(keys)`
 - **Query**: `collection.where(...).delete()`
 
 ### Examples
 
 ```typescript
 // CREATE
-db.users.add({
-	id: '1',
-	name: 'John Doe',
-	email: 'john@example.com',
-	age: 30,
-});
+db.users.add({ id: '1', name: 'John Doe', email: 'john@example.com', ... });
 db.users.bulkAdd([user1, user2]);
 
 // READ
 const user = db.users.get('1');
 const allUsers = db.users.toArray();
-const adults = db.users.where('status').equals('active').toArray();
+const activeUsers = db.users.where({ status: 'active' }).toArray();
 
 // UPDATE
 db.users.update('1', { age: 31 });
-db.users.bulkUpdate([{ id: '1', changes: { age: 32 } }]);
+db.users.bulkUpdate(['1', '2'], { age: 32 });
 db.users.where({ status: 'inactive' }).modify({ status: 'active' });
 
 // DELETE

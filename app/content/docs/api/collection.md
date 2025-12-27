@@ -21,7 +21,7 @@ exists.
 
 ```typescript
 // Throws if ID '1' exists
-const userId = db.users.add({ id: '1', name: 'Alice', email: 'alice@example.com' });
+const userId = db.users.add({ id: '1', name: 'Alice', email: 'alice@example.com', ... });
 ```
 
 **Parameters:**
@@ -41,7 +41,7 @@ exists.
 
 ```typescript
 // Overwrites if ID '1' exists
-const userId = db.users.put({ id: '1', name: 'Alice Updated', email: 'alice@example.com' });
+const userId = db.users.put({ id: '1', name: 'Alice Updated', email: 'alice@example.com', ... });
 ```
 
 **Parameters:**
@@ -52,7 +52,7 @@ const userId = db.users.put({ id: '1', name: 'Alice Updated', email: 'alice@exam
 
 ---
 
-#### `get(id)`
+#### `get(key)`
 
 Retrieves a document by its primary key.
 
@@ -67,7 +67,7 @@ if (user) {
 
 **Parameters:**
 
-- **`primaryVal`**: `T[Pk]` - The primary key value of the document to retrieve
+- **`key`**: `T[Pk]` - The primary key value of the document to retrieve
 
 **Returns:** `T | undefined` - The document if found, otherwise `undefined`
 
@@ -90,7 +90,7 @@ console.log(`Total users: ${allUsers.length}`);
 
 ---
 
-#### `update(id, changes)`
+#### `update(key, changes)`
 
 Partially updates a document by merging the changes with the existing document.
 
@@ -105,14 +105,14 @@ if (updated) {
 
 **Parameters:**
 
-- **`primaryVal`**: `T[Pk]` - The primary key of the document to update
+- **`key`**: `T[Pk]` - The primary key of the document to update
 - **`changes`**: `Partial<T>` - An object containing the fields to update
 
 **Returns:** `T[Pk] | undefined` - The primary key if updated, `undefined` if not found
 
 ---
 
-#### `delete(id)`
+#### `delete(key)`
 
 Removes a document by its primary key.
 
@@ -127,7 +127,7 @@ if (deleted) {
 
 **Parameters:**
 
-- **`primaryVal`**: `T[Pk]` - The primary key of the document to delete
+- **`key`**: `T[Pk]` - The primary key of the document to delete
 
 **Returns:** `T[Pk] | undefined` - The primary key of the deleted document, or `undefined` if not
 found
@@ -194,7 +194,7 @@ const userIds = db.users.bulkPut([
 
 ---
 
-#### `bulkGet(ids)`
+#### `bulkGet(keys)`
 
 Retrieves multiple documents by their primary keys.
 
@@ -206,34 +206,32 @@ const users = db.users.bulkGet(['1', '2', '3']);
 
 **Parameters:**
 
-- **`primaryVals`**: `Array<T[Pk]>` - Array of primary keys to retrieve
+- **`keys`**: `Array<T[Pk]>` - Array of primary keys to retrieve
 
 **Returns:** `Array<T | undefined>` - Array of documents (or `undefined` for not found)
 
 ---
 
-#### `bulkUpdate(updates)`
+#### `bulkUpdate(keys, changes)`
 
 Updates multiple documents with their respective changes.
 
 **Example:**
 
 ```typescript
-const updated = db.users.bulkUpdate([
-	{ key: '1', changes: { age: 31 } },
-	{ key: '2', changes: { age: 28 } },
-]);
+const updated = db.users.bulkUpdate(['1', '2', '3'], { status: 'inactive' });
 ```
 
 **Parameters:**
 
-- **`documents`**: `Array<{ key: T[Pk]; changes: Partial<T> }>` - Array of update operations
+- **`keys`**: `Array<T[Pk]>` - Array of primary keys to update
+- **`changes`**: `Partial<T>` - An object containing the fields to update
 
 **Returns:** `Array<T[Pk] | undefined>` - Array of primary keys (or `undefined` for not found)
 
 ---
 
-#### `bulkDelete(ids)`
+#### `bulkDelete(keys)`
 
 Deletes multiple documents by their primary keys.
 
@@ -245,7 +243,7 @@ const deleted = db.users.bulkDelete(['1', '2', '3']);
 
 **Parameters:**
 
-- **`primaryVals`**: `Array<T[Pk]>` - Array of primary keys to delete
+- **`keys`**: `Array<T[Pk]>` - Array of primary keys to delete
 
 **Returns:** `Array<T[Pk] | undefined>` - Array of deleted primary keys (or `undefined` for not
 found)
@@ -286,7 +284,7 @@ const userIds = db.users.keys();
 
 ---
 
-#### `has(id)`
+#### `has(key)`
 
 Checks if a document with the given primary key exists.
 
@@ -300,7 +298,7 @@ if (db.users.has('1')) {
 
 **Parameters:**
 
-- **`primaryVal`**: `T[Pk]` - The primary key to check
+- **`key`**: `T[Pk]` - The primary key to check
 
 **Returns:** `boolean` - `true` if exists, `false` otherwise
 
@@ -371,7 +369,8 @@ db.users.where({ status: ['active', 'pending'] });
 
 #### `filter(callback)`
 
-Filters documents using a JavaScript callback function. This is slower than indexed queries.
+Filters documents using a JavaScript callback function. This loops through all documents and is
+slower than indexed queries.
 
 **Example:**
 
@@ -389,7 +388,7 @@ db.users.filter((u) => u.name.startsWith('A'));
 
 #### `orderBy(field)`
 
-Returns a query ordered by the specified field.
+Returns a query ordered by the specified field, this performs Js sorting under the hood.
 
 **Example:**
 
@@ -430,7 +429,7 @@ Returns a query with an offset applied.
 **Example:**
 
 ```typescript
-db.users.offset(5).limit(10).toArray();
+db.users.limit(10).offset(5).toArray();
 ```
 
 **Parameters:**
@@ -466,7 +465,7 @@ unsubscribe();
 Where `Observer` is defined as:
 
 ```typescript
-type Observer<T> = (operation: CollectionOperation, keys: T[]) => void;
+export type Observer<Pk = any> = (type: CollectionOperation, keys: Pk[]) => void;
 type CollectionOperation = 'create' | 'update' | 'delete' | 'clear';
 ```
 
@@ -518,7 +517,7 @@ The primary key field name.
 
 #### `indexes`
 
-**Type:** `string[]`
+**Type:** `Array<NestedKeyOf<T>>`
 
 Array of indexed field names (excluding multi-entry indexes).
 

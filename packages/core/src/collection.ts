@@ -1,14 +1,15 @@
 import { NotificationManager, type Observer } from '@/observer.js';
-import {
-	Query,
-	type Criteria,
-	type ExecutableStage,
-	type LimitedStage,
-	type OrderableStage,
-	type WhereStage,
-	type WhereStageNested,
-} from '@/query.js';
-import type { NestedKeyOf, Schema } from '@/types';
+import { Query } from '@/query.js';
+import type {
+	Criteria,
+	ExecutableStage,
+	LimitedStage,
+	NestedKeyOf,
+	OrderableStage,
+	Schema,
+	WhereStage,
+	WhereStageNested,
+} from '@/types';
 import { getNestedValue } from '@/utils/getNestedValue';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
 import assert from 'assert';
@@ -144,9 +145,9 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		return primaryVal;
 	}
 
-	bulkUpdate(documents: Array<{ key: T[Pk]; changes: Partial<T> }>): Array<T[Pk] | undefined> {
+	bulkUpdate(keys: Array<T[Pk]>, changes: Partial<T>): Array<T[Pk] | undefined> {
 		this.batchOperationInProgress = true;
-		const results = documents.map(({ key, changes }) => this.update(key, changes));
+		const results = keys.map((key) => this.update(key, changes));
 		this.batchOperationInProgress = false;
 
 		this.observer.notify('update', results);

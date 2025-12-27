@@ -19,7 +19,7 @@ Target a specific field for filtering operations.
 **Example:**
 
 ```typescript
-users.where('age').equals(18);
+db.users.where('email').equals('alice@example.com');
 ```
 
 **Parameters:**
@@ -38,13 +38,7 @@ Match fields by equality (or inclusion for array values).
 
 ```typescript
 // Exact match
-users.where({ role: 'admin' });
-
-// Array values act as IN operator
-users.where({
-	role: 'admin',
-	status: ['active', 'pending'], // matches if status is 'active' OR 'pending'
-});
+db.users.where({ status: 'active', roles: ['admin'] });
 ```
 
 **Parameters:**
@@ -54,8 +48,10 @@ users.where({
 Where `Criteria<T>` is defined as:
 
 ```typescript
-type Criteria<T> = {
-	[K in keyof T]?: T[K] | T[K][];
+export type Criteria<T> = {
+	[K in keyof T]?: T[K];
+} & {
+	[K in NestedKeyOf<T>]?: K extends keyof T ? T[K] : GetNestedType<T, K>;
 };
 ```
 
@@ -74,12 +70,15 @@ Exact match for the specified field.
 **Example:**
 
 ```typescript
-users.where('status').equals('active').toArray();
+db.users.where('status').equals('active').toArray();
+
+// Same as
+// db.users.where({ status: 'active' }).toArray();
 ```
 
 **Parameters:**
 
-- **`value`**: `T[K]` - The value to match (for array fields, matches individual elements)
+- **`value`**: `T[K]` - The value to match
 
 **Returns:** `ExecutableStage<T>` - An executable query stage
 
@@ -92,7 +91,7 @@ Match any value in the provided array.
 **Example:**
 
 ```typescript
-users.where('role').anyOf(['admin', 'moderator']).toArray();
+db.users.where('status').anyOf(['inactive', 'banned']).toArray();
 ```
 
 **Parameters:**
@@ -110,8 +109,8 @@ Match all values in the provided array (for multi-entry indexes).
 **Example:**
 
 ```typescript
-// Assuming 'tags' is a multi-entry index
-users.where('tags').allOf(['javascript', 'typescript']).toArray();
+// Assuming 'roles' is a multi-entry index
+db.users.where('roles').allOf(['admin', 'moderator']).toArray();
 ```
 
 **Parameters:**
@@ -135,7 +134,7 @@ Sort results by the specified field in ascending order.
 **Example:**
 
 ```typescript
-users.where('status').equals('active').orderBy('lastName').toArray();
+db.users.where('status').equals('active').orderBy('name').toArray();
 ```
 
 **Parameters:**
@@ -153,7 +152,7 @@ Reverse the sort order (only available after `orderBy()`).
 **Example:**
 
 ```typescript
-users.orderBy('createdAt').reverse().toArray(); // Descending order
+db.users.where('status').equals('active').orderBy('name').reverse().toArray(); // Descending order
 ```
 
 **Parameters:** None
@@ -169,7 +168,7 @@ Take the first N results.
 **Example:**
 
 ```typescript
-users.where('status').equals('active').limit(10).toArray();
+db.users.where('status').equals('active').limit(10).toArray();
 ```
 
 **Parameters:**
@@ -187,7 +186,7 @@ Skip the first N results.
 **Example:**
 
 ```typescript
-users.where('status').equals('active').offset(10).limit(10).toArray();
+db.users.where('status').equals('active').limit(10).offset(10).toArray();
 ```
 
 **Parameters:**
@@ -200,15 +199,13 @@ users.where('status').equals('active').offset(10).limit(10).toArray();
 
 #### `filter(callback)`
 
-Apply an arbitrary JavaScript filter. This runs **after** index queries and is slower than indexed
-queries.
+Apply an arbitrary JavaScript filter. This runs **after** index queries.
 
 **Example:**
 
 ```typescript
-users
-	.where('status')
-	.equals('active')
+db.users
+	.where({ status: 'active' })
 	.filter((u) => u.name.startsWith('A'))
 	.toArray();
 ```
@@ -232,7 +229,7 @@ Returns all matching documents as an array.
 **Example:**
 
 ```typescript
-const activeUsers = users.where('status').equals('active').toArray();
+const activeUsers = db.users.where({ status: 'active' }).toArray();
 ```
 
 **Parameters:** None
@@ -248,7 +245,7 @@ Returns the first matching document.
 **Example:**
 
 ```typescript
-const firstAdmin = users.where('role').equals('admin').first();
+const firstAdmin = db.users.where('roles').anyOf(['admin']).first();
 ```
 
 **Parameters:** None
@@ -264,7 +261,7 @@ Returns the last matching document.
 **Example:**
 
 ```typescript
-const lastUser = users.orderBy('createdAt').last();
+const lastUser = db.users.where({ status: 'active' }).orderBy('createdAt').last();
 ```
 
 **Parameters:** None
@@ -280,7 +277,7 @@ Returns the number of matching documents.
 **Example:**
 
 ```typescript
-const activeCount = users.where('status').equals('active').count();
+const activeCount = db.users.where({ status: 'active' }).count();
 ```
 
 **Parameters:** None
@@ -296,8 +293,8 @@ Deletes all matching documents.
 **Example:**
 
 ```typescript
-const deleted = users.where('status').equals('inactive').delete();
-console.log(`Deleted ${deleted.length} users`);
+const deleted = db.users.where('status').anyOf(['inactive', 'banned']).delete();
+console.log(`Deleted userIds:`, deleted.filter(Boolean));
 ```
 
 **Parameters:** None
@@ -313,15 +310,15 @@ Updates all matching documents with the specified changes.
 **Example:**
 
 ```typescript
-const modified = users.where('status').equals('pending').modify({ status: 'active' });
-console.log(`Modified ${modified} users`);
+const modified = db.users.where('status').equals('pending').modify({ status: 'active' });
+console.log(`Modified userIds:`, modified.filter(Boolean));
 ```
 
 **Parameters:**
 
 - **`changes`**: `Partial<T>` - An object containing the fields to update
 
-**Returns:** `number` - The number of documents modified
+**Returns:** `Array<T[Pk] | undefined>` - Array of modified primary keys
 
 ---
 
@@ -353,54 +350,6 @@ Available after `orderBy()`. Extends `ExecutableStage<T>` with:
 #### `LimitedStage<T>`
 
 Available after `limit()` or `offset()`. Extends `ExecutableStage<T>`.
-
----
-
-### Examples
-
-#### Exact match
-
-```typescript
-users.where('status').equals('active').toArray();
-```
-
-#### Match any value
-
-```typescript
-users.where('role').anyOf(['admin', 'moderator']).toArray();
-```
-
-#### Complex sort & limit
-
-```typescript
-users.where('status').equals('active').orderBy('lastName').offset(10).limit(5).toArray();
-```
-
-#### Delete by query
-
-```typescript
-users.where('status').equals('inactive').delete();
-```
-
-#### Modify by query
-
-```typescript
-users
-	.where('role')
-	.equals('user')
-	.modify({ permissions: ['read'] });
-```
-
-#### Chaining filters
-
-```typescript
-users
-	.where('status')
-	.equals('active')
-	.filter((u) => u.age > 18)
-	.orderBy('name')
-	.toArray();
-```
 
 ---
 

@@ -25,3 +25,47 @@ export type Schema<T, PK extends keyof T = keyof T> = {
 	indexes?: Array<NestedKeyOf<T>>;
 	multiEntry?: Array<NestedKeyOf<T>>;
 };
+
+// Query-related types
+// Support both direct keys and nested paths in criteria
+export type Criteria<T> = {
+	[K in keyof T]?: T[K];
+} & {
+	[K in NestedKeyOf<T>]?: K extends keyof T ? T[K] : GetNestedType<T, K>;
+};
+
+export type WhereStage<T, K extends keyof T = keyof T> = {
+	anyOf(values: T[K] extends (infer E)[] ? E[] : T[K][]): ExecutableStage<T>;
+	equals(value: T[K]): ExecutableStage<T>;
+	allOf(values: T[K] extends (infer E)[] ? E[] : T[K][]): ExecutableStage<T>;
+};
+
+// Overload for nested paths using string
+export type WhereStageNested<T, Path extends string> = {
+	anyOf(
+		values: GetNestedType<T, Path> extends (infer E)[] ? E[] : GetNestedType<T, Path>[]
+	): ExecutableStage<T>;
+	equals(value: GetNestedType<T, Path>): ExecutableStage<T>;
+	allOf(
+		values: GetNestedType<T, Path> extends (infer E)[] ? E[] : GetNestedType<T, Path>[]
+	): ExecutableStage<T>;
+};
+
+export type OrderableStage<T> = Omit<ExecutableStage<T>, 'orderBy'> & {
+	reverse(): OrderableStage<T>;
+};
+
+export type LimitedStage<T> = Omit<ExecutableStage<T>, 'limit' | 'orderBy'>;
+
+export type ExecutableStage<T> = {
+	orderBy(field: keyof T): OrderableStage<T>;
+	limit(count: number): LimitedStage<T>;
+	offset(count: number): LimitedStage<T>;
+	filter(callback: (document: T) => boolean): ExecutableStage<T>;
+	toArray(): T[];
+	first(): T | undefined;
+	last(): T | undefined;
+	modify(changes: Partial<T>): (T[keyof T] | undefined)[];
+	delete(): Array<T[keyof T] | undefined>;
+	count(): number;
+};

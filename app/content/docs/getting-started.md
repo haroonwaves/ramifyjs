@@ -58,19 +58,30 @@ First, define the types for your data:
 
 ```typescript
 type User = {
-	id: string;
-	name: string;
+	id: number;
 	email: string;
+	name: string;
 	age: number;
-	tags: string[];
+	roles: string[];
+	status: 'active' | 'inactive' | 'banned';
+	stats: { score: number; level: number };
 };
 
-type Post = {
+type Message = {
 	id: string;
-	userId: string;
-	title: string;
 	content: string;
-	createdAt: number;
+	senderId: string;
+	channelId: string;
+	createdAt: Date;
+	isDeleted: boolean;
+
+	metadata: {
+		priority: 'low' | 'normal' | 'high';
+		readBy: string[];
+	};
+
+	mentions: string[]; // User IDs mentioned
+	tags: string[]; // Message tags
 };
 ```
 
@@ -83,16 +94,17 @@ import { Ramify, type Schema } from '@ramify-db/core';
 
 const db = new Ramify().createStore<{
 	users: Schema<User, 'id'>;
-	posts: Schema<Post, 'id'>;
+	messages: Schema<Message, 'id'>;
 }>({
 	users: {
 		primaryKey: 'id',
-		indexes: ['email', 'age'],
-		multiEntry: ['tags'],
+		indexes: ['email', 'status', 'stats.level'],
+		multiEntry: ['roles'],
 	},
-	posts: {
+	messages: {
 		primaryKey: 'id',
-		indexes: ['userId', 'createdAt'],
+		indexes: ['senderId', 'channelId', 'metadata.priority'],
+		multiEntry: ['mentions', 'tags', 'metadata.readBy'],
 	},
 });
 ```
@@ -114,7 +126,9 @@ db.users.add({
 	name: 'Alice Johnson',
 	email: 'alice@example.com',
 	age: 28,
-	tags: ['developer', 'designer'],
+	roles: ['admin'],
+	status: 'active',
+	stats: { score: 100, level: 1 },
 });
 
 // Add multiple users at once
@@ -124,14 +138,18 @@ db.users.bulkAdd([
 		name: 'Bob Smith',
 		email: 'bob@example.com',
 		age: 35,
-		tags: ['manager', 'developer'],
+		roles: ['manager', 'creator'],
+		status: 'active',
+		stats: { score: 200, level: 2 },
 	},
 	{
 		id: '3',
 		name: 'Charlie Brown',
 		email: 'charlie@example.com',
 		age: 22,
-		tags: ['intern', 'developer'],
+		roles: ['user', 'reader'],
+		status: 'active',
+		stats: { score: 300, level: 3 },
 	},
 ]);
 ```
@@ -151,12 +169,12 @@ const allUsers = db.users.toArray();
 const adults = db.users.filter((user) => user.age >= 18).toArray();
 
 // Query with multi-entry index
-const developers = db.users.where('tags').equals('developer').toArray();
+const developers = db.users.where('roles').equals(['admin']).toArray();
 
 // Complex queries with sorting and pagination
 const topUsers = db.users
-	.where('tags')
-	.anyOf(['developer', 'manager'])
+	.where('roles')
+	.anyOf(['admin', 'manager'])
 	.orderBy('name')
 	.limit(10)
 	.toArray();
@@ -177,7 +195,7 @@ db.users.bulkUpdate([
 ]);
 
 // Update via query
-db.users.where({ email: 'alice@example.com' }).modify({ tags: ['team lead'] });
+db.users.where({ email: 'alice@example.com' }).modify({ roles: ['admin', 'manager'] });
 ```
 
 #### 6. Delete Data
@@ -192,7 +210,7 @@ db.users.delete('1');
 db.users.bulkDelete(['1', '2', '3']);
 
 // Delete via query
-db.users.where('tags').equals('intern').delete();
+db.users.where('roles').equals(['manager', 'creator']).delete();
 
 // Clear entire collection
 db.users.clear();
@@ -208,10 +226,11 @@ import { useLiveQuery } from '@ramify-db/react-hooks';
 function UserList() {
   const users = useLiveQuery(
     () => db.users
-      .orderBy('name')
-      .reverse()
-      .limit(10)
-      .toArray(),
+		.where({ status: 'active' })
+		.orderBy('name')
+		.reverse()
+		.limit(10)
+		.toArray(),
     {
       collections: [db.users],
       others: []

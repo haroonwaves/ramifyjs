@@ -28,7 +28,7 @@ in-memory structures to hold your data.
 
 #### Collections
 
-Each collection is dedicated to a specific entity type (e.g., `User`, `Post`).
+Each collection is dedicated to a specific entity type (e.g., `User`, `Message`).
 
 - **Reactive Updates**: Collections emit events when data changes, which powers Ramify's Live Query
   system.
@@ -42,22 +42,14 @@ import { Ramify, type Schema } from 'ramify-db';
 // Initialize Ramify
 const ramify = new Ramify();
 
-// Define your data type
-interface User {
-	id: string;
-	name: string;
-	email: string;
-	age: number;
-}
-
 // Create a store with collections and schema
 const db = ramify.createStore<{
 	users: Schema<User, 'id'>;
 }>({
 	users: {
 		primaryKey: 'id',
-		indexes: ['email', 'age'],
-		multiEntry: ['tags'],
+		indexes: ['email', 'active', 'stats.level'],
+		multiEntry: ['roles'],
 	},
 });
 
