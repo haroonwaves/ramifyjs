@@ -127,14 +127,14 @@ db.users.where('roles').allOf(['admin', 'moderator']).toArray();
 
 Chain these to sort, paginate, or apply additional filtering.
 
-#### `orderBy(field)`
+#### `sortBy(field)`
 
 Sort results by the specified field in ascending order.
 
 **Example:**
 
 ```typescript
-db.users.where('status').equals('active').orderBy('name').toArray();
+db.users.where('status').equals('active').sortBy('name').toArray();
 ```
 
 **Parameters:**
@@ -147,12 +147,12 @@ db.users.where('status').equals('active').orderBy('name').toArray();
 
 #### `reverse()`
 
-Reverse the sort order (only available after `orderBy()`).
+Reverse the sort order (only available after `sortBy()`).
 
 **Example:**
 
 ```typescript
-db.users.where('status').equals('active').orderBy('name').reverse().toArray(); // Descending order
+db.users.where('status').equals('active').sortBy('name').reverse().toArray(); // Descending order
 ```
 
 **Parameters:** None
@@ -261,7 +261,7 @@ Returns the last matching document.
 **Example:**
 
 ```typescript
-const lastUser = db.users.where({ status: 'active' }).orderBy('createdAt').last();
+const lastUser = db.users.where({ status: 'active' }).sortBy('createdAt').last();
 ```
 
 **Parameters:** None
@@ -338,12 +338,12 @@ Available after `where(field)`. Provides filtering operators:
 
 Available after applying a filter or using `where(criteria)`. Provides:
 
-- Modifiers: `orderBy()`, `limit()`, `offset()`, `filter()`
+- Modifiers: `sortBy()`, `limit()`, `offset()`, `filter()`
 - Execution: `toArray()`, `first()`, `last()`, `count()`, `delete()`, `modify()`
 
 #### `OrderableStage<T>`
 
-Available after `orderBy()`. Extends `ExecutableStage<T>` with:
+Available after `sortBy()`. Extends `ExecutableStage<T>` with:
 
 - `reverse()`
 

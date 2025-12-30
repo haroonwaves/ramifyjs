@@ -20,7 +20,7 @@ Queries start with `.where()` and proceed through a chain of operations.
 
 - **Selection**: Target a field or criteria (`where('tags')`).
 - **Filtering**: Apply constraints (`anyOf(['needsAction'])`).
-- **Modification**: Sort or paginate (`orderBy('createdAt')`, `limit(10)`).
+- **Modification**: Sort or paginate (`sortBy('createdAt')`, `limit(10)`).
 - **Execution**: Run the query (`toArray()`).
   > [!IMPORTANT] **Execution Requirement**: The query builder object is lazy; you must call an
   > execution method like `.toArray()` to actually run the query and retrieve results.
@@ -55,5 +55,5 @@ const special = db.messages
 const adminsOrMods = db.messages.where('metadata.priority').anyOf(['high', 'normal']).toArray();
 
 // Sorting
-const sorted = db.messages.where({ isDeleted: false }).orderBy('createdAt').reverse().toArray();
+const sorted = db.messages.where({ isDeleted: false }).sortBy('createdAt').reverse().toArray();
 ```

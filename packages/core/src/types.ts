@@ -51,14 +51,14 @@ export type WhereStageNested<T, Path extends string> = {
 	): ExecutableStage<T>;
 };
 
-export type OrderableStage<T> = Omit<ExecutableStage<T>, 'orderBy'> & {
+export type OrderableStage<T> = Omit<ExecutableStage<T>, 'sortBy'> & {
 	reverse(): OrderableStage<T>;
 };
 
-export type LimitedStage<T> = Omit<ExecutableStage<T>, 'limit' | 'orderBy'>;
+export type LimitedStage<T> = Omit<ExecutableStage<T>, 'limit' | 'sortBy'>;
 
 export type ExecutableStage<T> = {
-	orderBy(field: keyof T): OrderableStage<T>;
+	sortBy(field: keyof T): OrderableStage<T>;
 	limit(count: number): LimitedStage<T>;
 	offset(count: number): LimitedStage<T>;
 	filter(callback: (document: T) => boolean): ExecutableStage<T>;

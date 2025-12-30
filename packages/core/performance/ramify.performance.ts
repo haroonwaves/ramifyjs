@@ -30,7 +30,7 @@ const OPS = {
 	BULK_GET: 50,
 	WHERE_EQUALS: 100,
 	FILTER: 100,
-	ORDERBY_LIMIT: 1000,
+	SORTBY_LIMIT: 1000,
 	PUT: 50,
 	UPDATE: 100,
 	BULK_ADD: 100,
@@ -142,8 +142,8 @@ function runBenchmarks(db: ReturnType<typeof createStore>) {
 	);
 
 	r.push(
-		runTimed('orderBy(age).limit()', OPS.ORDERBY_LIMIT, () => {
-			users.orderBy('age').limit(OPS.ORDERBY_LIMIT).toArray();
+		runTimed('sortBy(age).limit()', OPS.SORTBY_LIMIT, () => {
+			users.sortBy('age').limit(OPS.SORTBY_LIMIT).toArray();
 		})
 	);
 

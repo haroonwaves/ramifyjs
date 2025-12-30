@@ -41,19 +41,3 @@ Live Queries are powerful but come with overhead.
   `useLiveQuery`. Instead, query data higher up the tree and pass it down via props.
 - **Selective Subscriptions**: Subscribing to data that rarely changes still consumes cycles. Only
   use Live Queries for data that requires reactive updates.
-
-### Examples
-
-```typescript
-// ❌ ERROR: Querying non-indexed fields throws an error
-// db.users.where('name').equals('john');
-
-// ✅ Try this:
-db.users.filter((user) => user.name === 'john').toArray();
-
-// ❌ BAD: Multiple individual adds (triggers N events)
-items.forEach((item) => db.todos.add(item));
-
-// ✅ GOOD: Bulk add (triggers 1 event)
-db.todos.bulkAdd(items);
-```

@@ -180,7 +180,7 @@ const developers = db.users.where('roles').equals(['admin']).toArray();
 const topUsers = db.users
 	.where('roles')
 	.anyOf(['admin', 'manager'])
-	.orderBy('name')
+	.sortBy('name')
 	.limit(10)
 	.toArray();
 ```
@@ -232,7 +232,7 @@ function UserList() {
   const users = useLiveQuery(
     () => db.users
 		.where({ status: 'active' })
-		.orderBy('name')
+		.sortBy('name')
 		.reverse()
 		.limit(10)
 		.toArray(),

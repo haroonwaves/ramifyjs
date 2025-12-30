@@ -395,14 +395,14 @@ db.users.filter((u) => u.name.startsWith('A'));
 
 ---
 
-#### `orderBy(field)`
+#### `sortBy(field)`
 
 Returns a query ordered by the specified field, this performs Js sorting under the hood.
 
 **Example:**
 
 ```typescript
-db.users.orderBy('name').toArray();
+db.users.sortBy('name').toArray();
 ```
 
 **Parameters:**

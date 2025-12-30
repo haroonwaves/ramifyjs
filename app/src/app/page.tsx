@@ -244,7 +244,7 @@ export default function Home() {
 										<tr className="transition-colors hover:bg-foreground/5">
 											<td className="px-6 py-4 font-medium">Primary Use</td>
 											<td className="px-6 py-4 text-muted-foreground">
-												Application Data, Offline-capable Local Data
+												App Data, Offline-capable state
 											</td>
 											<td className="px-6 py-4 text-muted-foreground">
 												Caching, Data Transformations
@@ -253,21 +253,17 @@ export default function Home() {
 										<tr className="transition-colors hover:bg-foreground/5">
 											<td className="px-6 py-4 font-medium">Lifecycle</td>
 											<td className="px-6 py-4 text-muted-foreground">Session-long</td>
-											<td className="px-6 py-4 text-muted-foreground">
-												Request-scoped or Process-scoped
-											</td>
+											<td className="px-6 py-4 text-muted-foreground">Request or Process-scoped</td>
 										</tr>
 										<tr className="transition-colors hover:bg-foreground/5">
-											<td className="px-6 py-4 font-medium">Reactive</td>
-											<td className="px-6 py-4 text-muted-foreground">Yes (Live Queries)</td>
-											<td className="px-6 py-4 text-muted-foreground">
-												Possible, but rarely needed
-											</td>
+											<td className="px-6 py-4 font-medium">Reactivity</td>
+											<td className="px-6 py-4 text-muted-foreground">Real-time (Hooks)</td>
+											<td className="px-6 py-4 text-muted-foreground">Event-driven (Observers)</td>
 										</tr>
 										<tr className="transition-colors hover:bg-foreground/5">
 											<td className="px-6 py-4 font-medium">Durability</td>
-											<td className="px-6 py-4 text-red-400">None</td>
-											<td className="px-6 py-4 text-red-400">None</td>
+											<td className="px-6 py-4 text-muted-foreground">Pluggable (via Events)</td>
+											<td className="px-6 py-4 text-muted-foreground">Pluggable (via Events)</td>
 										</tr>
 									</tbody>
 								</table>

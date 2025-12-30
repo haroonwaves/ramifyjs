@@ -97,7 +97,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 
 	toArray(): T[] {
 		if (!this.results) this.execute();
-		return this.results?.map((record) => createLazyCloneProxy<T>(record)) || [];
+		return this.results?.map((document) => createLazyCloneProxy<T>(document)) || [];
 	}
 
 	modify(changes: Partial<T>): (T[PK] | undefined)[] {
@@ -105,8 +105,8 @@ export class Query<T = any, PK extends keyof T = keyof T>
 
 		this.collection.batchOperationInProgress = true;
 		const keys: T[PK][] = [];
-		const results = (this.results || []).map((record) => {
-			const key = record[this.collection.primaryKey];
+		const results = (this.results || []).map((document) => {
+			const key = document[this.collection.primaryKey];
 			keys.push(key as T[PK]);
 			return this.collection.update(key, changes);
 		});
@@ -121,8 +121,8 @@ export class Query<T = any, PK extends keyof T = keyof T>
 
 		this.collection.batchOperationInProgress = true;
 		const keys: T[PK][] = [];
-		const results = (this.results || []).map((record) => {
-			const key = record[this.collection.primaryKey];
+		const results = (this.results || []).map((document) => {
+			const key = document[this.collection.primaryKey];
 			keys.push(key as T[PK]);
 			return this.collection.delete(key);
 		});
@@ -132,7 +132,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		return results;
 	}
 
-	orderBy(field: keyof T): OrderableStage<T> {
+	sortBy(field: keyof T): OrderableStage<T> {
 		this.orderField = field;
 		return this;
 	}
@@ -179,36 +179,36 @@ export class Query<T = any, PK extends keyof T = keyof T>
 			whereStage,
 		} = this;
 
-		let records: T[] = [];
+		let documents: T[] = [];
 
 		const hasWhereStage = whereStage !== null;
 		const fields = hasWhereStage ? [whereStage[0]] : Object.keys(criteria as object);
 
-		const primaryField = fields.find((field) => field === String(collection.primaryKey));
-		const indexFields = fields.filter(
+		const primaryKey = fields.find((field) => field === String(collection.primaryKey));
+		const indexes = fields.filter(
 			(field) => collection.indexes.includes(field) || collection.multiEntryIndexes.includes(field)
 		);
 
 		this.isExact = !hasWhereStage || whereStage?.[1].$equals;
 
-		if (primaryField) {
-			records = this.getRecordsByPrimaryField(primaryField); // Query by primary key
-		} else if (indexFields.length > 0) {
-			records = this.getRecordsByIndexFields(indexFields); // Query by index fields
+		if (primaryKey) {
+			documents = this.getDocumentsByPrimaryKey(primaryKey); // Query by primary key
+		} else if (indexes.length > 0) {
+			documents = this.getDocumentsByIndexes(indexes); // Query by indexes
 		} else if (Object.keys(criteria as object).length === 0) {
-			records = [...(collection as any).data.values()]; // Query all records (for collection.filter(callback))
+			documents = [...(collection as any).data.values()]; // Query all docs (for collection.filter(callback))
 		} else {
 			throw new Error('Ramify: No primary key or index fields found for the query');
 		}
 
 		if (hasWhereStage) {
-			records = records.filter((record) => this.matchesWhereStage(record));
-		} else if (primaryField || indexFields.length > 0) {
-			records = records.filter((record) => this.matchesCriteria(record));
+			documents = documents.filter((document) => this.matchesWhereStage(document));
+		} else if (primaryKey || indexes.length > 0) {
+			documents = documents.filter((document) => this.matchesCriteria(document));
 		}
 
 		if (orderField) {
-			records.sort((a, b) => {
+			documents.sort((a, b) => {
 				const aValue = a[orderField];
 				const bValue = b[orderField];
 				if (aValue < bValue) return orderDirection === 'asc' ? -1 : 1;
@@ -217,44 +217,44 @@ export class Query<T = any, PK extends keyof T = keyof T>
 			});
 		}
 
-		if (offsetCount) records = records.slice(offsetCount);
-		if (limitCount !== null) records = records.slice(0, limitCount);
+		if (offsetCount) documents = documents.slice(offsetCount);
+		if (limitCount !== null) documents = documents.slice(0, limitCount);
 
-		this.results = records;
+		this.results = documents;
 	}
 
-	private getRecordsByPrimaryField(primaryField: string): T[] {
-		const records: T[] = [];
-		const primaryValue = this.getFieldValue(primaryField);
+	private getDocumentsByPrimaryKey(primaryKey: string): T[] {
+		const documents: T[] = [];
+		const key = this.getFieldValue(primaryKey);
 		const data = (this.collection as any).data;
 
-		if (Array.isArray(primaryValue)) {
-			for (const value of primaryValue as T[PK][]) {
-				const record = data.get(value) as T;
-				if (record) records.push(record);
+		if (Array.isArray(key)) {
+			for (const value of key as T[PK][]) {
+				const document = data.get(value) as T;
+				if (document) documents.push(document);
 			}
-		} else if (primaryValue !== undefined) {
-			const record = data.get(primaryValue as T[PK]) as T;
-			if (record) records.push(record);
+		} else if (key !== undefined) {
+			const document = data.get(key as T[PK]) as T;
+			if (document) documents.push(document);
 		}
 
-		return records;
+		return documents;
 	}
 
-	private getRecordsByIndexFields(indexFields: string[]): T[] {
-		const smallestMap = this.findSmallestMatchingMap(indexFields);
+	private getDocumentsByIndexes(indexes: string[]): T[] {
+		const smallestMap = this.findSmallestMatchingMap(indexes);
 		if (!smallestMap) return [];
 		return [...smallestMap.values()];
 	}
 
-	private findSmallestMatchingMap(indexFields: string[]): Map<any, T> | null {
+	private findSmallestMatchingMap(indexes: string[]): Map<any, T> | null {
 		let smallestMap: Map<any, T> | null = null;
 
-		for (const field of indexFields) {
-			const indexValue = this.getFieldValue(field);
+		for (const index of indexes) {
+			const indexValue = this.getFieldValue(index);
 			if (indexValue === undefined) continue;
 
-			const currentMap = this.getMatchingMapForField(field, indexValue);
+			const currentMap = this.getMatchingMapForField(index, indexValue);
 			if (!currentMap) continue;
 			if (!smallestMap || currentMap.size < smallestMap.size) smallestMap = currentMap;
 		}
@@ -262,60 +262,60 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		return smallestMap;
 	}
 
-	private getMatchingMapForField(field: string, indexValue: any): Map<any, T> {
+	private getMatchingMapForField(index: string, indexValue: any): Map<any, T> {
 		const indexMaps = (this.collection as any).indexMaps;
 
 		if (Array.isArray(indexValue)) {
 			const combinedMap = new Map<any, T>();
 			for (const value of indexValue) {
-				const matches = indexMaps[field]?.get(value) || new Map();
-				for (const [key, record] of matches) combinedMap.set(key, record as T);
+				const matches = indexMaps[index]?.get(value) || new Map();
+				for (const [idx, document] of matches) combinedMap.set(idx, document as T);
 			}
 			return combinedMap;
 		}
 
-		return indexMaps[field]?.get(indexValue) || new Map();
+		return indexMaps[index]?.get(indexValue) || new Map();
 	}
 
 	private getFieldValue(field: string): T[keyof T] {
 		return this.criteria[field as keyof T] || Object.values(this.whereStage?.[1] || {})[0];
 	}
 
-	private matchesCriteria(record: T): boolean {
+	private matchesCriteria(document: T): boolean {
 		return Object.entries(this.criteria as object).every(([field, value]) => {
-			const recordValue = getNestedValue(record as Record<string, unknown>, field);
-			return this.compareValues(recordValue, value, true);
+			const nestedValue = getNestedValue(document as Record<string, unknown>, field);
+			return this.compareValues(nestedValue, value, true);
 		});
 	}
 
-	private compareValues(recordValue: any, criteriaValue: any, isEvery: boolean = false): boolean {
+	private compareValues(document: any, criteriaValue: any, isEvery: boolean = false): boolean {
 		if (Array.isArray(criteriaValue)) {
-			if (Array.isArray(recordValue)) {
+			if (Array.isArray(document)) {
 				if (isEvery) {
 					return (
-						(this.isExact ? criteriaValue.length === recordValue.length : true) &&
-						criteriaValue.every((v) => recordValue.includes(v))
+						(this.isExact ? criteriaValue.length === document.length : true) &&
+						criteriaValue.every((v) => document.includes(v))
 					);
 				}
-				return criteriaValue.some((v) => recordValue.includes(v));
+				return criteriaValue.some((v) => document.includes(v));
 			}
 
-			return isEvery ? false : criteriaValue.includes(recordValue);
+			return isEvery ? false : criteriaValue.includes(document);
 		}
 
-		if (Array.isArray(recordValue)) return recordValue.includes(criteriaValue);
-		return recordValue === criteriaValue;
+		if (Array.isArray(document)) return document.includes(criteriaValue);
+		return document === criteriaValue;
 	}
 
-	private matchesWhereStage(record: T): boolean {
+	private matchesWhereStage(document: T): boolean {
 		if (!this.whereStage) return true;
 		const [field, operators] = this.whereStage;
-		const recordValue = getNestedValue(record as Record<string, unknown>, field);
+		const nestedValue = getNestedValue(document as Record<string, unknown>, field);
 
-		if (operators.$equals && !this.compareValues(recordValue, operators.$equals, true))
+		if (operators.$equals && !this.compareValues(nestedValue, operators.$equals, true))
 			return false;
-		if (operators.$anyOf && !this.compareValues(recordValue, operators.$anyOf)) return false;
-		if (operators.$allOf && !this.compareValues(recordValue, operators.$allOf, true)) return false;
+		if (operators.$anyOf && !this.compareValues(nestedValue, operators.$anyOf)) return false;
+		if (operators.$allOf && !this.compareValues(nestedValue, operators.$allOf, true)) return false;
 
 		return true;
 	}

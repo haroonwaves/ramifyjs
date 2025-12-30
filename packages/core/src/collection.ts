@@ -65,11 +65,11 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	put(document: T): T[Pk] {
-		const primaryVal = document[this.primaryKey];
+		const key = document[this.primaryKey];
 
 		assert(
-			isPrimitive(primaryVal),
-			`Ramify: Primary key "${String(this.primaryKey)}" must be a primitive value (string, number, boolean, Date). Got ${typeof primaryVal}.`
+			isPrimitive(key),
+			`Ramify: Primary key "${String(this.primaryKey)}" must be a primitive value (string, number, boolean, Date). Got ${typeof key}.`
 		);
 
 		this.delete(document[this.primaryKey]); // Delete existing document
@@ -78,8 +78,8 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 			this.addToIndex(index, document); // Add to index Map
 		}
 
-		if (!this.batchOperationInProgress) this.observer.notify('create', [primaryVal]);
-		return primaryVal;
+		if (!this.batchOperationInProgress) this.observer.notify('create', [key]);
+		return key;
 	}
 
 	bulkPut(documents: T[]) {
@@ -92,11 +92,11 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 	}
 
 	add(document: T) {
-		const primaryVal = document[this.primaryKey];
-		const existingDocument = this.data.get(primaryVal);
+		const key = document[this.primaryKey];
+		const existingDocument = this.data.get(key);
 		if (existingDocument)
 			throw new Error(
-				`Ramify: Document with primary key ${primaryVal as string} already exists in the collection`
+				`Ramify: Document with primary key ${key as string} already exists in the collection`
 			);
 
 		return this.put(document);
@@ -111,21 +111,21 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		return results;
 	}
 
-	get(primaryVal: T[Pk]): T | undefined {
-		const value = this.data.get(primaryVal);
+	get(key: T[Pk]): T | undefined {
+		const value = this.data.get(key);
 		return value ? createLazyCloneProxy<T>(value) : undefined;
 	}
 
-	bulkGet(primaryVals: Array<T[Pk]>): Array<T | undefined> {
-		return primaryVals.map((value) => this.get(value));
+	bulkGet(keys: Array<T[Pk]>): Array<T | undefined> {
+		return keys.map((key) => this.get(key));
 	}
 
 	toArray(): T[] {
 		return [...this.data.values()].map((item) => createLazyCloneProxy<T>(item));
 	}
 
-	update(primaryVal: T[Pk], changes: Partial<T>): T[Pk] | undefined {
-		const oldData = this.data.get(primaryVal);
+	update(key: T[Pk], changes: Partial<T>): T[Pk] | undefined {
+		const oldData = this.data.get(key);
 		if (!oldData) return;
 
 		const newData = Object.assign(oldData, changes); // Update the data through reference.
@@ -137,12 +137,12 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 
 		// If the primary key or index is updated, delete the old document and add the new one.
 		if (isPrimaryKeyUpdate || isIndexUpdate) {
-			this.delete(primaryVal);
+			this.delete(key);
 			this.put(newData);
 		}
 
-		if (!this.batchOperationInProgress) this.observer.notify('update', [primaryVal]);
-		return primaryVal;
+		if (!this.batchOperationInProgress) this.observer.notify('update', [key]);
+		return key;
 	}
 
 	bulkUpdate(keys: Array<T[Pk]>, changes: Partial<T>): Array<T[Pk] | undefined> {
@@ -154,22 +154,22 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		return results;
 	}
 
-	delete(primaryVal: T[Pk]): T[Pk] | undefined {
-		const document = this.data.get(primaryVal);
+	delete(key: T[Pk]): T[Pk] | undefined {
+		const document = this.data.get(key);
 		if (!document) return;
 
-		this.data.delete(primaryVal); // Delete from primary Map
+		this.data.delete(key); // Delete from primary Map
 		for (const index of [...this.indexes, ...this.multiEntryIndexes]) {
 			this.removeFromIndex(index, document); // Delete from index Map
 		}
 
-		if (!this.batchOperationInProgress) this.observer.notify('delete', [primaryVal]);
-		return primaryVal;
+		if (!this.batchOperationInProgress) this.observer.notify('delete', [key]);
+		return key;
 	}
 
-	bulkDelete(primaryVals: Array<T[Pk]>): Array<T[Pk] | undefined> {
+	bulkDelete(keys: Array<T[Pk]>): Array<T[Pk] | undefined> {
 		this.batchOperationInProgress = true;
-		const results = primaryVals.map((value) => this.delete(value));
+		const results = keys.map((key) => this.delete(key));
 		this.batchOperationInProgress = false;
 
 		this.observer.notify('delete', results);
@@ -191,8 +191,8 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		return [...this.data.keys()];
 	}
 
-	has(primaryVal: T[Pk]): boolean {
-		return this.data.has(primaryVal);
+	has(key: T[Pk]): boolean {
+		return this.data.has(key);
 	}
 
 	filter(callback: (document: T) => boolean): ExecutableStage<T> {
@@ -203,8 +203,8 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		this.toArray().forEach((element) => callback(element));
 	}
 
-	orderBy(field: keyof T): OrderableStage<T> {
-		return new Query<T, Pk>(this, {}).orderBy(field);
+	sortBy(field: keyof T): OrderableStage<T> {
+		return new Query<T, Pk>(this, {}).sortBy(field);
 	}
 
 	limit(count: number): LimitedStage<T> {

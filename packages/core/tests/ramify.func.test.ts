@@ -194,17 +194,17 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 	/*                             Query Pipelines                                */
 	/* -------------------------------------------------------------------------- */
 
-	test('orderBy / limit / offset / filter / first / last', () => {
+	test('sortBy / limit / offset / filter / first / last', () => {
 		seedUsers();
 
-		const arr = db.users.orderBy('age').limit(2).toArray();
+		const arr = db.users.sortBy('age').limit(2).toArray();
 		expect(arr.length).toBe(2);
 		expect(arr[0].age).toBe(22);
 
-		const second = db.users.orderBy('age').limit(1).offset(1).first();
+		const second = db.users.sortBy('age').limit(1).offset(1).first();
 		expect(second?.age).toBe(25);
 
-		const last = db.users.orderBy('age').reverse().first();
+		const last = db.users.sortBy('age').reverse().first();
 		expect(last?.age).toBe(40);
 	});
 
