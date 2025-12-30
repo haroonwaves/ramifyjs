@@ -6,9 +6,16 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
+import * as React from 'react';
 
 export default function Header() {
 	const { theme, resolvedTheme } = useTheme();
+	const [mounted, setMounted] = React.useState(false);
+
+	React.useEffect(() => {
+		setMounted(true);
+	}, []);
+
 	const currentTheme = theme === 'system' ? resolvedTheme : theme;
 	const pathname = usePathname();
 	const isDocs = pathname.startsWith('/docs');
@@ -23,17 +30,21 @@ export default function Header() {
 						isDocs && 'pl-8 lg:pl-0'
 					)}
 				>
-					<Image
-						src={currentTheme === 'dark' ? '/logo-dark.svg' : '/logo.svg'}
-						alt="Ramify"
-						width={120}
-						height={32}
-					/>
+					{mounted ? (
+						<Image
+							src={currentTheme === 'dark' ? '/logo-dark.svg' : '/logo.svg'}
+							alt="Ramify"
+							width={120}
+							height={32}
+						/>
+					) : (
+						<div className="w-[120px] h-8" /> // Spacer to prevent layout shift
+					)}
 				</Link>
 
 				<nav className="flex items-center gap-6">
 					<Link
-						href="/docs"
+						href="/docs/getting-started"
 						className="text-sm hidden lg:inline-block font-medium text-muted-foreground transition-colors hover:text-foreground"
 					>
 						Documentation

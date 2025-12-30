@@ -2,7 +2,16 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Database, Zap, Code2, Sparkles, ArrowRight, Github, Terminal } from 'lucide-react';
+import {
+	Code2,
+	Sparkles,
+	ArrowRight,
+	Github,
+	Terminal,
+	Timer,
+	Activity,
+	Search,
+} from 'lucide-react';
 import Image from 'next/image';
 
 export default function Home() {
@@ -13,10 +22,21 @@ export default function Home() {
 				<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
 			</div>
 
-			{/* Gradient Orbs */}
-			<div className="pointer-events-none fixed inset-0 z-0">
-				<div className="absolute left-1/4 top-0 h-[500px] w-[500px] animate-pulse rounded-full bg-foreground/5 blur-[120px]" />
-				<div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] animate-pulse rounded-full bg-foreground/5 blur-[120px] [animation-delay:2s]" />
+			{/* Premium Background: Floating Orbs & Grain */}
+			<div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+				{/* Noise/Grain Overlay */}
+				<div
+					className="absolute inset-0 opacity-[0.015] sm:opacity-[0.03] mix-blend-overlay"
+					style={{
+						backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+					}}
+				/>
+
+				{/* Animated Orbs - Reduced/Hidden on mobile */}
+				<div className="absolute -top-[10%] left-[10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] animate-blob rounded-full bg-blue-500/5 sm:bg-blue-500/10 blur-[80px] sm:blur-[120px] filter" />
+				<div className="absolute top-[20%] -right-[5%] hidden sm:block h-[600px] w-[600px] animate-blob rounded-full bg-purple-500/10 blur-[120px] filter [animation-delay:2s]" />
+				<div className="absolute -bottom-[10%] left-[20%] hidden sm:block h-[500px] w-[500px] animate-blob rounded-full bg-orange-500/10 blur-[120px] filter [animation-delay:4s]" />
+				<div className="absolute bottom-[10%] right-[10%] h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] animate-blob rounded-full bg-emerald-500/5 sm:bg-emerald-500/10 blur-[80px] sm:blur-[120px] filter [animation-delay:6s]" />
 			</div>
 
 			<div className="relative z-10">
@@ -54,7 +74,7 @@ export default function Home() {
 						</p>
 
 						<div className="flex flex-wrap items-center justify-center gap-4">
-							<Link href="/docs">
+							<Link href="/docs/getting-started">
 								<Button
 									size="lg"
 									className="group cursor-pointer gap-2 bg-foreground px-8 py-6 text-base font-medium text-background transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_0_40px_rgba(255,255,255,0.1)]"
@@ -107,13 +127,13 @@ export default function Home() {
 						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 							{[
 								{
-									icon: Database,
-									title: 'In-Memory Performance',
+									icon: Timer,
+									title: 'No Event Loop Delays',
 									description:
-										'Lightning-fast queries with data stored entirely in memory. No network latency, no disk I/O.',
+										'10x faster than async databases. Synchronous, in-process execution removes event loop overhead entirely.',
 								},
 								{
-									icon: Zap,
+									icon: Activity,
 									title: 'Live Query Observation',
 									description:
 										'Observable queries with optional React hooks for automatic UI updates.',
@@ -130,7 +150,7 @@ export default function Home() {
 									description: 'Fluent API with filtering, sorting, pagination. Query like a pro.',
 								},
 								{
-									icon: Database,
+									icon: Search,
 									title: 'Indexed Collections',
 									description:
 										'Create indexes for lightning-fast lookups. Support for multi-entry indexes on array fields.',
@@ -241,7 +261,7 @@ export default function Home() {
 										</tr>
 									</thead>
 									<tbody className="divide-y divide-border/40">
-										<tr className="transition-colors hover:bg-foreground/5">
+										<tr className="transition-colors">
 											<td className="px-6 py-4 font-medium">Primary Use</td>
 											<td className="px-6 py-4 text-muted-foreground">
 												App Data, Offline-capable state
@@ -250,17 +270,17 @@ export default function Home() {
 												Caching, Data Transformations
 											</td>
 										</tr>
-										<tr className="transition-colors hover:bg-foreground/5">
+										<tr className="transition-colors">
 											<td className="px-6 py-4 font-medium">Lifecycle</td>
 											<td className="px-6 py-4 text-muted-foreground">Session-long</td>
 											<td className="px-6 py-4 text-muted-foreground">Request or Process-scoped</td>
 										</tr>
-										<tr className="transition-colors hover:bg-foreground/5">
+										<tr className="transition-colors">
 											<td className="px-6 py-4 font-medium">Reactivity</td>
 											<td className="px-6 py-4 text-muted-foreground">Real-time (Hooks)</td>
 											<td className="px-6 py-4 text-muted-foreground">Event-driven (Observers)</td>
 										</tr>
-										<tr className="transition-colors hover:bg-foreground/5">
+										<tr className="transition-colors">
 											<td className="px-6 py-4 font-medium">Durability</td>
 											<td className="px-6 py-4 text-muted-foreground">Pluggable (via Events)</td>
 											<td className="px-6 py-4 text-muted-foreground">Pluggable (via Events)</td>
@@ -284,14 +304,14 @@ export default function Home() {
 
 						<div className="rounded-lg border border-border/70">
 							<Image
-								className="rounded-lg dark:hidden"
+								className="h-auto w-full rounded-lg dark:hidden"
 								src="/example-light.png"
 								alt="Example"
 								width={1024}
 								height={1000}
 							/>
 							<Image
-								className="hidden rounded-lg dark:block"
+								className="hidden h-auto w-full rounded-lg dark:block"
 								src="/example-dark.png"
 								alt="Example"
 								width={1024}
@@ -314,7 +334,7 @@ export default function Home() {
 									Explore the documentation and start building high-performance, in-memory data
 									workflows
 								</p>
-								<Link href="/docs">
+								<Link href="/docs/getting-started">
 									<Button
 										size="lg"
 										className="group gap-2 bg-foreground px-10 py-7 text-lg font-medium text-background transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_0_50px_rgba(255,255,255,0.15)]"

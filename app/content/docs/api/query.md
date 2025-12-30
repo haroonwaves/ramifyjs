@@ -32,7 +32,7 @@ db.users.where('email').equals('alice@example.com');
 
 #### `where(criteria)`
 
-Match fields by equality (or inclusion for array values).
+Match fields by strict equality (deep equality for arrays).
 
 **Example:**
 

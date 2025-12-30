@@ -1,8 +1,15 @@
-## ramify js
+# @ramifyjs/core
 
-Lightweight in-memory data utilities with querying and live query observation.
+Reactive, in-memory database for JavaScript applications.
 
-### Install
+Ramify JS is environment-agnostic—built for the browser, Node.js, and Edge runtimes. It provides a
+lightweight, type-safe data store with live query observation for building reactive applications.
+
+[Main Documentation →](https://ramifyjs.pages.dev)
+
+[React Hooks →](https://www.npmjs.com/package/@ramifyjs/react-hooks)
+
+## Install
 
 ```bash
 npm install @ramifyjs/core
@@ -12,33 +19,36 @@ pnpm add @ramifyjs/core
 yarn add @ramifyjs/core
 ```
 
-### Usage
+## Usage
 
 ```ts
-import /* your exported APIs */ '@ramifyjs/core';
+import { Ramify, type Schema } from '@ramifyjs/core';
 
-// Example (replace with your actual API):
-// const db = createRamify();
-// const results = query(db, q => q.where(...));
+// 1. Define your schema
+const schema = {
+	users: {
+		primaryKey: 'id',
+		indexes: ['email'],
+	},
+};
+
+// 2. Create the store
+const db = new Ramify().createStore<{ users: Schema<User, 'id'> }>(schema);
+
+// 3. Simple operations
+db.users.put({ id: 1, name: 'John Doe', email: 'john@example.com' });
+
+const user = db.users.where({ email: 'john@example.com' }).first();
+console.log(user); // { id: 1, name: 'John Doe', email: 'john@example.com' }
 ```
 
-Exports are available from the root entrypoint; see source files like `ramify.ts`, `query.ts`,
-`table.ts`, `observer.ts`, and `useLiveQuery.ts` for details until full API docs are added.
+## Features
 
-### TypeScript
+- **Type-safe**: Full TypeScript support with schema-based type inference.
+- **Reactive**: Observe changes with live queries.
+- **Fast**: In-memory operations for high-performance data access.
+- **Environment Agnostic**: Works in Browser, Node.js, and Edge.
 
-- ESM build with bundled type declarations.
-- Target Node 18+ and modern bundlers.
+## License
 
-### Development
-
-- Build: `npm run build`
-- Entry: `index.ts` re-exports from local modules.
-
-### License
-
-MIT © Usman Haroon
-
-### SCRATCHPAD
-
-store └── collection └── document
+[LICENSE](/LICENSE)

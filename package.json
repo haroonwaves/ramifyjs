@@ -1,8 +1,11 @@
 {
 	"name": "ramifyjs",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"private": true,
 	"keywords": [
+		"ramify",
+		"ramifyjs",
+		"ramify-db",
 		"in-memory-database",
 		"reactive-database",
 		"live-query",
@@ -15,7 +18,9 @@
 		"real-time-data",
 		"state-management",
 		"data-store",
-		"memdb"
+		"memdb",
+		"nosql",
+		"javascript"
 	],
 	"author": "Haroon (https://github.com/haroonwaves)",
 	"license": "MIT",

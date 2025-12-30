@@ -1,4 +1,4 @@
-## Ramify JS
+# Ramify JS
 
 Reactive, in-memory database for in-process JavaScript applications.
 
@@ -9,43 +9,70 @@ lightweight, type-safe data store with live query observation for building react
 > management, request-scoped caching, and transient state. Data is lost when the process or page is
 > terminated.
 
-### Install
+## Documentation
+
+[ramifyjs.pages.dev](https://ramifyjs.pages.dev) - Main documentation
+
+## Development
+
+This is a monorepo managed with pnpm workspaces.
 
 ```bash
-npm install ramify-js
-# or
-pnpm add ramify-js
-# or
-yarn add ramify-js
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run type checking
+pnpm type-check
+
+# Run linting
+pnpm lint
+
+# Format code
+pnpm format
 ```
 
-### Usage
+# Contributing
 
-```ts
-import /* your exported APIs */ 'ramify-js';
+Fork the Project
 
-// Example (replace with your actual API):
-// const db = createRamify();
-// const results = query(db, q => q.where(...));
+## Branching Strategy
+
+- Feature branches: `feature/*`
+  ```bash
+  git checkout -b feature/YOUR-BRANCH-NAME
+  ```
+- Bug fix branches: `fix/*`
+  ```bash
+  git checkout -b fix/YOUR-BRANCH-NAME
+  ```
+
+## Commit Message Format
+
+All commits MUST follow this format:
+
+```
+<gitmoji> type(scope): subject
+
+[optional body]
 ```
 
-Exports are available from the root entrypoint; see source files like `ramify.ts`, `query.ts`,
-`table.ts`, `observer.ts`, and `useLiveQuery.ts` for details until full API docs are added.
+### Examples
 
-### TypeScript
+```bash
+✨ feat(core): support for reactive queries
+🐛 fix(react): infinite loop in useLiveQuery
+📝 docs(app): update query api documentation
+```
 
-- ESM build with bundled type declarations.
-- Target Node 18+ and modern bundlers.
+## Development Workflow
 
-### Development
+1. Create your Feature Branch `git checkout -b feature/YOUR-BRANCH-NAME` from the `main` branch
+2. Push to the Branch `git push origin feature/YOUR-BRANCH-NAME`
+3. Open a Pull Request against the `main` branch
 
-- Build: `npm run build`
-- Entry: `index.ts` re-exports from local modules.
+## License
 
-### License
-
-MIT © Usman Haroon
-
-### SCRATCHPAD
-
-store └── collection └── document
+[LICENSE](/LICENSE)
