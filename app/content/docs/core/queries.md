@@ -22,12 +22,17 @@ Queries start with `.where()` and proceed through a chain of operations.
 - **Filtering**: Apply constraints (`anyOf(['needsAction'])`).
 - **Modification**: Sort or paginate (`orderBy('createdAt')`, `limit(10)`).
 - **Execution**: Run the query (`toArray()`).
+  > [!IMPORTANT] **Execution Requirement**: The query builder object is lazy; you must call an
+  > execution method like `.toArray()` to actually run the query and retrieve results.
 
 #### Index Usage
 
 For a query to be performant, it generally needs to use an index. Ramify enforces this for queries:
 you can only call `.where('field')` or `.where({ field: value })` if `field` is indexed. This
 "fail-fast" design prevents accidental full-collection scans in production.
+
+> [!CAUTION] **Index Enforcement**: `where(field)` or `where({ field: value })` will throw an error
+> if the field is not indexed. Use `.filter()` for arbitrary logic on non-indexed fields.
 
 #### Execution Model
 
@@ -52,10 +57,3 @@ const adminsOrMods = db.messages.where('metadata.priority').anyOf(['high', 'norm
 // Sorting
 const sorted = db.messages.where({ isDeleted: false }).orderBy('createdAt').reverse().toArray();
 ```
-
-### Common Pitfalls
-
-- **Querying non-indexed fields**: `where(field)` or `where({ field: value })` throws if the field
-  is not indexed.
-- **Expect chained filters**: The query builder is specific; use `.filter()` for arbitrary logic.
-- **Forgeting toArray()**: The query object is not the result; you must execute it.

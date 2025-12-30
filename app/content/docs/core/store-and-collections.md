@@ -55,9 +55,3 @@ const db = ramify.createStore<{
 
 // db.users is now your typed collection
 ```
-
-### Common pitfalls
-
-- **Forgetting to define indexes**: Without indexes, queries can be slow
-- **Creating multiple stores**: Usually you only need one store per app
-- **Not typing your collections**: TypeScript types give you safety and autocomplete

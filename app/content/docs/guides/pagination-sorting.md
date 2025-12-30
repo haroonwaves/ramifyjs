@@ -22,6 +22,9 @@ const reversed = db.users.orderBy('age').reverse().toArray();
 const managers = db.users.where('roles').anyOf(['manager']).orderBy('name').toArray();
 ```
 
+> [!TIP] **Inconsistent Ordering**: Always sort by a unique field (like `id`) for stable pagination,
+> especially if the secondary sort field (like `age`) contains duplicate values.
+
 > [!NOTE] You can sort by any field. Sorting uses JavaScript's `Array.sort()` and is not optimized
 > by indexes. However, indexing fields used in `where()` queries will improve the filtering
 > performance before sorting is applied.
@@ -47,6 +50,10 @@ const activePage1 = db.users
 	.toArray();
 ```
 
+> [!CAUTION] **Large Offsets**: Avoid using `offset(10000)` or larger on huge datasets. Ramify DB
+> must iterate through all offset records, which can impact performance. Use cursor-based pagination
+> for deep pagination.
+
 ### Cursor-Based Pagination
 
 Alternatively you can use cursor pagination if you are data is likely to change often.
@@ -62,9 +69,3 @@ const usersAfter = db.users
 	.limit(10)
 	.toArray();
 ```
-
-### Common Pitfalls
-
-- **Large offsets**: Avoid `offset(10000)` on huge datasets—use cursor pagination instead
-- **Missing indexes**: Index fields used in `where()` queries for better performance
-- **Inconsistent ordering**: Always sort by a unique field (like `id`) for stable pagination

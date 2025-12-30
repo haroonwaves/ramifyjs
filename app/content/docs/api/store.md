@@ -1,3 +1,8 @@
+---
+title: 'Store API'
+description: 'Store API for creating and managing collections'
+---
+
 ## Store API
 
 The **Store API** is initialized via the `Ramify` class. It serves as the central database instance,
@@ -57,10 +62,8 @@ const db = ramify.createStore<{
 
 - **`storeDefinition`**: `S` - An object mapping collection names to their schema definition
   - **`primaryKey`**: `Pk extends keyof T` - The field used as the unique identifier (required)
-  - **`indexes`**: `Array<NestedKeyOf<T>>` - Array of fields to be indexed for fast lookups
-    (optional)
+  - **`indexes`**: `Array<NestedKeyOf<T>>` - Array of fields to be indexed for fast lookups.
   - **`multiEntry`**: `Array<NestedKeyOf<T>>` - Array of array-fields where each element should be
-    indexed individually (optional)
 
 **Returns:** A typed store object where:
 
@@ -102,20 +105,8 @@ type Schema<T, PK extends keyof T = keyof T> = {
 - **`T`**: The document type for the collection
 - **`Pk`**: The primary key field name, must be a key of `T`
 
----
-
-### Common Pitfalls
-
-- **Defining indexes later** – Indexes must be defined at store creation time in the schema. You
-  cannot add them dynamically later.
-- **Missing Primary Key** – Every collection requires a valid `primaryKey`.
-- **Type mismatches** – Ensure the `primaryKey` specified in the schema matches a field in your
-  document type.
-
----
-
-### Mental Model
-
-- **Ramify Instance** → Database Server
-- **Store Definition** → Schema / Migration
-- **Collection** → Table
+> [!IMPORTANT]
+>
+> - **Primary Key Requirement**: Every collection requires a valid `primaryKey`.
+> - **Type Alignment**: Ensure the `primaryKey` specified in the schema matches a field in your
+>   document type.

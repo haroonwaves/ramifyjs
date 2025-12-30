@@ -19,6 +19,9 @@ Indexes are the single most important factor for read performance in `where` que
 - **Note**: Indexes do NOT improve sorting. Sorting uses JavaScript's `Array.sort()` on the filtered
   results, regardless of whether the field is indexed. Indexes only optimize the initial filtering
   step.
+- **Over-indexing Warning**: Each index slows down write operations because every add/update/delete
+  must update all indexes. However, memory impact is minimal since indexes store references to
+  documents, not copies.
 
 #### 2. Batch Operations
 
@@ -36,6 +39,8 @@ Live Queries are powerful but come with overhead.
 - **Granularity**: Subscribe to specific datasets rather than whole collections if possible.
 - **Component Design**: Avoid having hundreds of small components each with their own
   `useLiveQuery`. Instead, query data higher up the tree and pass it down via props.
+- **Selective Subscriptions**: Subscribing to data that rarely changes still consumes cycles. Only
+  use Live Queries for data that requires reactive updates.
 
 ### Examples
 
@@ -52,11 +57,3 @@ items.forEach((item) => db.todos.add(item));
 // ✅ GOOD: Bulk add (triggers 1 event)
 db.todos.bulkAdd(items);
 ```
-
-### Common Pitfalls
-
-- **Over-indexing**: Each index slows down write operations because every add/update/delete must
-  update all indexes. However, memory impact is minimal since indexes store references to documents,
-  not copies.
-- **Unnecessary Live Queries**: Subscribing to data that rarely changes still consumes cycles.
-- **Large Offsets**: `offset(10000)` is slow; use cursor pagination instead.

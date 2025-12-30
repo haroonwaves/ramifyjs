@@ -1,68 +1,65 @@
 ---
-title: 'Live Queries (React)'
-description: 'Reactive queries that automatically update your UI'
+title: 'Live Queries'
+description: 'Reactive queries that automatically update when data changes'
 ---
 
-## Live Queries (React)
+## Live Queries
 
-Live Queries allow your React components to stay in sync with your Ramify database automatically.
-Instead of manually subscribing to events and managing state, you use the `useLiveQuery` hook.
+**Live Queries** are the foundation of reactive applications built with Ramify DB. Instead of
+performing one-off data fetches, Live Queries allow your application to observe specific collections
+and automatically react to changes.
 
-### How It Works
+### The Mechanism
 
-The `useLiveQuery` hook observes a set of specified collections. Whenever a write operation
-(add/update/delete) occurs on those collections, the hook re-runs your query function and triggers a
-re-render with the new data.
+At its core, Ramify DB uses an observer pattern on every collection. When a write operation (`add`,
+`put`, `update`, `delete`, or `clear`) occurs, the collection emits an event containing the affected
+primary keys.
 
-### The `useLiveQuery` Hook
+Live Query implementations (like React hooks or custom observers) listen to these events to
+determine when a result set might have changed, triggering a re-execution of the query.
 
-```tsx
-import { useLiveQuery } from '@ramify-db/react-hooks';
+```typescript
+// Users subscription
+const unsubscribeUsers = db.users.subscribe((type, keys) => {
+	/* handle users update */
+});
 
-function UserList() {
-	const users = useLiveQuery(
-		// 1. Query Function
-		() => db.users.where({ status: 'active' }).toArray(),
-		// 2. Dependencies
-		{
-			collections: [db.users],
-			others: [],
-		}
-	);
+// Posts subscription
+const unsubscribePosts = db.posts.subscribe((type, keys) => {
+	/* handle posts update */
+});
 
-	return (
-		<ul>
-			{users?.map((u) => (
-				<li key={u.id}>{u.name}</li>
-			))}
-		</ul>
-	);
-}
+// Later, to unsubscribe
+unsubscribeUsers();
+unsubscribePosts();
 ```
 
-### Dependency Tracking
+---
 
-The second argument to `useLiveQuery` is critical.
+### Platform Integration
 
-- **`collections`**: Must include every collection you query. If you forget one, updates to that
-  collection won't trigger a re-render.
-- **`others`**: Functions like React's dependency array. Use it for component props or state
-  variables used inside your query function.
+While the core mechanism is platform-agnostic, most users will interact with Live Queries through
+framework-specific integrations.
+
+#### React Integration
+
+For React applications, Ramify DB provides a dedicated package `@ramify-db/react-hooks` which
+includes the `useLiveQuery` hook. This hook handles subscription lifecycle, dependency tracking, and
+component re-renders automatically. Visit the [React Hooks API](/docs/api/react-hooks) documentation
+for more details.
+
+#### Custom Observers
+
+If you are using Ramify DB without a specialist framework integration, you can use the low-level
+[Collection Subscription API](/docs/api/collection#subscriptions) to build your own reactive logic.
+
+---
 
 ### Best Practices
 
-- **Global Store**: Import your store instance from a module rather than creating it inside the
-  component.
-- **Stability**: Ensure the query function and dependency arrays are stable (or use the hook's
-  naturally stable behavior) to avoid infinite loops, though `useLiveQuery` handles inline function
-  definition well.
-
-### Comparison to Other Libraries
-
-Unlike libraries that require wrapping your app in a Provider or using higher-order components,
-Ramify's approach is more direct and similar to `dexie-react-hooks`.
-
-### Common pitfalls
-
-- **Using in non-React contexts**: Use observers instead
-- **Too many live queries**: Each subscription has overhead
+- **Stability**: Ensure your query functions are stable (defined outside components or memoized) to
+  prevent unnecessary re-subscriptions.
+- **Granular Dependencies**: Only subscribe to the collections that are actually being queried to
+  minimize overhead.
+- **Batching**: Use bulk operations to group multiple changes into a single notification, reducing
+  the number of reactive updates.

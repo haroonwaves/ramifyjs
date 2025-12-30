@@ -1,6 +1,13 @@
-## ramify-db
+## Ramify DB
 
-Lightweight in-memory data utilities with querying and live query observation.
+Reactive, in-memory database for in-process JavaScript applications.
+
+Ramify DB is environment-agnostic—built for the browser, Node.js, and Edge runtimes. It provides a
+lightweight, type-safe data store with live query observation for building reactive applications.
+
+> [!IMPORTANT] **Ramify DB is not a durable database.** It is designed for in-process data
+> management, request-scoped caching, and transient state. Data is lost when the process or page is
+> terminated.
 
 ### Install
 

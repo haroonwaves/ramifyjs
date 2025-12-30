@@ -12,6 +12,9 @@ sorting. Unlike some databases, you define indexes upfront when creating the sto
 
 Indexes are declared in the `createStore` configuration.
 
+> [!NOTE] **Schema-Driven**: Indexes must be defined upfront in the schema. Ramify DB does not
+> support dynamic index creation (e.g., via `createIndex`) after the store has been initialized.
+
 ```typescript
 const db = ramify.createStore<{ users: Schema<User, 'id'> }>({
 	users: {
@@ -51,6 +54,9 @@ Added via the `multiEntry` array. If a field contains an array of values (e.g.,
 `roles: ['manager']`), a multi-entry index allows you to query for documents that contain a specific
 role. Nested properties are also supported using dot notation.
 
+> [!IMPORTANT] **Multi-Entry vs standard**: Don't put array fields in `indexes` if you want to match
+> individual elements; put them in `multiEntry`.
+
 ```typescript
 // Query: Find users with tag 'developer'
 db.users.where('roles').equals(['manager']).toArray();
@@ -61,14 +67,3 @@ db.users.where('roles').equals(['manager']).toArray();
 - **Index what you query**: If you filter by it with `where()`, index it.
 - **Understand the trade-off**: Indexes speed up reads but slow down writes (every write must update
   all indexes). Memory impact is minimal since indexes use references, not copies.
-
-### Common Pitfalls
-
-- **Trying to create indexes dynamically**: `users.createIndex` does not exist. Indexes must be in
-  schema.
-- **Multi-entry vs standard**: Don't put array fields in `indexes` if you want to match individual
-  elements; put them in `multiEntry`.
-
-```
-
-```

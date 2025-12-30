@@ -67,8 +67,3 @@ db.users.where({ status: 'inactive' }).delete();
 // Clear all
 db.users.clear();
 ```
-
-### Common pitfalls
-
-- **Not handling missing records**: Always check if `get()` returns undefined
-- **Forgetting IDs**: Every record needs a unique ID

@@ -1,6 +1,6 @@
 import type { CollectionOperation } from '@/collection';
 
-export type Observer<Pk = any> = (type: CollectionOperation, keys: Pk[]) => void;
+export type Observer<Pk = any> = (type: CollectionOperation, keys: Pk[]) => void | Promise<void>;
 
 type ObserverMap<Pk> = {
 	[collectionName: string]: Set<Observer<Pk>>;
@@ -28,6 +28,6 @@ export class NotificationManager<Pk = any> {
 		const observers = this.observers[this.collectionName];
 		if (!observers) return;
 
-		for (const obs of observers) obs(type, keys);
+		for (const obs of observers) void obs(type, keys);
 	}
 }

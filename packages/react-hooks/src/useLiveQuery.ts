@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export type Subscribable = {
-	subscribe: (cb: () => void) => () => void;
+	subscribe: (cb: () => void | Promise<void>) => () => void;
 };
 
 export function useLiveQuery<T>(

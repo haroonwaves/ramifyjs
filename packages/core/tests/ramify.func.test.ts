@@ -145,7 +145,7 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 	/*                                Update Tests                                */
 	/* -------------------------------------------------------------------------- */
 
-	test('update / bulkUpdate / reindexing', () => {
+	test('update / bulkUpdate / re-indexing', () => {
 		seedUsers();
 
 		// update non-index
@@ -238,7 +238,9 @@ describe('Ramify – functional test suite (refactored dataset)', () => {
 	test('subscribe / unsubscribe behavior (debounced)', (done) => {
 		const received: string[] = [];
 
-		const unsubscribe = db.users.subscribe((type) => received.push(type));
+		const unsubscribe = db.users.subscribe((type) => {
+			received.push(type);
+		});
 
 		db.users.add({
 			id: 1,

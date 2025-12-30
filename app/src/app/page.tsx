@@ -27,7 +27,7 @@ export default function Home() {
 							<div className="group relative inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-foreground/20 hover:bg-background/80">
 								<Sparkles className="h-3.5 w-3.5 transition-transform group-hover:rotate-12" />
 								<span className="bg-linear-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
-									Lightweight • Reactive • TypeScript-First
+									Lightweight • In-Memory • Reactive
 								</span>
 							</div>
 						</div>
@@ -39,19 +39,18 @@ export default function Home() {
 						</h1>
 
 						<p className="mb-6 text-center text-xl font-medium text-foreground/90 sm:text-2xl lg:text-3xl">
-							Lightweight in-memory database with{' '}
+							Reactive, in-memory database for{' '}
 							<span className="relative inline-block">
 								<span className="relative z-10 bg-linear-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
-									live query observation
+									in-process JS applications
 								</span>
 								<span className="absolute -bottom-1 left-0 h-[2px] w-full bg-linear-to-r from-foreground/40 to-transparent" />
 							</span>
 						</p>
 
 						<p className="mx-auto mb-12 max-w-2xl text-center text-base leading-relaxed text-muted-foreground sm:text-lg">
-							Build reactive applications with a powerful, type-safe database that runs entirely in
-							memory. Perfect for client-side data management, real-time data, and observable
-							queries.
+							The lightweight data engine for client-side apps, edge runtimes, and Node.js services.
+							Type-safe, dependency-free, and environment-agnostic.
 						</p>
 
 						<div className="flex flex-wrap items-center justify-center gap-4">
@@ -100,7 +99,8 @@ export default function Home() {
 						<div className="mb-20 text-center">
 							<h2 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">Why Ramify DB?</h2>
 							<p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-								Everything you need for reactive, client-side data management
+								Designed for fast filtering, sorting, and live queries in in-process JavaScript
+								runtimes.
 							</p>
 						</div>
 
@@ -116,7 +116,7 @@ export default function Home() {
 									icon: Zap,
 									title: 'Live Query Observation',
 									description:
-										'React hooks that automatically re-render when your data changes. Build reactive UIs effortlessly.',
+										'Observable queries with optional React hooks for automatic UI updates.',
 								},
 								{
 									icon: Code2,
@@ -160,30 +160,29 @@ export default function Home() {
 					</div>
 				</section>
 
-				{/* Mental Model Section */}
+				{/* Global Identity Section */}
 				<section className="px-6 py-16 lg:px-8">
-					<div className="mx-auto max-w-6xl">
+					<div className="mx-auto max-w-7xl">
 						<div className="mb-12 text-center">
 							<h2 className="mb-3 text-3xl font-bold tracking-tight sm:text-4xl">
-								Not Another State Manager
+								Run Anywhere JS Runs
 							</h2>
 							<p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-								A reactive in-memory database that works{' '}
-								<span className="font-medium text-foreground">alongside</span> your existing tools
+								A unified in-memory data engine across JavaScript runtimes
 							</p>
 						</div>
 
 						<div className="grid gap-6 md:grid-cols-3">
-							<div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-linear-to-br from-green-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-green-500/30 hover:shadow-[0_8px_30px_rgba(34,197,94,0.1)]">
-								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-green-500/10 blur-2xl transition-all group-hover:bg-green-500/20" />
+							<div className="group relative overflow-hidden rounded-2xl border border-blue-500/20 bg-linear-to-br from-blue-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(59,130,246,0.1)]">
+								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-blue-500/10 blur-2xl transition-all group-hover:bg-blue-500/20" />
 								<div className="relative">
-									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-green-500/10 px-3 py-1 text-sm font-semibold text-green-600 dark:text-green-400">
-										✓ Use Ramify DB
+									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-600 dark:text-blue-400">
+										Browser
 									</div>
-									<h3 className="mb-3 text-xl font-semibold">For Your Data</h3>
+									<h3 className="mb-3 text-xl font-semibold">Reactive Client Apps</h3>
 									<p className="leading-relaxed text-muted-foreground">
-										Collections, entities, records. Anything that needs filtering, sorting, or
-										querying.
+										The primary engine for fast UIs. Use live queries to keep your views in sync
+										with local data automatically.
 									</p>
 								</div>
 							</div>
@@ -192,27 +191,86 @@ export default function Home() {
 								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-purple-500/10 blur-2xl transition-all group-hover:bg-purple-500/20" />
 								<div className="relative">
 									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-purple-500/10 px-3 py-1 text-sm font-semibold text-purple-600 dark:text-purple-400">
-										⚡ Performance Layer
+										Edge
 									</div>
-									<h3 className="mb-3 text-xl font-semibold">As a Cache</h3>
+									<h3 className="mb-3 text-xl font-semibold">Request-Scoped Cache</h3>
 									<p className="leading-relaxed text-muted-foreground">
-										Bridge between persistent storage and UI. Instant feedback with in-memory
+										Fast lookups for Cloudflare Workers or Vercel Edge. Filter and sort upstream API
+										data with zero latency.
 									</p>
 								</div>
 							</div>
 
-							<div className="group relative overflow-hidden rounded-2xl border border-blue-500/20 bg-linear-to-br from-blue-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(59,130,246,0.1)]">
-								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-blue-500/10 blur-2xl transition-all group-hover:bg-blue-500/20" />
+							<div className="group relative overflow-hidden rounded-2xl border border-orange-500/20 bg-linear-to-br from-orange-500/5 to-background/50 p-8 backdrop-blur-sm transition-all hover:border-orange-500/30 hover:shadow-[0_8px_30px_rgba(249,115,22,0.1)]">
+								<div className="absolute right-0 top-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-orange-500/10 blur-2xl transition-all group-hover:bg-orange-500/20" />
 								<div className="relative">
-									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-600 dark:text-blue-400">
-										★ Best Together
+									<div className="mb-4 inline-flex items-center justify-center rounded-lg bg-orange-500/10 px-3 py-1 text-sm font-semibold text-orange-600 dark:text-orange-400">
+										Node.js
 									</div>
-									<h3 className="mb-3 text-xl font-semibold">Hybrid Approach</h3>
+									<h3 className="mb-3 text-xl font-semibold">In-Process Services</h3>
 									<p className="leading-relaxed text-muted-foreground">
-										Ramify DB for application data + your favorite state manager for UI. The perfect
-										combo.
+										Perfect for hot data management, background jobs, or complex data
+										transformations in long-running processes.
 									</p>
 								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				{/* Comparison Table Section */}
+				<section className="px-6 py-24 lg:px-8">
+					<div className="mx-auto max-w-7xl">
+						<div className="mb-12 text-center">
+							<h2 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
+								Client vs Server
+							</h2>
+							<p className="text-lg text-muted-foreground">
+								Understand how Ramify DB works in different environments
+							</p>
+						</div>
+
+						<div className="overflow-hidden rounded-2xl border border-border/60 bg-background/50 backdrop-blur-sm">
+							<div className="overflow-x-auto">
+								<table className="w-full">
+									<thead>
+										<tr className="border-b border-border/60">
+											<th className="px-6 py-4 text-left text-sm font-semibold">Feature</th>
+											<th className="px-6 py-4 text-left text-sm font-semibold">Client-Side</th>
+											<th className="px-6 py-4 text-left text-sm font-semibold">Server-Side</th>
+										</tr>
+									</thead>
+									<tbody className="divide-y divide-border/40">
+										<tr className="transition-colors hover:bg-foreground/5">
+											<td className="px-6 py-4 font-medium">Primary Use</td>
+											<td className="px-6 py-4 text-muted-foreground">
+												Application Data, Offline-capable Local Data
+											</td>
+											<td className="px-6 py-4 text-muted-foreground">
+												Caching, Data Transformations
+											</td>
+										</tr>
+										<tr className="transition-colors hover:bg-foreground/5">
+											<td className="px-6 py-4 font-medium">Lifecycle</td>
+											<td className="px-6 py-4 text-muted-foreground">Session-long</td>
+											<td className="px-6 py-4 text-muted-foreground">
+												Request-scoped or Process-scoped
+											</td>
+										</tr>
+										<tr className="transition-colors hover:bg-foreground/5">
+											<td className="px-6 py-4 font-medium">Reactive</td>
+											<td className="px-6 py-4 text-muted-foreground">Yes (Live Queries)</td>
+											<td className="px-6 py-4 text-muted-foreground">
+												Possible, but rarely needed
+											</td>
+										</tr>
+										<tr className="transition-colors hover:bg-foreground/5">
+											<td className="px-6 py-4 font-medium">Durability</td>
+											<td className="px-6 py-4 text-red-400">None</td>
+											<td className="px-6 py-4 text-red-400">None</td>
+										</tr>
+									</tbody>
+								</table>
 							</div>
 						</div>
 					</div>
@@ -257,7 +315,8 @@ export default function Home() {
 									Ready to get started?
 								</h2>
 								<p className="mb-10 text-lg text-muted-foreground">
-									Explore the documentation and start building reactive applications today.
+									Explore the documentation and start building high-performance, in-memory data
+									workflows
 								</p>
 								<Link href="/docs">
 									<Button

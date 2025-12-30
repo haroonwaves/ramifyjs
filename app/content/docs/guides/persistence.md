@@ -5,10 +5,13 @@ description: 'Save and restore data across sessions with incremental sync'
 
 ## Persistence
 
-By default, Ramify DB operates as an **in-memory** database. Data is lost when the page refreshes.
-For persistence, sync your store with **IndexedDB** using the event-based pattern below.
+Ramify DB is **in-memory by design**. Data exists only while your application is running. This is
+intentional—it keeps Ramify DB fast, lightweight, and environment-agnostic.
 
-### Recommended Pattern: Event-Based Incremental Sync
+However, you can add persistence by syncing Ramify DB with external storage using the built-in
+observer pattern.
+
+### Event-Based Incremental Sync (Ex: IndexedDB)
 
 Ramify DB emits events with the primary keys of changed documents, enabling efficient incremental
 sync to IndexedDB.
@@ -66,16 +69,17 @@ db.users.delete('1'); // Auto-synced
 
 ### How It Works
 
+> [!TIP] **Hydration & Errors**: Load data from IndexedDB on app startup to hydrate Ramify DB.
+> Ensure you wrap IndexedDB operations in try/catch blocks to handle potential storage errors.
+
+> [!NOTE] **Schema Evolution**: Version your IndexedDB schema and handle migrations appropriately as
+> your document structures change. For very large datasets, consider batching bulk operations during
+> initial hydration.
+
 **Observer Events**: Every collection operation emits an event with:
 
 - `type`: Operation type (`'create'`, `'update'`, `'delete'`, `'clear'`)
 - `keys`: Array of affected primary keys
-
-**Incremental Sync**: Only changed documents are synced to IndexedDB:
-
-- Single operation: `event.keys` contains 1 key
-- Bulk operation: `event.keys` contains all affected keys
-- Scales to any dataset size
 
 ### Multiple Collections
 
@@ -83,19 +87,12 @@ Sync multiple collections independently:
 
 ```typescript
 // Users sync
-db.users.subscribe(async (event) => {
+db.users.subscribe(async (type, keys) => {
 	/* sync logic */
 });
 
 // Posts sync
-db.posts.subscribe(async (event) => {
+db.posts.subscribe(async (type, keys) => {
 	/* sync logic */
 });
 ```
-
-### Common Pitfalls
-
-- **Not handling storage errors**: IndexedDB operations can fail - use try/catch
-- **Forgetting initial hydration**: Load data from IndexedDB on app startup
-- **Schema changes**: Version your IndexedDB schema and handle migrations
-- **Large bulk operations**: Consider batching very large bulk operations

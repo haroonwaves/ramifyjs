@@ -5,62 +5,18 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Book, Lightbulb, Rocket, Github, Package } from 'lucide-react';
-
-interface DocSection {
-	title: string;
-	icon: React.ComponentType<{ className?: string }>;
-	items: {
-		title: string;
-		href: string;
-	}[];
-}
-
-const docSections: DocSection[] = [
-	{
-		title: 'Getting Started',
-		icon: Rocket,
-		items: [{ title: 'Introduction', href: '/docs/getting-started' }],
-	},
-	{
-		title: 'Core Concepts',
-		icon: Book,
-		items: [
-			{ title: 'API Reference', href: '/docs/api-reference' },
-			{ title: 'Advanced Queries', href: '/docs/advanced-queries' },
-			{ title: 'Live Queries', href: '/docs/live-queries' },
-		],
-	},
-	{
-		title: 'Guides',
-		icon: Lightbulb,
-		items: [
-			{ title: 'Best Practices', href: '/docs/best-practices' },
-			{ title: 'Examples', href: '/docs/examples' },
-			{ title: 'Comparison', href: '/docs/comparison' },
-			{ title: 'FAQ', href: '/docs/faq' },
-		],
-	},
-];
+import { docSections } from '@/config/docs';
 
 export function MobileNav() {
 	const [isOpen, setIsOpen] = useState(false);
-	const [searchQuery, setSearchQuery] = useState('');
 	const pathname = usePathname();
-
-	const filteredSections = docSections.map((section) => ({
-		...section,
-		items: section.items.filter((item) =>
-			item.title.toLowerCase().includes(searchQuery.toLowerCase())
-		),
-	}));
 
 	return (
 		<>
 			{/* Mobile Menu Button */}
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-background shadow-lg transition-colors hover:bg-foreground/5 lg:hidden"
+				className="fixed top-2 left-2 z-50 flex h-12 w-12 items-center justify-center hover:bg-foreground/5 lg:hidden!"
 				aria-label="Toggle menu"
 			>
 				{isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -81,21 +37,10 @@ export function MobileNav() {
 					isOpen ? 'translate-x-0' : '-translate-x-full'
 				)}
 			>
-				<div className="flex h-full flex-col gap-8 p-6 pt-20">
-					{/* Search */}
-					<div className="relative">
-						<input
-							type="text"
-							placeholder="Search..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-sm placeholder:text-muted-foreground/60 focus:border-foreground/20 focus:outline-none focus:ring-1 focus:ring-foreground/10"
-						/>
-					</div>
-
+				<div className="flex h-full flex-col gap-8 pt-20">
 					{/* Navigation */}
-					<nav className="flex-1 space-y-8 overflow-y-auto">
-						{filteredSections.map((section) => {
+					<nav className="flex-1 space-y-8 overflow-y-auto p-6">
+						{docSections.map((section) => {
 							if (section.items.length === 0) return null;
 							const Icon = section.icon;
 
@@ -130,28 +75,6 @@ export function MobileNav() {
 							);
 						})}
 					</nav>
-
-					{/* Quick Links */}
-					<div className="space-y-2 border-t border-border/40 pt-6">
-						<a
-							href="https://github.com/haroonwaves/ramify-db"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-foreground/3 hover:text-foreground"
-						>
-							<Github className="h-4 w-4" />
-							<span>GitHub</span>
-						</a>
-						<a
-							href="https://www.npmjs.com/package/ramify-db"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-foreground/3 hover:text-foreground"
-						>
-							<Package className="h-4 w-4" />
-							<span>npm</span>
-						</a>
-					</div>
 				</div>
 			</aside>
 		</>

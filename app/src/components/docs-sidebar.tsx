@@ -3,61 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Book, Lightbulb, Rocket, Package } from 'lucide-react';
-
-interface DocSection {
-	title: string;
-	icon: React.ComponentType<{ className?: string }>;
-	items: {
-		title: string;
-		href: string;
-	}[];
-}
-
-const docSections: DocSection[] = [
-	{
-		title: 'Introduction',
-		icon: Rocket,
-		items: [{ title: 'Getting Started', href: '/docs/getting-started' }],
-	},
-	{
-		title: 'Core Concepts',
-		icon: Book,
-		items: [
-			{ title: 'Store & Collections', href: '/docs/core/store-and-collections' },
-			{ title: 'Indexes', href: '/docs/core/indexes' },
-			{ title: 'Queries', href: '/docs/core/queries' },
-			{ title: 'Live Queries (React)', href: '/docs/core/live-queries' },
-		],
-	},
-	{
-		title: 'Guides',
-		icon: Lightbulb,
-		items: [
-			{ title: 'CRUD Patterns', href: '/docs/guides/crud' },
-			{ title: 'Pagination & Sorting', href: '/docs/guides/pagination-sorting' },
-			{ title: 'Search', href: '/docs/guides/search' },
-			{ title: 'Performance', href: '/docs/guides/performance' },
-			{ title: 'Persistence', href: '/docs/guides/persistence' },
-		],
-	},
-	{
-		title: 'API Reference',
-		icon: Package,
-		items: [
-			{ title: 'Store API', href: '/docs/api/store' },
-			{ title: 'Collection API', href: '/docs/api/collection' },
-			{ title: 'Query API', href: '/docs/api/query' },
-			{ title: 'React Hooks', href: '/docs/api/react-hooks' },
-		],
-	},
-];
+import { docSections } from '@/config/docs';
 
 export function DocsSidebar() {
 	const pathname = usePathname();
 
 	return (
-		<aside className="sticky top-16 overflow-y-auto h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-border/40 bg-background lg:block">
+		<aside className="sticky hidden top-16 overflow-y-auto h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-border/40 bg-background lg:block">
 			<div className="flex h-full flex-col gap-8 p-6">
 				{/* Navigation */}
 				<nav className="flex-1 space-y-8 ">

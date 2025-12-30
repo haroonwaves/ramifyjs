@@ -14,8 +14,10 @@ Access collections via the object returned by `ramify.createStore()`.
 
 #### `add(document)`
 
-Adds a document to the collection. Throws an error if a document with the same primary key already
-exists.
+Adds a document to the collection.
+
+> [!IMPORTANT] Throws an error if a document with the same primary key already exists. Use `put()`
+> if you want upsert behavior.
 
 **Example:**
 
@@ -151,6 +153,10 @@ db.users.clear();
 ---
 
 ### Bulk Operations
+
+> [!NOTE] **Performance & Notifications**: Bulk operations batch notifications, so subscribers
+> receive a single notification with all affected keys. Each individual operation in a bulk method
+> triggers index updates but coalesce event emissions for optimized performance.
 
 #### `bulkAdd(docs)`
 
@@ -326,6 +332,9 @@ db.users.each((user) => {
 
 ### Query Entry Points
 
+> [!TIP] **No `find()`?**: Ramify DB uses `where()` for indexed queries and `filter()` for arbitrary
+> logic. There is no explicit `find()` method.
+
 #### `where(field)`
 
 Starts a query execution chain targeting a specific field.
@@ -465,11 +474,14 @@ unsubscribe();
 Where `Observer` is defined as:
 
 ```typescript
-export type Observer<Pk = any> = (type: CollectionOperation, keys: Pk[]) => void;
+export type Observer<Pk = any> = (type: CollectionOperation, keys: Pk[]) => void | Promise<void>;
 type CollectionOperation = 'create' | 'update' | 'delete' | 'clear';
 ```
 
-**Returns:** `() => void` - An unsubscribe function to stop listening to changes
+**Returns:** `() => void` - An unsubscribe function to stop listening to changes.
+
+> [!WARNING] **Memory Management**: Memory leaks can occur if you forget to unsubscribe from event
+> listeners when they are no longer needed.
 
 ---
 
@@ -522,14 +534,3 @@ The primary key field name.
 Array of indexed field names (excluding multi-entry indexes).
 
 ---
-
-### Common Pitfalls
-
-- **Using `add` on existing ID** – Use `put` if you want upsert behavior.
-- **Expecting `find()`** – Use `where()` or `toArray()`/`filter()` instead.
-- **Mutating results** – Returned objects are proxies; treat them as immutable or use them with
-  care.
-- **Forgetting to unsubscribe** – Memory leaks from event listeners can occur if you don't
-  unsubscribe.
-- **Bulk operations and individual notifications** – Bulk operations batch notifications, so
-  subscribers receive a single notification with all affected keys.

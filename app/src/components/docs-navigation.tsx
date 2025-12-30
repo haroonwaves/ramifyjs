@@ -4,29 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-interface PageLink {
-	title: string;
-	href: string;
-}
-
-const pageOrder: PageLink[] = [
-	{ title: 'Getting Started', href: '/docs/getting-started' },
-	{ title: 'Store & Collections', href: '/docs/core/store-and-collections' },
-	{ title: 'Indexes', href: '/docs/core/indexes' },
-	{ title: 'Queries', href: '/docs/core/queries' },
-	{ title: 'Live Queries (React)', href: '/docs/core/live-queries' },
-	{ title: 'CRUD Patterns', href: '/docs/guides/crud' },
-	{ title: 'Pagination & Sorting', href: '/docs/guides/pagination-sorting' },
-	{ title: 'Search', href: '/docs/guides/search' },
-	{ title: 'Performance', href: '/docs/guides/performance' },
-	{ title: 'Persistence', href: '/docs/guides/persistence' },
-	{ title: 'Store API', href: '/docs/api/store' },
-	{ title: 'Collection API', href: '/docs/api/collection' },
-	{ title: 'Query API', href: '/docs/api/query' },
-	{ title: 'React Hooks', href: '/docs/api/react-hooks' },
-	{ title: 'Examples', href: '/docs/examples' },
-	{ title: 'FAQ', href: '/docs/faq' },
-];
+import { pageOrder } from '@/config/docs';
 
 export function DocsNavigation() {
 	const pathname = usePathname();

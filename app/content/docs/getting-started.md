@@ -14,13 +14,18 @@ in-memory database designed for reactive applications.
 
 ### What is Ramify DB?
 
-Ramify DB is a TypeScript-first, in-memory database that provides:
+Ramify DB is a **reactive, in-memory database for in-process JavaScript applications**. It is
+environment-agnostic, making it ideal for client-side applications, edge runtimes, and in-process
+Node.js services.
 
-- **Lightning-fast queries** - All data stored in memory for instant access
-- **Live query observation** - React hooks that automatically update when data changes
-- **Type-safe API** - Full TypeScript support with intelligent autocomplete
-- **Indexed collections** - Fast lookups with primary keys and secondary indexes
-- **Fluent query API** - Chainable methods for powerful data queries
+Key features include:
+
+- **Environment-agnostic** - Runs in the browser, Node.js, Bun, Deno, and Edge.
+- **Lightning-fast queries** - All data stored in memory for instant access.
+- **Live query observation** - React hooks that automatically update when data changes.
+- **Type-safe API** - Full TypeScript support with intelligent autocomplete.
+- **Indexed collections** - Fast lookups with primary keys and secondary indexes.
+- **Zero dependencies** - Light footprint for any environment.
 
 ### Installation
 
@@ -256,15 +261,14 @@ The component will automatically re-render whenever:
 
 Now that you've learned the basics, explore more advanced features:
 
-- [API Reference](/docs/api-reference) - Complete API documentation
-- [Advanced Queries](/docs/advanced-queries) - Complex filtering and query patterns
-- [Live Queries](/docs/live-queries) - Deep dive into reactive queries with React
-- [Best Practices](/docs/best-practices) - Tips for optimal performance
+- [API Reference](/docs/api/store) - Complete API documentation
+- [Advanced Queries](/docs/guides/crud) - Complex filtering and query patterns
+- [Live Queries](/docs/core/live-queries) - Deep dive into reactive queries with React
 
 ### Need Help?
 
 If you run into any issues:
 
-- Check the [API Reference](/docs/api-reference) for detailed documentation
+- Check the [API Reference](/docs/api/store) for detailed documentation
 - Open an issue on [GitHub](https://github.com/haroonwaves/ramify-db)
 - Review the examples in the documentation

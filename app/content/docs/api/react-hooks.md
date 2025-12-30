@@ -43,12 +43,16 @@ function MyComponent() {
    - A synchronous function that queries the database
    - Runs on mount and whenever dependencies change
    - Should return the query result
+   - **Performance Note**: The callback runs on every render _and_ every database change. Keep it
+     fast. For expensive transformations, use `useMemo` on the query result rather than in the
+     callback.
 
 2. **`dependencies`**: `{ collections: readonly Subscribable[]; others: readonly unknown[] }`
    - **`collections`**: `readonly Subscribable[]`
      - Array of collections to observe
      - When these collections emit a change (add/update/delete), the hook re-runs the callback
-     - Must include all collections queried in the callback
+     - **Requirement**: Must include all collections queried in the callback. If a collection is
+       omitted, the component won't update when that collection changes.
    - **`others`**: `readonly unknown[]`
      - Array of standard React dependencies (like `useEffect` deps)
      - If these change, the hook also re-runs
@@ -127,61 +131,3 @@ function UserMessages({ userId }: { userId: string }) {
 ```
 
 ---
-
-### Common Pitfalls
-
-#### Missing Collections in Dependencies
-
-If you query a collection but don't list it in `collections`, the component won't update when that
-collection changes.
-
-```typescript
-// ❌ BAD: messages not in collections array
-const data = useLiveQuery(() => db.messages.where('senderId').equals(userId).toArray(), {
-	collections: [db.users], // Wrong! Should include messages
-	others: [userId],
-});
-
-// ✅ GOOD: messages included in collections array
-const data = useLiveQuery(() => db.messages.where('senderId').equals(userId).toArray(), {
-	collections: [db.users, db.messages], // Correct
-	others: [userId],
-});
-```
-
----
-
-#### Expensive Callbacks
-
-The callback runs on every render _and_ every database change. Keep it fast.
-
-```typescript
-// ❌ BAD: Expensive computation in callback
-const data = useLiveQuery(
-	() => {
-		const users = db.users.toArray();
-		// Expensive computation
-		return users.map((u) => expensiveTransform(u));
-	},
-	{ collections: [db.users], others: [] }
-);
-
-// ✅ GOOD: Move expensive computation outside or memoize
-const users = useLiveQuery(() => db.users.toArray(), {
-	collections: [db.users],
-	others: [],
-});
-const transformed = useMemo(() => users?.map((u) => expensiveTransform(u)), [users]);
-```
-
----
-
-### Performance Considerations
-
-- **Ramify queries are fast** – Most queries execute in microseconds, so re-running on every change
-  is typically not a problem.
-- **Batch updates** – Use bulk operations (`bulkAdd`, `bulkPut`, etc.) to minimize the number of
-  re-renders.
-- **Selective subscriptions** – Only include collections that are actually queried in the callback.
-- **Memoization** – For expensive transformations, use `useMemo` on the query result rather than in
-  the callback.
