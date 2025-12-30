@@ -1,9 +1,9 @@
 {
 	"name": "ramify-db",
+	"version": "0.0.1",
 	"private": true,
 	"keywords": [
 		"in-memory-database",
-		"client-side-database",
 		"reactive-database",
 		"live-query",
 		"observable-query",
@@ -22,12 +22,13 @@
 	"scripts": {
 		"dev": "pnpm -r dev",
 		"build": "pnpm -r build",
-		"check": "npm run lint && npm run format:check && npm run type-check",
+		"check": "npm run lint && npm run format:check && npm run type-check && npm run test",
 		"lint": "eslint . --ext .ts,.tsx",
 		"lint:fix": "eslint . --ext .ts,.tsx --fix",
 		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
 		"format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
 		"type-check": "pnpm -r type-check",
+		"publish:packages": "pnpm -r publish --access public",
 		"version:bump": "pnpm version patch --recursive --no-git-tag-version",
 		"test": "pnpm -r test",
 		"perf": "pnpm -r perf"
