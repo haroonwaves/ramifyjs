@@ -19,7 +19,7 @@ Creates a new Ramify instance.
 **Example:**
 
 ```typescript
-import { Ramify, type Schema } from '@ramify-db/core';
+import { Ramify, type Schema } from '@ramifyjs/core';
 
 const ramify = new Ramify();
 ```

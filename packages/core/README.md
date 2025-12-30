@@ -1,21 +1,21 @@
-## ramify-db
+## ramify js
 
 Lightweight in-memory data utilities with querying and live query observation.
 
 ### Install
 
 ```bash
-npm install ramify-db
+npm install @ramifyjs/core
 # or
-pnpm add ramify-db
+pnpm add @ramifyjs/core
 # or
-yarn add ramify-db
+yarn add @ramifyjs/core
 ```
 
 ### Usage
 
 ```ts
-import /* your exported APIs */ 'ramify-db';
+import /* your exported APIs */ '@ramifyjs/core';
 
 // Example (replace with your actual API):
 // const db = createRamify();

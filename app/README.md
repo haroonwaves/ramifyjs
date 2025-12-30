@@ -1,6 +1,6 @@
-# Ramify DB Documentation
+# Ramify JS Documentation
 
-This is the documentation website for Ramify DB, built with Next.js 16, React 19, and Tailwind
+This is the documentation website for Ramify JS, built with Next.js 16, React 19, and Tailwind
 CSS 4.
 
 ## Features
@@ -51,7 +51,7 @@ The blog-kit system automatically generates routes and navigation from these fil
 
 ## Development
 
-The documentation site runs alongside the main Ramify DB development:
+The documentation site runs alongside the main Ramify JS development:
 
 ```bash
 # Start the dev server

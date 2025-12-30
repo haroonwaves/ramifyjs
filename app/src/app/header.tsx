@@ -39,7 +39,7 @@ export default function Header() {
 						Documentation
 					</Link>
 					<a
-						href="https://github.com/haroonwaves/ramify-db"
+						href="https://github.com/haroonwaves/ramifyjs"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

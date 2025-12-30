@@ -12,7 +12,7 @@ sorting. Unlike some databases, you define indexes upfront when creating the sto
 
 Indexes are declared in the `createStore` configuration.
 
-> [!NOTE] **Schema-Driven**: Indexes must be defined upfront in the schema. Ramify DB does not
+> [!NOTE] **Schema-Driven**: Indexes must be defined upfront in the schema. Ramify JS does not
 > support dynamic index creation (e.g., via `createIndex`) after the store has been initialized.
 
 ```typescript

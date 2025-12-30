@@ -332,7 +332,7 @@ db.users.each((user) => {
 
 ### Query Entry Points
 
-> [!TIP] **No `find()`?**: Ramify DB uses `where()` for indexed queries and `filter()` for arbitrary
+> [!TIP] **No `find()`?**: Ramify JS uses `where()` for indexed queries and `filter()` for arbitrary
 > logic. There is no explicit `find()` method.
 
 #### `where(field)`

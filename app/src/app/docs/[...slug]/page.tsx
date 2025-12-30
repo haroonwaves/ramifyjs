@@ -64,7 +64,7 @@ export async function generateMetadata({
 	}
 
 	return {
-		title: `${blog.metadata.title} | Ramify DB`,
+		title: `${blog.metadata.title} | Ramify JS`,
 		description: blog.metadata.description,
 		openGraph: {
 			title: blog.metadata.title,

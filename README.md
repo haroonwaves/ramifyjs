@@ -1,28 +1,28 @@
-## Ramify DB
+## Ramify JS
 
 Reactive, in-memory database for in-process JavaScript applications.
 
-Ramify DB is environment-agnostic—built for the browser, Node.js, and Edge runtimes. It provides a
+Ramify JS is environment-agnostic—built for the browser, Node.js, and Edge runtimes. It provides a
 lightweight, type-safe data store with live query observation for building reactive applications.
 
-> [!IMPORTANT] **Ramify DB is not a durable database.** It is designed for in-process data
+> [!IMPORTANT] **Ramify JS is not a durable database.** It is designed for in-process data
 > management, request-scoped caching, and transient state. Data is lost when the process or page is
 > terminated.
 
 ### Install
 
 ```bash
-npm install ramify-db
+npm install ramify-js
 # or
-pnpm add ramify-db
+pnpm add ramify-js
 # or
-yarn add ramify-db
+yarn add ramify-js
 ```
 
 ### Usage
 
 ```ts
-import /* your exported APIs */ 'ramify-db';
+import /* your exported APIs */ 'ramify-js';
 
 // Example (replace with your actual API):
 // const db = createRamify();

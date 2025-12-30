@@ -1,6 +1,6 @@
 ---
 title: 'Performance'
-description: 'Optimize Ramify-DB for speed and efficiency'
+description: 'Optimize Ramify JS for speed and efficiency'
 ---
 
 ## Performance

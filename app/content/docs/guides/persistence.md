@@ -5,21 +5,21 @@ description: 'Save and restore data across sessions with incremental sync'
 
 ## Persistence
 
-Ramify DB is **in-memory by design**. Data exists only while your application is running. This is
-intentional—it keeps Ramify DB fast, lightweight, and environment-agnostic.
+Ramify JS is **in-memory by design**. Data exists only while your application is running. This is
+intentional—it keeps Ramify JS fast, lightweight, and environment-agnostic.
 
-However, you can add persistence by syncing Ramify DB with external storage using the built-in
+However, you can add persistence by syncing Ramify JS with external storage using the built-in
 observer pattern.
 
 ### Implementing Custom Persistence
 
-Ramify DB emits events with the primary keys of changed documents, enabling efficient incremental
+Ramify JS emits events with the primary keys of changed documents, enabling efficient incremental
 sync to any external storage (e.g., IndexedDB, LocalStorage, or a remote API).
 
 ```typescript
-import { Ramify, Schema } from '@ramify-db/core';
+import { Ramify, Schema } from '@ramifyjs/core';
 
-// 1. Setup Ramify DB
+// 1. Setup Ramify JS
 const ramify = new Ramify();
 const db = ramify.createStore<{
 	users: Schema<User, 'id'>;
@@ -46,7 +46,7 @@ db.users.subscribe(async (type, keys) => {
 	} catch (error) {
 		console.error('Persistence failed:', error);
 		// IMPORTANT: If persistence fails, you may need to update/revert
-		// the stale data in Ramify DB to keep it in sync with your storage.
+		// the stale data in Ramify JS to keep it in sync with your storage.
 	}
 });
 
@@ -59,7 +59,7 @@ db.users.bulkAdd(storedUsers);
 
 > [!TIP] **Hydration & Errors**: Load data from external storage on app startup to hydrate Ramify
 > DB. Always wrap persistence operations in try/catch blocks. If an external save fails, remember to
-> handle the stale data in Ramify DB to prevent UI/State inconsistencies.
+> handle the stale data in Ramify JS to prevent UI/State inconsistencies.
 
 > [!NOTE] **Schema Evolution**: Version your IndexedDB schema and handle migrations appropriately as
 > your document structures change. For very large datasets, consider batching bulk operations during

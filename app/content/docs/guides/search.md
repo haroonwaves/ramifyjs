@@ -1,11 +1,11 @@
 ---
 title: 'Search'
-description: 'Full-text search and filtering strategies in Ramify-DB'
+description: 'Full-text search and filtering strategies in Ramify JS'
 ---
 
 ## Search Strategies
 
-Ramify DB is primarily an in-memory document store with exact-match indexing. It does **not** have a
+Ramify JS is primarily an in-memory document store with exact-match indexing. It does **not** have a
 built-in full-text search engine (like ElasticSearch or multiple-token indexing). However, because
 it runs in-memory, you can implement efficient search strategies using standard JavaScript or
 lightweight helper libraries.

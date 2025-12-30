@@ -1,6 +1,6 @@
 ---
 title: 'Store & Collections'
-description: 'Understanding the core building blocks of Ramify-DB'
+description: 'Understanding the core building blocks of Ramify JS'
 ---
 
 ## Store & Collections
@@ -37,7 +37,7 @@ Each collection is dedicated to a specific entity type (e.g., `User`, `Message`)
 ### Examples
 
 ```typescript
-import { Ramify, type Schema } from 'ramify-db';
+import { Ramify, type Schema } from '@ramifyjs/core';
 
 // Initialize Ramify
 const ramify = new Ramify();

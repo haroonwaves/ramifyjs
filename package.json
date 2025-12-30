@@ -1,5 +1,5 @@
 {
-	"name": "ramify-db",
+	"name": "ramifyjs",
 	"version": "0.0.1",
 	"private": true,
 	"keywords": [
@@ -49,7 +49,7 @@
 		"typescript-eslint": "^8.46.2",
 		"tsup": "^7.2.0"
 	},
-	"packageManager": "pnpm@9.0.0",
+	"packageManager": "pnpm@10.18.3",
 	"engines": {
 		"node": ">=18"
 	}

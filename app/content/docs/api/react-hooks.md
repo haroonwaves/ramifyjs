@@ -5,7 +5,7 @@ description: 'React hooks for reactive data access'
 
 ## React Hooks
 
-Ramify DB exposes a single powerful hook `useLiveQuery` that enables any functional component to
+Ramify JS exposes a single powerful hook `useLiveQuery` that enables any functional component to
 reactively update when database content changes.
 
 ---
@@ -17,7 +17,7 @@ Executes the callback immediately and re-executes it whenever the dependent coll
 **Example:**
 
 ```typescript
-import { useLiveQuery } from '@ramify-db/react-hooks';
+import { useLiveQuery } from '@ramifyjs/react-hooks';
 
 function MyComponent() {
 	const data = useLiveQuery(

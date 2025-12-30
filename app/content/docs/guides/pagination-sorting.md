@@ -5,7 +5,7 @@ description: 'Handle large datasets with pagination and sorting'
 
 ## Pagination & Sorting
 
-Efficiently handle large datasets with Ramify DB's built-in pagination and sorting capabilities.
+Efficiently handle large datasets with Ramify JS's built-in pagination and sorting capabilities.
 
 ### Sorting
 
@@ -50,7 +50,7 @@ const activePage1 = db.users
 	.toArray();
 ```
 
-> [!CAUTION] **Large Offsets**: Avoid using `offset(10000)` or larger on huge datasets. Ramify DB
+> [!CAUTION] **Large Offsets**: Avoid using `offset(10000)` or larger on huge datasets. Ramify JS
 > must iterate through all offset records, which can impact performance. Use cursor-based pagination
 > for deep pagination.
 

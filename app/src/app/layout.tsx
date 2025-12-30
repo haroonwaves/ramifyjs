@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'Ramify DB - Lightweight In-Memory Database',
+	title: 'Ramify JS - Lightweight In-Memory Database',
 	description:
 		'Lightweight in-memory database with querying and live query observation for reactive applications',
 	icons: {

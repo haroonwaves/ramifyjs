@@ -1,20 +1,20 @@
 ---
 title: Getting Started
 description:
-  Learn how to get started with Ramify DB - a lightweight in-memory database with querying and live
+  Learn how to get started with Ramify JS - a lightweight in-memory database with querying and live
   query observation
 date: 2024-12-10
 category: Tutorial
 ---
 
-## Getting Started with Ramify DB
+## Getting Started with Ramify JS
 
-Welcome to Ramify DB! This guide will help you get up and running with this powerful, lightweight
+Welcome to Ramify JS! This guide will help you get up and running with this powerful, lightweight
 in-memory database designed for reactive applications.
 
-### What is Ramify DB?
+### What is Ramify JS?
 
-Ramify DB is a **reactive, in-memory database for in-process JavaScript applications**. It is
+Ramify JS is a **reactive, in-memory database for in-process JavaScript applications**. It is
 environment-agnostic, making it ideal for client-side applications, edge runtimes, and in-process
 Node.js services.
 
@@ -29,14 +29,14 @@ Key features include:
 
 ### Installation
 
-Install Ramify DB using your preferred package manager:
+Install Ramify JS using your preferred package manager:
 
 ```bash
-npm install @ramify-db/core
+npm install @ramifyjs/core
 # or
-pnpm add @ramify-db/core
+pnpm add @ramifyjs/core
 # or
-yarn add @ramify-db/core
+yarn add @ramifyjs/core
 ```
 
 **For React Applications (Optional):**
@@ -45,14 +45,14 @@ If you're using React and want to use live queries with the `useLiveQuery` hook,
 hooks package:
 
 ```bash
-npm install @ramify-db/react-hooks
+npm install @ramifyjs/react-hooks
 # or
-pnpm add @ramify-db/react-hooks
+pnpm add @ramifyjs/react-hooks
 # or
-yarn add @ramify-db/react-hooks
+yarn add @ramifyjs/react-hooks
 ```
 
-> **Note:** The `@ramify-db/react-hooks` package is optional and only required if you're building a
+> **Note:** The `@ramifyjs/react-hooks` package is optional and only required if you're building a
 > React application. The core package works independently in any JavaScript/TypeScript environment.
 
 ### Basic Usage
@@ -95,7 +95,7 @@ type Message = {
 Create a Ramify instance and define your collections with schemas:
 
 ```typescript
-import { Ramify, type Schema } from '@ramify-db/core';
+import { Ramify, type Schema } from '@ramifyjs/core';
 
 const db = new Ramify().createStore<{
 	users: Schema<User, 'id'>;
@@ -223,10 +223,10 @@ db.users.clear();
 
 ### Using with React
 
-Ramify DB provides a React hook for live queries that automatically re-render when data changes:
+Ramify JS provides a React hook for live queries that automatically re-render when data changes:
 
 ```typescript
-import { useLiveQuery } from '@ramify-db/react-hooks';
+import { useLiveQuery } from '@ramifyjs/react-hooks';
 
 function UserList() {
   const users = useLiveQuery(
@@ -270,5 +270,5 @@ Now that you've learned the basics, explore more advanced features:
 If you run into any issues:
 
 - Check the [API Reference](/docs/api/store) for detailed documentation
-- Open an issue on [GitHub](https://github.com/haroonwaves/ramify-db)
+- Open an issue on [GitHub](https://github.com/haroonwaves/ramifyjs)
 - Review the examples in the documentation

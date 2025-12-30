@@ -5,7 +5,7 @@ description: 'Complete query syntax and operators reference'
 
 ## Query API
 
-Queries in Ramify DB are built using a **fluent interface**. You start a query with `.where()`,
+Queries in Ramify JS are built using a **fluent interface**. You start a query with `.where()`,
 chain operators, and execute it with a termination method (like `toArray()` or `first()`).
 
 ---

@@ -5,13 +5,13 @@ description: 'Reactive queries that automatically update when data changes'
 
 ## Live Queries
 
-**Live Queries** are the foundation of reactive applications built with Ramify DB. Instead of
+**Live Queries** are the foundation of reactive applications built with Ramify JS. Instead of
 performing one-off data fetches, Live Queries allow your application to observe specific collections
 and automatically react to changes.
 
 ### The Mechanism
 
-At its core, Ramify DB uses an observer pattern on every collection. When a write operation (`add`,
+At its core, Ramify JS uses an observer pattern on every collection. When a write operation (`add`,
 `put`, `update`, `delete`, or `clear`) occurs, the collection emits an event containing the affected
 primary keys.
 
@@ -43,14 +43,14 @@ framework-specific integrations.
 
 #### React Integration
 
-For React applications, Ramify DB provides a dedicated package `@ramify-db/react-hooks` which
+For React applications, Ramify JS provides a dedicated package `@ramifyjs/react-hooks` which
 includes the `useLiveQuery` hook. This hook handles subscription lifecycle, dependency tracking, and
 component re-renders automatically. Visit the [React Hooks API](/docs/api/react-hooks) documentation
 for more details.
 
 #### Custom Observers
 
-If you are using Ramify DB without a specialist framework integration, you can use the low-level
+If you are using Ramify JS without a specialist framework integration, you can use the low-level
 [Collection Subscription API](/docs/api/collection#subscriptions) to build your own reactive logic.
 
 ---

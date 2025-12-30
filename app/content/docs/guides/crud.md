@@ -1,6 +1,6 @@
 ---
 title: 'CRUD Patterns'
-description: 'Create, Read, Update, and Delete operations in Ramify-DB'
+description: 'Create, Read, Update, and Delete operations in Ramify JS'
 ---
 
 ## CRUD Patterns

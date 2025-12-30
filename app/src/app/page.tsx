@@ -34,7 +34,7 @@ export default function Home() {
 
 						<h1 className="mb-8 text-center text-6xl font-bold tracking-tighter sm:text-7xl lg:text-8xl">
 							<span className="inline-block bg-linear-to-b from-foreground to-foreground/40 bg-clip-text text-transparent">
-								Ramify DB
+								Ramify JS
 							</span>
 						</h1>
 
@@ -63,7 +63,7 @@ export default function Home() {
 									<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
 								</Button>
 							</Link>
-							<Link href="https://github.com/haroonwaves/ramify-db" target="_blank">
+							<Link href="https://github.com/haroonwaves/ramifyjs" target="_blank">
 								<Button
 									size="lg"
 									variant="outline"
@@ -97,7 +97,7 @@ export default function Home() {
 				<section className="px-6 py-24 lg:px-8">
 					<div className="mx-auto max-w-7xl">
 						<div className="mb-20 text-center">
-							<h2 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">Why Ramify DB?</h2>
+							<h2 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">Why Ramify JS?</h2>
 							<p className="mx-auto max-w-2xl text-lg text-muted-foreground">
 								Designed for fast filtering, sorting, and live queries in in-process JavaScript
 								runtimes.
@@ -226,7 +226,7 @@ export default function Home() {
 								Client vs Server
 							</h2>
 							<p className="text-lg text-muted-foreground">
-								Understand how Ramify DB works in different environments
+								Understand how Ramify JS works in different environments
 							</p>
 						</div>
 
