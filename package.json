@@ -1,6 +1,6 @@
 {
 	"name": "ramifyjs",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": true,
 	"keywords": [
 		"ramify",
@@ -36,7 +36,7 @@
 		"publish:packages": "pnpm -r publish --access public",
 		"version:bump": "pnpm version patch --recursive --no-git-tag-version",
 		"test": "pnpm -r test",
-		"perf": "pnpm -r perf"
+		"benchmark": "pnpm -r benchmark"
 	},
 	"devDependencies": {
 		"@cspell/eslint-plugin": "^9.3.0",

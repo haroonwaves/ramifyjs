@@ -7,6 +7,8 @@ lightweight, type-safe data store with live query observation for building react
 
 [Main Documentation →](https://ramifyjs.pages.dev)
 
+[Benchmark](https://ramifyjs.pages.dev/docs/guides/performance#benchmark)
+
 [React Hooks →](https://www.npmjs.com/package/@ramifyjs/react-hooks)
 
 ## Install

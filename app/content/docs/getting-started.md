@@ -264,6 +264,7 @@ Now that you've learned the basics, explore more advanced features:
 - [API Reference](/docs/api/store) - Complete API documentation
 - [Advanced Queries](/docs/guides/crud) - Complex filtering and query patterns
 - [Live Queries](/docs/core/live-queries) - Deep dive into reactive queries with React
+- [Benchmark](/docs/guides/performance#benchmark) - Benchmark results
 
 ### Need Help?
 

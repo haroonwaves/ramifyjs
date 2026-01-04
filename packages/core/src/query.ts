@@ -184,12 +184,12 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		const hasWhereStage = whereStage !== null;
 		const fields = hasWhereStage ? [whereStage[0]] : Object.keys(criteria as object);
 
+		this.isExact = !hasWhereStage || whereStage?.[1].$equals;
+
 		const primaryKey = fields.find((field) => field === String(collection.primaryKey));
 		const indexes = fields.filter(
 			(field) => collection.indexes.includes(field) || collection.multiEntryIndexes.includes(field)
 		);
-
-		this.isExact = !hasWhereStage || whereStage?.[1].$equals;
 
 		if (primaryKey) {
 			documents = this.getDocumentsByPrimaryKey(primaryKey); // Query by primary key

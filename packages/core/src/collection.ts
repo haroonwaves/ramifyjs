@@ -72,8 +72,9 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 			`Ramify: Primary key "${String(this.primaryKey)}" must be a primitive value (string, number, boolean, Date). Got ${typeof key}.`
 		);
 
-		this.delete(document[this.primaryKey]); // Delete existing document
-		this.data.set(document[this.primaryKey], document); // Add to primary Map
+		if (this.has(key)) this.delete(key); // Delete existing document
+
+		this.data.set(key, document); // Add to primary Map
 		for (const index of [...this.indexes, ...this.multiEntryIndexes]) {
 			this.addToIndex(index, document); // Add to index Map
 		}
@@ -93,8 +94,8 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 
 	add(document: T) {
 		const key = document[this.primaryKey];
-		const existingDocument = this.data.get(key);
-		if (existingDocument)
+		const exists = this.has(key);
+		if (exists)
 			throw new Error(
 				`Ramify: Document with primary key ${key as string} already exists in the collection`
 			);

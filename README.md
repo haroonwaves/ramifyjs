@@ -13,6 +13,8 @@ lightweight, type-safe data store with live query observation for building react
 
 [ramifyjs.pages.dev](https://ramifyjs.pages.dev) - Main documentation
 
+[Benchmark](https://ramifyjs.pages.dev/docs/guides/performance#benchmark) - Benchmark results
+
 ## Development
 
 This is a monorepo managed with pnpm workspaces.
@@ -32,6 +34,9 @@ pnpm lint
 
 # Format code
 pnpm format
+
+# Run benchmarks (default: 100,000 records)
+pnpm benchmark
 ```
 
 # Contributing

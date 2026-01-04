@@ -7,6 +7,8 @@ automatically re-render components when data changes.
 
 [Main Documentation →](https://ramifyjs.pages.dev)
 
+[Benchmark](https://ramifyjs.pages.dev/docs/guides/performance#benchmark)
+
 [Core Package →](https://www.npmjs.com/package/@ramifyjs/core)
 
 ## Install
