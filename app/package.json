@@ -10,8 +10,8 @@
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@haroonwaves/blog-kit-core": "^1.1.0",
-		"@haroonwaves/blog-kit-react": "^1.1.0",
+		"@haroonwaves/blog-kit-core": "^1.1.3",
+		"@haroonwaves/blog-kit-react": "^1.1.3",
 		"@radix-ui/react-slot": "^1.2.4",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
