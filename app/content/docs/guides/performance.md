@@ -1,6 +1,8 @@
 ---
-title: 'Performance'
-description: 'Optimize Ramify JS for speed and efficiency'
+title: 'Ramify JS Performance Guide'
+description:
+  'Optimize Ramify JS for maximum speed with indexing strategies, batch operations, and live query
+  best practices. Includes benchmarks.'
 ---
 
 ## Performance

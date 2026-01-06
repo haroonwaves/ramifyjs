@@ -1,6 +1,7 @@
 ---
-title: 'Query API'
-description: 'Complete query syntax and operators reference'
+title: 'Ramify JS Query API'
+description:
+  'Master the Ramify JS query API with complete syntax reference for filtering, sorting, pagination.'
 ---
 
 ## Query API

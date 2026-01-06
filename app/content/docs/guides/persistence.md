@@ -1,6 +1,8 @@
 ---
-title: 'Persistence'
-description: 'Save and restore data across sessions with incremental sync'
+title: 'Ramify JS Data Persistence'
+description:
+  'Add persistence to Ramify JS with incremental sync to IndexedDB, LocalStorage, or remote APIs
+  using the built-in observer pattern.'
 ---
 
 ## Persistence
