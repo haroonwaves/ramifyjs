@@ -1,6 +1,8 @@
 ---
-title: 'Search'
-description: 'Full-text search and filtering strategies in Ramify JS'
+title: 'Ramify JS Search Strategies'
+description:
+  'Implement efficient search in Ramify JS with filtering, multi-entry indexing, and tokenization
+  strategies for finding data quickly.'
 ---
 
 ## Search Strategies

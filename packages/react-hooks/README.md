@@ -5,9 +5,9 @@ React hooks for Ramify JS - the reactive, in-memory database.
 Seamlessly integrate Ramify JS into your React applications with live query observers that
 automatically re-render components when data changes.
 
-[Main Documentation →](https://ramifyjs.pages.dev)
+[Main Documentation →](https://ramifyjs.haroonwaves.com)
 
-[Benchmark](https://ramifyjs.pages.dev/docs/guides/performance#benchmark)
+[Benchmark](https://ramifyjs.haroonwaves.com/docs/guides/performance#benchmark)
 
 [Core Package →](https://www.npmjs.com/package/@ramifyjs/core)
 

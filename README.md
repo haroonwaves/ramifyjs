@@ -11,9 +11,9 @@ lightweight, type-safe data store with live query observation for building react
 
 ## Documentation
 
-[ramifyjs.pages.dev](https://ramifyjs.pages.dev) - Main documentation
+[Ramify JS](https://ramifyjs.haroonwaves.com) - Main documentation
 
-[Benchmark](https://ramifyjs.pages.dev/docs/guides/performance#benchmark) - Benchmark results
+[Benchmark](https://ramifyjs.haroonwaves.com/docs/guides/performance#benchmark) - Benchmark results
 
 ## Development
 

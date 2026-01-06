@@ -1,8 +1,6 @@
 ---
-title: Getting Started
-description:
-  Learn how to get started with Ramify JS - a lightweight in-memory database with querying and live
-  query observation
+title: Getting Started with Ramify JS
+description: Learn how to get started with Ramify JS - a lightweight in-memory database
 date: 2024-12-10
 category: Tutorial
 ---

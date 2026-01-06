@@ -5,9 +5,9 @@ Reactive, in-memory database for JavaScript applications.
 Ramify JS is environment-agnostic—built for the browser, Node.js, and Edge runtimes. It provides a
 lightweight, type-safe data store with live query observation for building reactive applications.
 
-[Main Documentation →](https://ramifyjs.pages.dev)
+[Main Documentation →](https://ramifyjs.haroonwaves.com)
 
-[Benchmark](https://ramifyjs.pages.dev/docs/guides/performance#benchmark)
+[Benchmark](https://ramifyjs.haroonwaves.com/docs/guides/performance#benchmark)
 
 [React Hooks →](https://www.npmjs.com/package/@ramifyjs/react-hooks)
 

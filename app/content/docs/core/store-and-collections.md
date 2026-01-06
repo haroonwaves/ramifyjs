@@ -1,6 +1,8 @@
 ---
-title: 'Store & Collections'
-description: 'Understanding the core building blocks of Ramify JS'
+title: 'Ramify JS Store & Collections'
+description:
+  'Learn about stores and collections in Ramify JS - the core building blocks for managing in-memory
+  data with type safety and reactive updates.'
 ---
 
 ## Store & Collections
