@@ -1,6 +1,8 @@
 ---
-title: 'Live Queries'
-description: 'Reactive queries that automatically update when data changes'
+title: 'Ramify JS Live Queries'
+description:
+  'Build reactive applications with Ramify JS live queries that automatically update your UI when
+  data changes in real-time.'
 ---
 
 ## Live Queries

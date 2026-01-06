@@ -1,6 +1,8 @@
 ---
-title: 'Pagination & Sorting'
-description: 'Handle large datasets with pagination and sorting'
+title: 'Ramify JS Pagination & Sorting'
+description:
+  'Master pagination and sorting in Ramify JS with offset-based and cursor-based techniques for
+  handling large datasets efficiently.'
 ---
 
 ## Pagination & Sorting

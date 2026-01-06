@@ -1,6 +1,6 @@
 ---
-title: 'Collection API'
-description: 'Complete API reference for the Collection class'
+title: 'Ramify JS Collection API'
+description: 'Complete API reference for Ramify JS collections including CRUD operations.'
 ---
 
 ## Collection API

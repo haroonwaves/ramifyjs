@@ -65,12 +65,34 @@ export async function generateMetadata({
 
 	return {
 		title: `${blog.metadata.title} | Ramify JS`,
-		description: blog.metadata.description,
+		description:
+			blog.metadata.description ||
+			'Learn how to use Ramify JS, a lightweight in-memory database for JavaScript applications.',
+		keywords: [
+			'ramifyjs',
+			'javascript database',
+			'in-memory database',
+			'documentation',
+			blog.metadata.title,
+		],
+		alternates: {
+			canonical: `/docs/${slugPath}`,
+		},
 		openGraph: {
-			title: blog.metadata.title,
-			description: blog.metadata.description,
+			title: `${blog.metadata.title} | Ramify JS Documentation`,
+			description:
+				blog.metadata.description ||
+				'Learn how to use Ramify JS, a lightweight in-memory database for JavaScript applications.',
 			type: 'article',
 			publishedTime: blog.metadata.date,
+			url: `https://ramifyjs.haroonwaves.com/docs/${slugPath}`,
+		},
+		twitter: {
+			card: 'summary',
+			title: `${blog.metadata.title} | Ramify JS`,
+			description:
+				blog.metadata.description ||
+				'Learn how to use Ramify JS, a lightweight in-memory database for JavaScript applications.',
 		},
 	};
 }

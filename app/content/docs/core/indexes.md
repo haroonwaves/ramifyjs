@@ -1,6 +1,8 @@
 ---
-title: 'Indexes'
-description: 'Speed up queries with strategic indexing'
+title: 'Ramify JS Indexes Guide'
+description:
+  'Master indexing in Ramify JS to speed up queries with primary keys, secondary indexes, and
+  multi-entry indexes for optimal performance.'
 ---
 
 ## Indexes

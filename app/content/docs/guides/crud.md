@@ -1,6 +1,8 @@
 ---
-title: 'CRUD Patterns'
-description: 'Create, Read, Update, and Delete operations in Ramify JS'
+title: 'Ramify JS CRUD Operations'
+description:
+  'Learn CRUD patterns in Ramify JS for creating, reading, updating, and deleting data with
+  type-safe operations and bulk methods.'
 ---
 
 ## CRUD Patterns

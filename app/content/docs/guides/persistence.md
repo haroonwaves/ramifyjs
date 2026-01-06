@@ -1,6 +1,8 @@
 ---
-title: 'Persistence'
-description: 'Save and restore data across sessions with incremental sync'
+title: 'Ramify JS Data Persistence'
+description:
+  'Add persistence to Ramify JS with incremental sync to IndexedDB, LocalStorage, or remote APIs
+  using the built-in observer pattern.'
 ---
 
 ## Persistence
@@ -33,7 +35,7 @@ db.users.subscribe(async (type, keys) => {
 		switch (type) {
 			case 'create':
 			case 'update':
-				const docs = db.users.where('id').anyOf(keys).toArray();
+				const docs = db.users.bulkGet(keys);
 				await myExternalDB.bulkPut('users', docs);
 				break;
 			case 'delete':

@@ -1,6 +1,8 @@
 ---
-title: 'Queries'
-description: 'Find and filter data with powerful query syntax'
+title: 'Ramify JS Query Guide'
+description:
+  'Learn how to query data in Ramify JS using the fluent API with filtering, sorting, and pagination
+  for fast, indexed lookups.'
 ---
 
 ## Queries

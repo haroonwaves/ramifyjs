@@ -1,8 +1,6 @@
 ---
-title: Getting Started
-description:
-  Learn how to get started with Ramify JS - a lightweight in-memory database with querying and live
-  query observation
+title: Getting Started with Ramify JS
+description: Learn how to get started with Ramify JS - a lightweight in-memory database
 date: 2024-12-10
 category: Tutorial
 ---
@@ -194,10 +192,7 @@ Update existing documents:
 db.users.update('1', { age: 29 });
 
 // Update multiple users
-db.users.bulkUpdate([
-	{ key: '1', changes: { age: 29 } },
-	{ key: '2', changes: { age: 36 } },
-]);
+db.users.bulkUpdate(['1', '2'], { age: 29 });
 
 // Update via query
 db.users.where({ email: 'alice@example.com' }).modify({ roles: ['admin', 'manager'] });

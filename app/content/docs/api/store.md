@@ -1,6 +1,6 @@
 ---
-title: 'Store API'
-description: 'Store API for creating and managing collections'
+title: 'Ramify JS Store API'
+description: 'Store API for creating and managing collections in Ramify JS'
 ---
 
 ## Store API

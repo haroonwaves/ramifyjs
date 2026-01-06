@@ -1,9 +1,11 @@
 import { DocsSidebar } from '@/components/docs-sidebar';
 import { MobileNav } from '@/components/mobile-nav';
+import { ScrollToTop } from '@/components/scroll-to-top';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<>
+			<ScrollToTop />
 			<MobileNav />
 			<div className="flex min-h-[calc(100vh-4rem)]">
 				<DocsSidebar />

@@ -15,8 +15,40 @@ import {
 import Image from 'next/image';
 
 export default function Home() {
+	// Structured data for SEO
+	const structuredData = {
+		'@context': 'https://schema.org',
+		'@type': 'SoftwareApplication',
+		name: 'Ramify JS',
+		applicationCategory: 'DeveloperApplication',
+		operatingSystem: 'Cross-platform',
+		offers: {
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'USD',
+		},
+		description:
+			'Lightweight, reactive in-memory database for JavaScript. Perfect for client-side apps, edge runtimes, and Node.js.',
+		url: 'https://ramifyjs.haroonwaves.com',
+		softwareVersion: '0.0.4',
+		programmingLanguage: 'TypeScript',
+		keywords:
+			'in-memory database, javascript database, js database, ramifyjs, client-side database, reactive database',
+		author: {
+			'@type': 'Organization',
+			name: 'Haroon',
+			url: 'https://github.com/haroonwaves',
+		},
+		codeRepository: 'https://github.com/haroonwaves/ramifyjs',
+	};
+
 	return (
 		<div className="relative min-h-screen overflow-hidden">
+			{/* Structured Data */}
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+			/>
 			{/* Animated Background Grid */}
 			<div className="pointer-events-none fixed inset-0 z-0">
 				<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
@@ -39,7 +71,7 @@ export default function Home() {
 				<div className="absolute bottom-[10%] right-[10%] h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] animate-blob rounded-full bg-emerald-500/5 sm:bg-emerald-500/10 blur-[80px] sm:blur-[120px] filter [animation-delay:6s]" />
 			</div>
 
-			<div className="relative z-10">
+			<main className="relative z-10">
 				{/* Hero Section */}
 				<section className="px-6 py-24 sm:py-40 lg:px-8">
 					<div className="mx-auto max-w-4xl">
@@ -130,7 +162,7 @@ export default function Home() {
 									icon: Timer,
 									title: 'No Event Loop Delays',
 									description:
-										'10x faster than async databases. Synchronous, in-process execution removes event loop overhead entirely.',
+										'100x faster than async databases. Synchronous, in-process execution removes event loop overhead entirely.',
 								},
 								{
 									icon: Activity,
@@ -334,7 +366,7 @@ export default function Home() {
 									Explore the documentation and start building high-performance, in-memory data
 									workflows
 								</p>
-								<Link href="/docs/getting-started">
+								<Link href="/docs">
 									<Button
 										size="lg"
 										className="group gap-2 bg-foreground px-10 py-7 text-lg font-medium text-background transition-all hover:scale-105 hover:shadow-[0_0_50px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_0_50px_rgba(255,255,255,0.15)]"
@@ -347,7 +379,7 @@ export default function Home() {
 						</div>
 					</div>
 				</section>
-			</div>
+			</main>
 		</div>
 	);
 }
