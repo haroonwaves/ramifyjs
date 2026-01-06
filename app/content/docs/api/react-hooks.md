@@ -1,6 +1,8 @@
 ---
-title: 'React Hooks'
-description: 'React hooks for reactive data access'
+title: 'Ramify JS React Hooks'
+description:
+  'Build reactive React applications with Ramify JS using the useLiveQuery hook for automatic UI
+  updates when data changes.'
 ---
 
 ## React Hooks

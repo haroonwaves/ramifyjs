@@ -1,6 +1,8 @@
 ---
-title: 'Performance'
-description: 'Optimize Ramify JS for speed and efficiency'
+title: 'Ramify JS Performance Guide'
+description:
+  'Optimize Ramify JS for maximum speed with indexing strategies, batch operations, and live query
+  best practices. Includes benchmarks.'
 ---
 
 ## Performance
@@ -58,16 +60,16 @@ Live Queries are powerful but come with overhead.
 
 #### Memory Usage
 
-| Scenario                     | Heap Used (MB) |
-| ---------------------------- | -------------- |
-| Empty DB                     | 12.17          |
-| After Load (100,000 records) | 99.00          |
+| Scenario                  | Heap Used (MB) |
+| ------------------------- | -------------- |
+| Empty DB                  | 12.17          |
+| After Load (100k records) | 99.00          |
 
 ---
 
 #### Results
 
-**Dataset:** 100,000 messages
+**Dataset:** 100k messages
 
 | Operation                 |     ms/op |     Ops/sec |     ±% | Samples |
 | ------------------------- | --------: | ----------: | -----: | ------: |
