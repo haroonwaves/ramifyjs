@@ -5,22 +5,22 @@ description:
   type-safe operations and bulk methods.'
 ---
 
-## CRUD Patterns
+# CRUD Patterns
 
 **CRUD** (Create, Read, Update, Delete) represents the four basic functions usage in persistent
 storage. Ramify DB provides a simple, synchronous API for these operations, ensuring type safety
 throughout the process.
 
-### Operations
+## Operations
 
-#### Create
+### Create
 
 Adding records is done via `add()` (which ensures uniqueness) or `put()` (which handles upserts).
 
 - **Single**: `collection.add(doc)`
 - **Bulk**: `collection.bulkAdd([doc1, doc2])`
 
-#### Read
+### Read
 
 Data can be retrieved by primary key or via queries.
 
@@ -28,7 +28,7 @@ Data can be retrieved by primary key or via queries.
 - **All**: `collection.toArray()` (use with caution on large datasets)
 - **Query**: `collection.where(...).toArray()`
 
-#### Update
+### Update
 
 Updates are partial and immutable by default (they replace the internal record).
 
@@ -36,7 +36,7 @@ Updates are partial and immutable by default (they replace the internal record).
 - **Bulk**: `collection.bulkUpdate(keys, changes)`
 - **Query**: `collection.where(...).modify(changes)`
 
-#### Delete
+### Delete
 
 Removing records is permanent.
 
@@ -44,7 +44,7 @@ Removing records is permanent.
 - **Bulk**: `collection.bulkDelete(keys)`
 - **Query**: `collection.where(...).delete()`
 
-### Examples
+## Examples
 
 ```typescript
 // CREATE

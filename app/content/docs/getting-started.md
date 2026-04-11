@@ -5,12 +5,12 @@ date: 2024-12-10
 category: Tutorial
 ---
 
-## Getting Started with Ramify JS
+# Getting Started with Ramify JS
 
 Welcome to Ramify JS! This guide will help you get up and running with this powerful, lightweight
 in-memory database designed for reactive applications.
 
-### What is Ramify JS?
+## What is Ramify JS?
 
 Ramify JS is a **reactive, in-memory database for in-process JavaScript applications**. It is
 environment-agnostic, making it ideal for client-side applications, edge runtimes, and in-process
@@ -25,7 +25,7 @@ Key features include:
 - **Indexed collections** - Fast lookups with primary keys and secondary indexes.
 - **Zero dependencies** - Light footprint for any environment.
 
-### Installation
+## Installation
 
 Install Ramify JS using your preferred package manager:
 
@@ -53,9 +53,9 @@ yarn add @ramifyjs/react-hooks
 > **Note:** The `@ramifyjs/react-hooks` package is optional and only required if you're building a
 > React application. The core package works independently in any JavaScript/TypeScript environment.
 
-### Basic Usage
+## Basic Usage
 
-#### 1. Define Your Schema
+### 1. Define Your Schema
 
 First, define the types for your data:
 
@@ -88,7 +88,7 @@ type Message = {
 };
 ```
 
-#### 2. Create a Store
+### 2. Create a Store
 
 Create a Ramify instance and define your collections with schemas:
 
@@ -118,7 +118,7 @@ const db = new Ramify().createStore<{
 - `indexes`: Array of fields to index for fast lookups (optional)
 - `multiEntry`: Array fields that should be indexed individually (optional)
 
-#### 3. Add Data
+### 3. Add Data
 
 Add documents to your collections:
 
@@ -157,7 +157,7 @@ db.users.bulkAdd([
 ]);
 ```
 
-#### 4. Query Data
+### 4. Query Data
 
 Query your data using the fluent API:
 
@@ -183,7 +183,7 @@ const topUsers = db.users
 	.toArray();
 ```
 
-#### 5. Update Data
+### 5. Update Data
 
 Update existing documents:
 
@@ -198,7 +198,7 @@ db.users.bulkUpdate(['1', '2'], { age: 29 });
 db.users.where({ email: 'alice@example.com' }).modify({ roles: ['admin', 'manager'] });
 ```
 
-#### 6. Delete Data
+### 6. Delete Data
 
 Remove documents from collections:
 
@@ -216,7 +216,7 @@ db.users.where('roles').equals(['manager', 'creator']).delete();
 db.users.clear();
 ```
 
-### Using with React
+## Using with React
 
 Ramify JS provides a React hook for live queries that automatically re-render when data changes:
 
@@ -252,7 +252,7 @@ The component will automatically re-render whenever:
 - Users are added, updated, or deleted
 - The query results change
 
-### Next Steps
+## Next Steps
 
 Now that you've learned the basics, explore more advanced features:
 
@@ -261,7 +261,7 @@ Now that you've learned the basics, explore more advanced features:
 - [Live Queries](/docs/core/live-queries) - Deep dive into reactive queries with React
 - [Benchmark](/docs/guides/performance#benchmark) - Benchmark results
 
-### Need Help?
+## Need Help?
 
 If you run into any issues:
 

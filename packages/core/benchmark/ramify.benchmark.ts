@@ -48,11 +48,9 @@ function getEnvironmentInfo() {
 
 	// Detect runtime
 	let runtime = 'Node.js';
-	// @ts-ignore - Bun and Deno are runtime-specific globals
-	if (typeof globalThis.Bun !== 'undefined') {
+	if (typeof (globalThis as any).Bun !== 'undefined') {
 		runtime = 'Bun';
-		// @ts-ignore
-	} else if (typeof globalThis.Deno !== 'undefined') {
+	} else if (typeof (globalThis as any).Deno !== 'undefined') {
 		runtime = 'Deno';
 	}
 
@@ -312,6 +310,7 @@ function run() {
 
 		.on('cycle', (event: Benchmark.Event) => {
 			const bench = event.target;
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			console.log(`  ${String(bench)}`);
 
 			results.push({

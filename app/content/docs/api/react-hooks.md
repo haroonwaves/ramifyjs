@@ -5,14 +5,14 @@ description:
   updates when data changes.'
 ---
 
-## React Hooks
+# React Hooks
 
 Ramify JS exposes a single powerful hook `useLiveQuery` that enables any functional component to
 reactively update when database content changes.
 
 ---
 
-### `useLiveQuery<T>(callback, dependencies)`
+## `useLiveQuery<T>(callback, dependencies)`
 
 Executes the callback immediately and re-executes it whenever the dependent collections change.
 
@@ -76,9 +76,9 @@ type Subscribable = {
 
 ---
 
-### Usage Patterns
+## Usage Patterns
 
-#### Reactive Query
+### Reactive Query
 
 Query all documents matching a criteria and reactively update when the collection changes.
 
@@ -102,7 +102,7 @@ function ActiveUsers() {
 
 ---
 
-#### Multiple Collections
+### Multiple Collections
 
 Query across multiple collections and subscribe to all of them.
 

@@ -5,11 +5,11 @@ description:
   handling large datasets efficiently.'
 ---
 
-## Pagination & Sorting
+# Pagination & Sorting
 
 Efficiently handle large datasets with Ramify JS's built-in pagination and sorting capabilities.
 
-### Sorting
+## Sorting
 
 You can sort results in ascending or descending order using `sortBy()` and `reverse()`.
 
@@ -31,7 +31,7 @@ const managers = db.users.where('roles').anyOf(['manager']).sortBy('name').toArr
 > by indexes. However, indexing fields used in `where()` queries will improve the filtering
 > performance before sorting is applied.
 
-### Offset Pagination
+## Offset Pagination
 
 The most common pagination method, using `limit()` and `offset()`. Perfect for data tables and
 traditional page-based UIs.
@@ -56,7 +56,7 @@ const activePage1 = db.users
 > must iterate through all offset records, which can impact performance. Use cursor-based pagination
 > for deep pagination.
 
-### Cursor-Based Pagination
+## Cursor-Based Pagination
 
 Alternatively you can use cursor pagination if you are data is likely to change often.
 

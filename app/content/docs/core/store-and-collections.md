@@ -5,7 +5,7 @@ description:
   data with type safety and reactive updates.'
 ---
 
-## Store & Collections
+# Store & Collections
 
 The **Store** and **Collections** are the fundamental building blocks of Ramify DB.
 
@@ -16,9 +16,9 @@ configuration, schema definitions, and acts as a factory for your collections.
 provide methods to add, update, delete, and query data, while maintaining type safety and handling
 indexing behind the scenes.
 
-### Core Concepts
+## Core Concepts
 
-#### The Store
+### The Store
 
 The Store manages the lifecycle of your data layer. When initialized, it creates the necessary
 in-memory structures to hold your data.
@@ -28,7 +28,7 @@ in-memory structures to hold your data.
 - **Schema Definition**: You define strict schemas for your collections, ensuring that all data
   interacting with the database is predictable and typed.
 
-#### Collections
+### Collections
 
 Each collection is dedicated to a specific entity type (e.g., `User`, `Message`).
 
@@ -36,7 +36,7 @@ Each collection is dedicated to a specific entity type (e.g., `User`, `Message`)
   system.
 - **Indexing**: Collections manage their own indexes to optimize lookups.
 
-### Examples
+## Examples
 
 ```typescript
 import { Ramify, type Schema } from '@ramifyjs/core';

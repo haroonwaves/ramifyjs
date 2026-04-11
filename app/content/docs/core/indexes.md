@@ -5,12 +5,12 @@ description:
   multi-entry indexes for optimal performance.'
 ---
 
-## Indexes
+# Indexes
 
 Indexes in Ramify DB are defined in your **Store Schema**. They enable O(1) lookups and efficient
 sorting. Unlike some databases, you define indexes upfront when creating the store.
 
-### Defining Indexes
+## Defining Indexes
 
 Indexes are declared in the `createStore` configuration.
 
@@ -27,9 +27,9 @@ const db = ramify.createStore<{ users: Schema<User, 'id'> }>({
 });
 ```
 
-### Types of Indexes
+## Types of Indexes
 
-#### Primary Key
+### Primary Key
 
 Every collection has exactly one primary key. It is always indexed and must be unique.
 
@@ -39,7 +39,7 @@ Every collection has exactly one primary key. It is always indexed and must be u
 }
 ```
 
-#### Secondary Indexes
+### Secondary Indexes
 
 Added via the `indexes` array. Use these for fields you frequently query with `.where()`. Nested
 properties are supported using dot notation (e.g., `'stats.level'`).
@@ -50,7 +50,7 @@ properties are supported using dot notation (e.g., `'stats.level'`).
 }
 ```
 
-#### Multi-Entry Indexes (Tags)
+### Multi-Entry Indexes (Tags)
 
 Added via the `multiEntry` array. If a field contains an array of values (e.g.,
 `roles: ['manager']`), a multi-entry index allows you to query for documents that contain a specific
@@ -64,7 +64,7 @@ role. Nested properties are also supported using dot notation.
 db.users.where('roles').equals(['manager']).toArray();
 ```
 
-### Best Practices
+## Best Practices
 
 - **Index what you query**: If you filter by it with `where()`, index it.
 - **Understand the trade-off**: Indexes speed up reads but slow down writes (every write must update

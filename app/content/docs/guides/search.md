@@ -5,14 +5,14 @@ description:
   strategies for finding data quickly.'
 ---
 
-## Search Strategies
+# Search Strategies
 
 Ramify JS is primarily an in-memory document store with exact-match indexing. It does **not** have a
 built-in full-text search engine (like ElasticSearch or multiple-token indexing). However, because
 it runs in-memory, you can implement efficient search strategies using standard JavaScript or
 lightweight helper libraries.
 
-### Strategy 1: Simple Filter (Small Datasets)
+## Strategy 1: Simple Filter (Small Datasets)
 
 For collections with fewer than ~10,000 records, Javascript's native string methods are often fast
 enough.
@@ -25,7 +25,7 @@ const results = db.users
 	.toArray()
 ```
 
-### Strategy 2: Multi-Entry Indexing (Tagging)
+## Strategy 2: Multi-Entry Indexing (Tagging)
 
 If you want to search by strict keywords or roles, use Ramify's `multiEntry` index.
 
@@ -42,7 +42,7 @@ const admins = db.users.where('roles').anyOf(['admin']).toArray();
 const usersWithReadAccess = db.users.where('roles').allOf(['user', 'reader']).toArray();
 ```
 
-### Strategy 3: Tokenization (Manual Search Index)
+## Strategy 3: Tokenization (Manual Search Index)
 
 For more advanced "search-like" behavior, you can tokenize your text fields into an array of
 keywords and store them in a `multiEntry` field.
@@ -96,7 +96,7 @@ const phonesOrTablets = db.products.where('_searchTerms').anyOf(['phone', 'table
 const smartPhones = db.products.where('_searchTerms').allOf(['phone', 'smart']).toArray();
 ```
 
-### Summary
+## Summary
 
 - **Exact Match**: Use Ramify `indexes`.
 - **Keyword Match**: Use `multiEntry` indexes.

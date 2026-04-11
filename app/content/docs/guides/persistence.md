@@ -5,7 +5,7 @@ description:
   using the built-in observer pattern.'
 ---
 
-## Persistence
+# Persistence
 
 Ramify JS is **in-memory by design**. Data exists only while your application is running. This is
 intentional—it keeps Ramify JS fast, lightweight, and environment-agnostic.
@@ -13,7 +13,7 @@ intentional—it keeps Ramify JS fast, lightweight, and environment-agnostic.
 However, you can add persistence by syncing Ramify JS with external storage using the built-in
 observer pattern.
 
-### Implementing Custom Persistence
+## Implementing Custom Persistence
 
 Ramify JS emits events with the primary keys of changed documents, enabling efficient incremental
 sync to any external storage (e.g., IndexedDB, LocalStorage, or a remote API).
@@ -57,7 +57,7 @@ const storedUsers = await myExternalDB.getAll('users');
 db.users.bulkAdd(storedUsers);
 ```
 
-### How It Works
+## How It Works
 
 > [!TIP] **Hydration & Errors**: Load data from external storage on app startup to hydrate Ramify
 > DB. Always wrap persistence operations in try/catch blocks. If an external save fails, remember to
@@ -72,7 +72,7 @@ db.users.bulkAdd(storedUsers);
 - `type`: Operation type (`'create'`, `'update'`, `'delete'`, `'clear'`)
 - `keys`: Array of affected primary keys
 
-### Multiple Collections
+## Multiple Collections
 
 Sync multiple collections independently:
 

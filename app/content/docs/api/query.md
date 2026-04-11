@@ -4,16 +4,16 @@ description:
   'Master the Ramify JS query API with complete syntax reference for filtering, sorting, pagination.'
 ---
 
-## Query API
+# Query API
 
 Queries in Ramify JS are built using a **fluent interface**. You start a query with `.where()`,
 chain operators, and execute it with a termination method (like `toArray()` or `first()`).
 
 ---
 
-### Starting a Query
+## Starting a Query
 
-#### `where(field)`
+### `where(field)`
 
 Target a specific field for filtering operations.
 
@@ -31,7 +31,7 @@ db.users.where('email').equals('alice@example.com');
 
 ---
 
-#### `where(criteria)`
+### `where(criteria)`
 
 Match fields by strict equality (deep equality for arrays).
 
@@ -60,11 +60,11 @@ export type Criteria<T> = {
 
 ---
 
-### Filtering Methods
+## Filtering Methods
 
 Available after `where(field)`.
 
-#### `equals(value)`
+### `equals(value)`
 
 Exact match for the specified field.
 
@@ -85,7 +85,7 @@ db.users.where('status').equals('active').toArray();
 
 ---
 
-#### `anyOf(values)`
+### `anyOf(values)`
 
 Match any value in the provided array.
 
@@ -103,7 +103,7 @@ db.users.where('status').anyOf(['inactive', 'banned']).toArray();
 
 ---
 
-#### `allOf(values)`
+### `allOf(values)`
 
 Match all values in the provided array (for multi-entry indexes).
 
@@ -124,11 +124,11 @@ db.users.where('roles').allOf(['admin', 'moderator']).toArray();
 
 ---
 
-### Modifiers
+## Modifiers
 
 Chain these to sort, paginate, or apply additional filtering.
 
-#### `sortBy(field)`
+### `sortBy(field)`
 
 Sort results by the specified field in ascending order.
 
@@ -146,7 +146,7 @@ db.users.where('status').equals('active').sortBy('name').toArray();
 
 ---
 
-#### `reverse()`
+### `reverse()`
 
 Reverse the sort order (only available after `sortBy()`).
 
@@ -162,7 +162,7 @@ db.users.where('status').equals('active').sortBy('name').reverse().toArray(); //
 
 ---
 
-#### `limit(n)`
+### `limit(n)`
 
 Take the first N results.
 
@@ -180,7 +180,7 @@ db.users.where('status').equals('active').limit(10).toArray();
 
 ---
 
-#### `offset(n)`
+### `offset(n)`
 
 Skip the first N results.
 
@@ -198,7 +198,7 @@ db.users.where('status').equals('active').limit(10).offset(10).toArray();
 
 ---
 
-#### `filter(callback)`
+### `filter(callback)`
 
 Apply an arbitrary JavaScript filter. This runs **after** index queries.
 
@@ -219,11 +219,11 @@ db.users
 
 ---
 
-### Execution Methods
+## Execution Methods
 
 Terminate the query chain and get results.
 
-#### `toArray()`
+### `toArray()`
 
 Returns all matching documents as an array.
 
@@ -239,7 +239,7 @@ const activeUsers = db.users.where({ status: 'active' }).toArray();
 
 ---
 
-#### `first()`
+### `first()`
 
 Returns the first matching document.
 
@@ -255,7 +255,7 @@ const firstAdmin = db.users.where('roles').anyOf(['admin']).first();
 
 ---
 
-#### `last()`
+### `last()`
 
 Returns the last matching document.
 
@@ -271,7 +271,7 @@ const lastUser = db.users.where({ status: 'active' }).sortBy('createdAt').last()
 
 ---
 
-#### `count()`
+### `count()`
 
 Returns the number of matching documents.
 
@@ -287,7 +287,7 @@ const activeCount = db.users.where({ status: 'active' }).count();
 
 ---
 
-#### `delete()`
+### `delete()`
 
 Deletes all matching documents.
 
@@ -304,7 +304,7 @@ console.log(`Deleted userIds:`, deleted.filter(Boolean));
 
 ---
 
-#### `modify(changes)`
+### `modify(changes)`
 
 Updates all matching documents with the specified changes.
 
@@ -323,11 +323,11 @@ console.log(`Modified userIds:`, modified.filter(Boolean));
 
 ---
 
-### Query Stages
+## Query Stages
 
 The query API uses a type-safe fluent interface with different stages:
 
-#### `WhereStage<T, K>`
+### `WhereStage<T, K>`
 
 Available after `where(field)`. Provides filtering operators:
 
@@ -335,26 +335,26 @@ Available after `where(field)`. Provides filtering operators:
 - `anyOf(values)`
 - `allOf(values)`
 
-#### `ExecutableStage<T>`
+### `ExecutableStage<T>`
 
 Available after applying a filter or using `where(criteria)`. Provides:
 
 - Modifiers: `sortBy()`, `limit()`, `offset()`, `filter()`
 - Execution: `toArray()`, `first()`, `last()`, `count()`, `delete()`, `modify()`
 
-#### `OrderableStage<T>`
+### `OrderableStage<T>`
 
 Available after `sortBy()`. Extends `ExecutableStage<T>` with:
 
 - `reverse()`
 
-#### `LimitedStage<T>`
+### `LimitedStage<T>`
 
 Available after `limit()` or `offset()`. Extends `ExecutableStage<T>`.
 
 ---
 
-### Performance Tips
+## Performance Tips
 
 - **Use indexed queries** – Queries on indexed fields are significantly faster than `filter()`.
 - **Order matters** – Apply indexed filters first, then use `filter()` for additional criteria.

@@ -5,14 +5,14 @@ description:
   best practices. Includes benchmarks.'
 ---
 
-## Performance
+# Performance
 
 Ramify DB is designed for speed, operating entirely in-memory. However, as datasets grow, following
 performance best practices ensures your application remains buttery smooth.
 
-### Performance Strategies
+## Performance Strategies
 
-#### 1. Strategic Indexing
+### 1. Strategic Indexing
 
 Indexes are the single most important factor for read performance in `where` queries.
 
@@ -25,7 +25,7 @@ Indexes are the single most important factor for read performance in `where` que
   must update all indexes. However, memory impact is minimal since indexes store references to
   documents, not copies.
 
-#### 2. Batch Operations
+### 2. Batch Operations
 
 When inserting or updating multiple records, always use bulk methods (`bulkAdd`, `bulkPut`,
 `bulkDelete`).
@@ -34,7 +34,7 @@ When inserting or updating multiple records, always use bulk methods (`bulkAdd`,
   Bulk methods coalesce these into a single event and optimized index build, which is significantly
   faster.
 
-#### 3. Optimize Live Queries
+### 3. Optimize Live Queries
 
 Live Queries are powerful but come with overhead.
 
@@ -46,11 +46,11 @@ Live Queries are powerful but come with overhead.
 
 ---
 
-### Benchmark
+## Benchmark
 
 > Benchmarked using [Benchmark.js](https://benchmarkjs.com/) for statistically significant results.
 
-#### Environment
+### Environment
 
 - **CPU:** Apple M4 (10 cores)
 - **RAM:** 16.00 GB
@@ -58,7 +58,7 @@ Live Queries are powerful but come with overhead.
 - **Runtime:** Node.js v22.19.0
 - **Flags:** None
 
-#### Memory Usage
+### Memory Usage
 
 | Scenario                  | Heap Used (MB) |
 | ------------------------- | -------------- |
@@ -67,7 +67,7 @@ Live Queries are powerful but come with overhead.
 
 ---
 
-#### Results
+### Results
 
 **Dataset:** 100k messages
 

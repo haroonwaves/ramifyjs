@@ -3,16 +3,16 @@ title: 'Ramify JS Store API'
 description: 'Store API for creating and managing collections in Ramify JS'
 ---
 
-## Store API
+# Store API
 
 The **Store API** is initialized via the `Ramify` class. It serves as the central database instance,
 managing collections, definitions, and schemas.
 
 ---
 
-### Core Methods
+## Core Methods
 
-#### `new Ramify<T>()`
+### `new Ramify<T>()`
 
 Creates a new Ramify instance.
 
@@ -30,7 +30,7 @@ const ramify = new Ramify();
 
 ---
 
-#### `createStore<S>(storeDefinition)`
+### `createStore<S>(storeDefinition)`
 
 Defines the database schema and creates collections. This method infers document types and primary
 keys from the schema definition.
@@ -72,7 +72,7 @@ const db = ramify.createStore<{
 
 ---
 
-#### `delete()`
+### `delete()`
 
 Clears all data from all collections in the store.
 
@@ -88,7 +88,7 @@ ramify.delete();
 
 ---
 
-### Schema Definition
+## Schema Definition
 
 The `Schema` type is defined as:
 

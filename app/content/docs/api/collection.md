@@ -3,16 +3,16 @@ title: 'Ramify JS Collection API'
 description: 'Complete API reference for Ramify JS collections including CRUD operations.'
 ---
 
-## Collection API
+# Collection API
 
 The **Collection API** provides CRUD operations and query entry points for a specific collection.
 Access collections via the object returned by `ramify.createStore()`.
 
 ---
 
-### CRUD Methods
+## CRUD Methods
 
-#### `add(document)`
+### `add(document)`
 
 Adds a document to the collection.
 
@@ -34,7 +34,7 @@ const userId = db.users.add({ id: '1', name: 'Alice', email: 'alice@example.com'
 
 ---
 
-#### `put(document)`
+### `put(document)`
 
 Adds or updates a document in the collection. Overwrites if a document with the same primary key
 exists.
@@ -54,7 +54,7 @@ const userId = db.users.put({ id: '1', name: 'Alice Updated', email: 'alice@exam
 
 ---
 
-#### `get(key)`
+### `get(key)`
 
 Retrieves a document by its primary key.
 
@@ -75,7 +75,7 @@ if (user) {
 
 ---
 
-#### `toArray()`
+### `toArray()`
 
 Returns all documents in the collection as an array.
 
@@ -92,7 +92,7 @@ console.log(`Total users: ${allUsers.length}`);
 
 ---
 
-#### `update(key, changes)`
+### `update(key, changes)`
 
 Partially updates a document by merging the changes with the existing document.
 
@@ -114,7 +114,7 @@ if (updated) {
 
 ---
 
-#### `delete(key)`
+### `delete(key)`
 
 Removes a document by its primary key.
 
@@ -136,7 +136,7 @@ found
 
 ---
 
-#### `clear()`
+### `clear()`
 
 Removes all documents from the collection.
 
@@ -152,13 +152,13 @@ db.users.clear();
 
 ---
 
-### Bulk Operations
+## Bulk Operations
 
 > [!NOTE] **Performance & Notifications**: Bulk operations batch notifications, so subscribers
 > receive a single notification with all affected keys. Each individual operation in a bulk method
 > triggers index updates but coalesce event emissions for optimized performance.
 
-#### `bulkAdd(docs)`
+### `bulkAdd(docs)`
 
 Adds multiple documents to the collection. Throws if any document with the same primary key exists.
 
@@ -179,7 +179,7 @@ const userIds = db.users.bulkAdd([
 
 ---
 
-#### `bulkPut(docs)`
+### `bulkPut(docs)`
 
 Adds or updates multiple documents in the collection.
 
@@ -200,7 +200,7 @@ const userIds = db.users.bulkPut([
 
 ---
 
-#### `bulkGet(keys)`
+### `bulkGet(keys)`
 
 Retrieves multiple documents by their primary keys.
 
@@ -218,7 +218,7 @@ const users = db.users.bulkGet(['1', '2', '3']);
 
 ---
 
-#### `bulkUpdate(keys, changes)`
+### `bulkUpdate(keys, changes)`
 
 Updates multiple documents with their respective changes.
 
@@ -237,7 +237,7 @@ const updated = db.users.bulkUpdate(['1', '2', '3'], { status: 'inactive' });
 
 ---
 
-#### `bulkDelete(keys)`
+### `bulkDelete(keys)`
 
 Deletes multiple documents by their primary keys.
 
@@ -256,9 +256,9 @@ found)
 
 ---
 
-### Utility Methods
+## Utility Methods
 
-#### `count()`
+### `count()`
 
 Returns the number of documents in the collection.
 
@@ -274,7 +274,7 @@ const totalUsers = db.users.count();
 
 ---
 
-#### `keys()`
+### `keys()`
 
 Returns all primary keys in the collection.
 
@@ -290,7 +290,7 @@ const userIds = db.users.keys();
 
 ---
 
-#### `has(key)`
+### `has(key)`
 
 Checks if a document with the given primary key exists.
 
@@ -310,7 +310,7 @@ if (db.users.has('1')) {
 
 ---
 
-#### `each(callback)`
+### `each(callback)`
 
 Iterates over all documents in the collection.
 
@@ -330,12 +330,12 @@ db.users.each((user) => {
 
 ---
 
-### Query Entry Points
+## Query Entry Points
 
 > [!TIP] **No `find()`?**: Ramify JS uses `where()` for indexed queries and `filter()` for arbitrary
 > logic. There is no explicit `find()` method.
 
-#### `where(field)`
+### `where(field)`
 
 Starts a query execution chain targeting a specific field.
 
@@ -354,7 +354,7 @@ db.users.where('age').equals(18);
 
 ---
 
-#### `where(criteria)`
+### `where(criteria)`
 
 Starts a query execution chain with object criteria for equality matching.
 
@@ -376,7 +376,7 @@ db.users.where({ status: ['active', 'pending'] });
 
 ---
 
-#### `filter(callback)`
+### `filter(callback)`
 
 Filters documents using a JavaScript callback function. This loops through all documents and is
 slower than indexed queries.
@@ -395,7 +395,7 @@ db.users.filter((u) => u.name.startsWith('A'));
 
 ---
 
-#### `sortBy(field)`
+### `sortBy(field)`
 
 Returns a query ordered by the specified field, this performs Js sorting under the hood.
 
@@ -413,7 +413,7 @@ db.users.sortBy('name').toArray();
 
 ---
 
-#### `limit(n)`
+### `limit(n)`
 
 Returns a query with a limit applied.
 
@@ -431,7 +431,7 @@ db.users.limit(10).toArray();
 
 ---
 
-#### `offset(n)`
+### `offset(n)`
 
 Returns a query with an offset applied.
 
@@ -449,9 +449,9 @@ db.users.limit(10).offset(5).toArray();
 
 ---
 
-### Subscriptions
+## Subscriptions
 
-#### `subscribe(callback)`
+### `subscribe(callback)`
 
 Subscribes to changes in the collection. The callback is invoked whenever documents are added,
 updated, deleted, or the collection is cleared.
@@ -485,7 +485,7 @@ type CollectionOperation = 'create' | 'update' | 'delete' | 'clear';
 
 ---
 
-#### `unsubscribe(callback)`
+### `unsubscribe(callback)`
 
 Unsubscribes a callback from collection changes.
 
@@ -509,9 +509,9 @@ db.users.unsubscribe(callback);
 
 ---
 
-### Properties
+## Properties
 
-#### `collectionName`
+### `collectionName`
 
 **Type:** `string`
 
@@ -519,7 +519,7 @@ The name of the collection.
 
 ---
 
-#### `primaryKey`
+### `primaryKey`
 
 **Type:** `Pk`
 
@@ -527,7 +527,7 @@ The primary key field name.
 
 ---
 
-#### `indexes`
+### `indexes`
 
 **Type:** `Array<NestedKeyOf<T>>`
 

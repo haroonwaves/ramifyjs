@@ -1,5 +1,5 @@
-import { getBlog } from '@haroonwaves/blog-kit-core';
-import { BlogRenderer } from '@haroonwaves/blog-kit-react';
+import { getContent } from '@haroonwaves/blog-kit-core';
+import { ContentRenderer } from '@haroonwaves/blog-kit-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { DocsNavigation } from '@/components/docs-navigation';
@@ -52,9 +52,9 @@ export async function generateMetadata({
 	// Join slug parts back together
 	const slugPath = slug.join('/');
 
-	const blog = getBlog(slugPath, {
+	const blog = getContent(slugPath, {
 		contentDirectory: process.cwd(),
-		blogSubdirectory: 'content/docs',
+		contentSubdirectory: 'content/docs',
 	});
 
 	if (!blog) {
@@ -103,18 +103,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 	// Join slug parts back together
 	const slugPath = slug.join('/');
 
-	const blog = getBlog(slugPath, {
+	const doc = getContent(slugPath, {
 		contentDirectory: process.cwd(),
-		blogSubdirectory: 'content/docs',
+		contentSubdirectory: 'content/docs',
 	});
 
-	if (!blog) notFound();
+	if (!doc) notFound();
 
 	return (
 		<article className="space-y-8">
-			<BlogRenderer
-				content={blog.content}
-				metadata={blog.metadata}
+			<ContentRenderer
+				body={doc.body}
+				metadata={doc.metadata}
 				showCategory={false}
 				showDate={false}
 				showReadingTime={false}

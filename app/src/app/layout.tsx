@@ -3,9 +3,9 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import Header from '@/app/header';
 
-import './globals.css';
 import '@haroonwaves/blog-kit-react/dist/index.css'; // For Prism styles
 import '@haroonwaves/blog-kit-react/dist/style.css'; // For Component styles
+import './globals.css';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
