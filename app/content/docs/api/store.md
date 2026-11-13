@@ -74,12 +74,12 @@ const db = ramify.createStore<{
 
 ### `delete()`
 
-Clears all data from all collections in the store.
+Clears all collection data and detaches all active observers in the store.
 
 **Example:**
 
 ```typescript
-ramify.delete();
+db.delete();
 ```
 
 **Parameters:** None

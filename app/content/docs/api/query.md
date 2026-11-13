@@ -38,8 +38,8 @@ Match fields by strict equality (deep equality for arrays).
 **Example:**
 
 ```typescript
-// Exact match
-db.users.where({ status: 'active', roles: ['admin'] });
+// Exact match (including booleans, numbers, Dates, or arrays)
+db.users.where({ status: 'active', active: false, roles: ['admin'] });
 ```
 
 **Parameters:**

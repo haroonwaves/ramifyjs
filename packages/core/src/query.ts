@@ -10,13 +10,14 @@ import type {
 } from '@/types';
 import { getNestedValue } from '@/utils/getNestedValue';
 import { createLazyCloneProxy } from '@/utils/lazyCloneProxy.js';
+import { normalizeKey } from '@/utils/normalizeKey.js';
 
 /**
  * whereCriteria (Object): always perform exact query
  * whereStage (String)
-  - $equals (Any): perform exact query
-  - $anyOf (Array): perform inexact query
-  - $allOf (Array): perform inexact query
+ * - $equals (Any): perform exact query
+ * - $anyOf (Array): perform inexact query
+ * - $allOf (Array): perform inexact query
  **/
 
 type WhereStageOperator = {
@@ -184,7 +185,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		const hasWhereStage = whereStage !== null;
 		const fields = hasWhereStage ? [whereStage[0]] : Object.keys(criteria as object);
 
-		this.isExact = !hasWhereStage || whereStage?.[1].$equals;
+		this.isExact = !hasWhereStage || whereStage?.[1].$equals !== undefined;
 
 		const primaryKey = fields.find((field) => field === String(collection.primaryKey));
 		const indexes = fields.filter(
@@ -230,11 +231,11 @@ export class Query<T = any, PK extends keyof T = keyof T>
 
 		if (Array.isArray(key)) {
 			for (const value of key as T[PK][]) {
-				const document = data.get(value) as T;
+				const document = data.get(normalizeKey(value)) as T;
 				if (document) documents.push(document);
 			}
 		} else if (key !== undefined) {
-			const document = data.get(key as T[PK]) as T;
+			const document = data.get(normalizeKey(key)) as T;
 			if (document) documents.push(document);
 		}
 
@@ -268,17 +269,25 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		if (Array.isArray(indexValue)) {
 			const combinedMap = new Map<any, T>();
 			for (const value of indexValue) {
-				const matches = indexMaps[index]?.get(value) || new Map();
+				const matches = indexMaps[index]?.get(normalizeKey(value)) || new Map();
 				for (const [idx, document] of matches) combinedMap.set(idx, document as T);
 			}
 			return combinedMap;
 		}
 
-		return indexMaps[index]?.get(indexValue) || new Map();
+		return indexMaps[index]?.get(normalizeKey(indexValue)) || new Map();
 	}
 
-	private getFieldValue(field: string): T[keyof T] {
-		return this.criteria[field as keyof T] || Object.values(this.whereStage?.[1] || {})[0];
+	private getFieldValue(field: string): any {
+		if (this.whereStage && this.whereStage[0] === field) {
+			const op = this.whereStage[1];
+			if (op.$equals !== undefined) return op.$equals;
+			if (op.$anyOf !== undefined) return op.$anyOf;
+			if (op.$allOf !== undefined) return op.$allOf;
+		}
+		if (this.criteria && field in (this.criteria as object)) return (this.criteria as any)[field];
+
+		return undefined;
 	}
 
 	private matchesCriteria(document: T): boolean {
@@ -289,22 +298,29 @@ export class Query<T = any, PK extends keyof T = keyof T>
 	}
 
 	private compareValues(document: any, criteriaValue: any, isEvery: boolean = false): boolean {
+		const isEqual = (a: any, b: any) => {
+			if (a instanceof Date && b instanceof Date) {
+				return a.getTime() === b.getTime();
+			}
+			return a === b;
+		};
+
 		if (Array.isArray(criteriaValue)) {
 			if (Array.isArray(document)) {
 				if (isEvery) {
 					return (
 						(this.isExact ? criteriaValue.length === document.length : true) &&
-						criteriaValue.every((v) => document.includes(v))
+						criteriaValue.every((v) => document.some((d: any) => isEqual(d, v)))
 					);
 				}
-				return criteriaValue.some((v) => document.includes(v));
+				return criteriaValue.some((v) => document.some((d: any) => isEqual(d, v)));
 			}
 
-			return isEvery ? false : criteriaValue.includes(document);
+			return isEvery ? false : criteriaValue.some((v) => isEqual(document, v));
 		}
 
-		if (Array.isArray(document)) return document.includes(criteriaValue);
-		return document === criteriaValue;
+		if (Array.isArray(document)) return document.some((d: any) => isEqual(d, criteriaValue));
+		return isEqual(document, criteriaValue);
 	}
 
 	private matchesWhereStage(document: T): boolean {
@@ -312,10 +328,15 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		const [field, operators] = this.whereStage;
 		const nestedValue = getNestedValue(document as Record<string, unknown>, field);
 
-		if (operators.$equals && !this.compareValues(nestedValue, operators.$equals, true))
+		if (
+			operators.$equals !== undefined &&
+			!this.compareValues(nestedValue, operators.$equals, true)
+		)
 			return false;
-		if (operators.$anyOf && !this.compareValues(nestedValue, operators.$anyOf)) return false;
-		if (operators.$allOf && !this.compareValues(nestedValue, operators.$allOf, true)) return false;
+		if (operators.$anyOf !== undefined && !this.compareValues(nestedValue, operators.$anyOf))
+			return false;
+		if (operators.$allOf !== undefined && !this.compareValues(nestedValue, operators.$allOf, true))
+			return false;
 
 		return true;
 	}

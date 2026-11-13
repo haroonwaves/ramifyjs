@@ -24,6 +24,10 @@ export class NotificationManager<Pk = any> {
 		this.observers[this.collectionName].delete(obs);
 	}
 
+	clear() {
+		this.observers[this.collectionName]?.clear();
+	}
+
 	notify(type: CollectionOperation, keys: Pk[]) {
 		const observers = this.observers[this.collectionName];
 		if (!observers) return;

@@ -38,8 +38,9 @@ you can only call `.where('field')` or `.where({ field: value })` if `field` is 
 
 ### Execution Model
 
-Queries in Ramify are synchronous and return "lazy" proxy objects by default to prevent accidental
-mutation of the store.
+Queries in Ramify are synchronous and return "lazy" copy-on-write proxy objects. Modifying
+properties or arrays on returned documents persists on your local copy without affecting the
+underlying store data.
 
 ## Examples
 

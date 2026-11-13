@@ -31,7 +31,8 @@ const db = ramify.createStore<{ users: Schema<User, 'id'> }>({
 
 ### Primary Key
 
-Every collection has exactly one primary key. It is always indexed and must be unique.
+Every collection has exactly one primary key. It is always indexed and must be unique. Primary keys
+can be a `string`, `number`, `boolean`, or `Date` (compared by timestamp value).
 
 ```typescript
 {
@@ -41,8 +42,9 @@ Every collection has exactly one primary key. It is always indexed and must be u
 
 ### Secondary Indexes
 
-Added via the `indexes` array. Use these for fields you frequently query with `.where()`. Nested
-properties are supported using dot notation (e.g., `'stats.level'`).
+Added via the `indexes` array. Use these for fields you frequently query with `.where()`. Indexed
+fields must be primitive values (`string`, `number`, `boolean`, `Date`). Nested properties are
+supported using dot notation (e.g., `'stats.level'`).
 
 ```typescript
 {

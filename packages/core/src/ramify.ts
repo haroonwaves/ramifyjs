@@ -33,6 +33,12 @@ export class Ramify<T> {
 	}
 
 	delete() {
+		for (const collection of Object.values(this.#collections)) {
+			if (collection) {
+				(collection as any).clearObservers?.();
+				(collection as any).clear?.();
+			}
+		}
 		this.#collections = {};
 	}
 }

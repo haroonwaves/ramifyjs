@@ -37,7 +37,8 @@ const userId = db.users.add({ id: '1', name: 'Alice', email: 'alice@example.com'
 ### `put(document)`
 
 Adds or updates a document in the collection. Overwrites if a document with the same primary key
-exists.
+exists. Emits a `'create'` event for new documents, or an `'update'` event when an existing document
+is overwritten.
 
 **Example:**
 
@@ -154,9 +155,9 @@ db.users.clear();
 
 ## Bulk Operations
 
-> [!NOTE] **Performance & Notifications**: Bulk operations batch notifications, so subscribers
-> receive a single notification with all affected keys. Each individual operation in a bulk method
-> triggers index updates but coalesce event emissions for optimized performance.
+> [!NOTE] **Performance & Notifications**: Bulk operations batch notifications into single event
+> emissions per operation type. For example, `bulkPut` notifies `'create'` for new records and
+> `'update'` for overwritten records.
 
 ### `bulkAdd(docs)`
 
@@ -239,7 +240,8 @@ const updated = db.users.bulkUpdate(['1', '2', '3'], { status: 'inactive' });
 
 ### `bulkDelete(keys)`
 
-Deletes multiple documents by their primary keys.
+Deletes multiple documents by their primary keys. Only actually deleted keys are emitted to
+subscribers (non-existent keys are filtered out).
 
 **Example:**
 
