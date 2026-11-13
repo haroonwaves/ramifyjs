@@ -65,10 +65,10 @@ const db = ramify.createStore<{
   - **`indexes`**: `Array<NestedKeyOf<T>>` - Array of fields to be indexed for fast lookups.
   - **`multiEntry`**: `Array<NestedKeyOf<T>>` - Array of array-fields where each element should be
 
-**Returns:** A typed store object where:
+**Returns:** A typed `Store<S>` object where:
 
-- The store extends `Ramify` with inferred document types
 - Each collection is accessible as a property with type `Collection<T, Pk>`
+- Provides a `delete()` method to clear collections and detach active observers
 
 ---
 

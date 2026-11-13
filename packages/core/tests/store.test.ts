@@ -35,6 +35,19 @@ describe('Ramify – Store lifecycle', () => {
 			expect(keys).toContain('items');
 		});
 
+		test('store only exposes collections and delete method, not createStore', () => {
+			type Item = { id: number };
+			const db = new Ramify().createStore<{
+				items: Schema<Item, 'id'>;
+			}>({
+				items: { primaryKey: 'id' },
+			});
+
+			expect(db.items).toBeDefined();
+			expect(typeof db.delete).toBe('function');
+			expect((db as any).createStore).toBeUndefined();
+		});
+
 		test('collections are independent of each other', () => {
 			type A = { id: number; val: string };
 			type B = { id: number; val: string };
