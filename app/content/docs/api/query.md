@@ -130,17 +130,21 @@ Chain these to sort, paginate, or apply additional filtering.
 
 ### `sortBy(field)`
 
-Sort results by the specified field in ascending order.
+Sort results by the specified field in ascending order. Supports both top-level and nested fields
+(using dot notation).
 
 **Example:**
 
 ```typescript
 db.users.where('status').equals('active').sortBy('name').toArray();
+
+// Nested field sorting
+db.users.sortBy('stats.score').toArray();
 ```
 
 **Parameters:**
 
-- **`field`**: `keyof T` - The field to sort by
+- **`field`**: `keyof T | NestedKeyOf<T>` - The field or nested path to sort by
 
 **Returns:** `OrderableStage<T>` - An orderable query stage (supports `.reverse()`)
 

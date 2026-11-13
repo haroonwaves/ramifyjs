@@ -58,7 +58,7 @@ export type OrderableStage<T> = Omit<ExecutableStage<T>, 'sortBy'> & {
 export type LimitedStage<T> = Omit<ExecutableStage<T>, 'limit' | 'sortBy'>;
 
 export type ExecutableStage<T> = {
-	sortBy(field: keyof T): OrderableStage<T>;
+	sortBy(field: keyof T | NestedKeyOf<T>): OrderableStage<T>;
 	limit(count: number): LimitedStage<T>;
 	offset(count: number): LimitedStage<T>;
 	filter(callback: (document: T) => boolean): ExecutableStage<T>;

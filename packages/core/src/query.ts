@@ -30,7 +30,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 	implements ExecutableStage<T>, WhereStage<T>, WhereStageNested<T, any>
 {
 	private results: T[] | null = null;
-	private orderField: keyof T | null = null;
+	private orderField: keyof T | NestedKeyOf<T> | null = null;
 	private orderDirection: 'asc' | 'desc' = 'asc';
 	private limitCount: number | null = null;
 	private offsetCount: number = 0;
@@ -133,7 +133,7 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		return results;
 	}
 
-	sortBy(field: keyof T): OrderableStage<T> {
+	sortBy(field: keyof T | NestedKeyOf<T>): OrderableStage<T> {
 		this.orderField = field;
 		return this;
 	}
@@ -209,9 +209,15 @@ export class Query<T = any, PK extends keyof T = keyof T>
 		}
 
 		if (orderField) {
+			const fieldStr = String(orderField);
+			const isNested = fieldStr.includes('.');
 			documents.sort((a, b) => {
-				const aValue = a[orderField];
-				const bValue = b[orderField];
+				const aValue = isNested
+					? (getNestedValue(a as Record<string, unknown>, fieldStr) as any)
+					: (a as any)[fieldStr];
+				const bValue = isNested
+					? (getNestedValue(b as Record<string, unknown>, fieldStr) as any)
+					: (b as any)[fieldStr];
 				if (aValue < bValue) return orderDirection === 'asc' ? -1 : 1;
 				if (aValue > bValue) return orderDirection === 'asc' ? 1 : -1;
 				return 0;

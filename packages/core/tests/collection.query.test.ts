@@ -204,6 +204,23 @@ describe('Collection – Query pipeline', () => {
 			const names = sorted.map((u) => u.name);
 			expect(names).toEqual(['Alice', 'Bob', 'Cara', 'Daniel']);
 		});
+
+		test('sorts nested fields ascending and descending', () => {
+			const customStore = new Ramify().createStore<{
+				items: Schema<{ id: number; nested: { val: number } }, 'id'>;
+			}>({
+				items: { primaryKey: 'id' },
+			});
+			customStore.items.put({ id: 1, nested: { val: 50 } });
+			customStore.items.put({ id: 2, nested: { val: 10 } });
+			customStore.items.put({ id: 3, nested: { val: 30 } });
+
+			const asc = customStore.items.sortBy('nested.val').toArray();
+			expect(asc.map((i) => i.nested.val)).toEqual([10, 30, 50]);
+
+			const desc = customStore.items.sortBy('nested.val').reverse().toArray();
+			expect(desc.map((i) => i.nested.val)).toEqual([50, 30, 10]);
+		});
 	});
 
 	/* ================================================================== */

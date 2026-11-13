@@ -399,17 +399,20 @@ db.users.filter((u) => u.name.startsWith('A'));
 
 ### `sortBy(field)`
 
-Returns a query ordered by the specified field, this performs Js sorting under the hood.
+Returns a query ordered by the specified field. Supports both top-level and nested fields.
 
 **Example:**
 
 ```typescript
 db.users.sortBy('name').toArray();
+
+// Sort by nested field
+db.users.sortBy('stats.score').toArray();
 ```
 
 **Parameters:**
 
-- **`field`**: `keyof T` - The field to order by
+- **`field`**: `keyof T | NestedKeyOf<T>` - The field or nested path to order by
 
 **Returns:** `OrderableStage<T>` - An orderable query stage
 

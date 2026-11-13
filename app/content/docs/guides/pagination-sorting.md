@@ -11,11 +11,15 @@ Efficiently handle large datasets with Ramify JS's built-in pagination and sorti
 
 ## Sorting
 
-You can sort results in ascending or descending order using `sortBy()` and `reverse()`.
+You can sort results in ascending or descending order using `sortBy()` and `reverse()`. Both
+top-level and nested fields are supported.
 
 ```typescript
 // Sort by any field (ascending)
 const sorted = db.users.sortBy('age').toArray();
+
+// Sort by a nested field
+const byScore = db.users.sortBy('stats.score').toArray();
 
 // Sort in descending order
 const reversed = db.users.sortBy('age').reverse().toArray();

@@ -260,7 +260,7 @@ export class Collection<T = any, Pk extends keyof T = keyof T> {
 		this.toArray().forEach((element) => callback(element));
 	}
 
-	sortBy(field: keyof T): OrderableStage<T> {
+	sortBy(field: keyof T | NestedKeyOf<T>): OrderableStage<T> {
 		return new Query<T, Pk>(this, {}).sortBy(field);
 	}
 
